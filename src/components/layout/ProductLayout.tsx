@@ -2,12 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import ProductFilter from '../products/ProductFilter.tsx'
 import SortBy from '../products/SortBy.tsx'
-import LayoutChanger, { type LayoutMode } from '../products/LayoutChanger.tsx'
+import LayoutChanger from '../products/LayoutChanger.tsx'
 import ProductGrid from '../products/ProductGrid.tsx'
 import ProductCard from '../products/ProductCard.tsx'
 import { ProductCardSkeleton } from '../common/Skeletons'
 import { useProductStore } from '../../store/productStore'
 import { navigationDropdown } from '../../constants/navigation'
+import type {LayoutChangerMode as LayoutMode} from '../../types/allTypes'
 
 const ProductLayout: React.FC = () => {
   const { id } = useParams();
