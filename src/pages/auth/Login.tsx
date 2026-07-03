@@ -1,0 +1,183 @@
+import { MdOutlineAlternateEmail } from "react-icons/md";
+import { LuKeyRound } from "react-icons/lu";
+import { FiEye } from "react-icons/fi";
+import { FiEyeOff } from "react-icons/fi";
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form"
+import toast from 'react-hot-toast';
+import { loginUser, googleAuth as googleAuthApi } from '../../services/authService';
+import { setAuthToken } from '../../services/api';
+import { useAuthStore } from '../../store/authStore';
+import type { LoginInputs as Inputs } from '../../types/allTypes';
+
+
+const Login = () => {
+    const navigate = useNavigate();
+    const setToken = useAuthStore((state) => state.setToken);
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const googleButtonRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        document.title = "VivahStore | Login";
+    }, []);
+
+    const {
+        register,
+        handleSubmit,
+    } = useForm<Inputs>()
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleGoogleResponse = async (response: any) => {
+        if (!response?.credential) {
+            toast.error('Google login failed.');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const result = await googleAuthApi({ token: response.credential });
+            const { token, user, message } = result.data;
+            setToken(token, user.role, user);
+            setAuthToken(token);
+            toast.success(message || 'Logged in with Google successfully');
+            navigate('/');
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Google login failed';
+            toast.error(message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const initializeGoogleAuth = () => {
+        const google = (window as any).google;
+        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+        if (google?.accounts?.id && clientId) {
+            try {
+                google.accounts.id.cancel?.();
+            } catch {
+                // ignore if cancel is unavailable
+            }
+
+            google.accounts.id.initialize({
+                client_id: clientId,
+                callback: handleGoogleResponse,
+                ux_mode: 'popup',
+                credential_helper: 'none',
+            });
+
+            if (googleButtonRef.current) {
+                google.accounts.id.renderButton(googleButtonRef.current, {
+                    theme: 'outline',
+                    size: 'large',
+                    width: '100%',
+                });
+            }
+
+            return true;
+        }
+
+        return false;
+    };
+
+    useEffect(() => {
+        document.title = 'VivahStore | Login';
+
+        if (!initializeGoogleAuth()) {
+            const interval = window.setInterval(() => {
+                if (initializeGoogleAuth()) {
+                    window.clearInterval(interval);
+                }
+            }, 200);
+
+            return () => window.clearInterval(interval);
+        }
+    }, []);
+
+    const onSubmit: SubmitHandler<Inputs> = async (data) => {
+        setLoading(true);
+        try {
+            const response = await loginUser({ email: data.email, password: data.password });
+            const { token, user, message } = response.data;
+            setToken(token, user.role, user);
+            setAuthToken(token);
+            toast.success(message || 'Logged in successfully');
+            navigate('/');
+        } catch (error: any) {
+            const message = error?.response?.data?.message || 'Login failed';
+            toast.error(message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <div className="flex h-screen w-full bg-stone-50 relative">
+            <div className="w-full hidden md:inline-block">
+                <img className="h-full w-full object-cover" src="/Assets/login_wedding_banner.png" alt="login_wedding_banner" />
+            </div>
+
+
+            <div className="w-full flex flex-col items-center justify-center">
+
+                <form onSubmit={handleSubmit(onSubmit)} className="md:w-96 w-80 flex flex-col items-center justify-center">
+                    <Link to="/"><img className='w-50 mb-5' src="/Assets/Logo.svg" alt="Logo" /></Link>
+
+                    <h2 className="text-4xl text-stone-900 font-medium">Sign In</h2>
+                    <p className="text-sm text-stone-500/90 mt-3">Sign in to your account</p>
+
+                    <div ref={googleButtonRef} className="w-full mt-8" />
+
+                    <div className="flex items-center gap-4 w-full my-5">
+                        <div className="w-full h-px bg-stone-300/90"></div>
+                        <p className="w-full text-nowrap text-sm text-stone-500/90">or sign in with email</p>
+                        <div className="w-full h-px bg-stone-300/90"></div>
+                    </div>
+
+                    <div className="flex items-center mt-6 w-full bg-transparent border border-stone-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2">
+                        <MdOutlineAlternateEmail className="text-stone-500/80" />
+                        <input {...register("email", { required: "Email is required" })} type="email" placeholder="Email id" className="bg-transparent text-stone-700 placeholder-stone-500/80 outline-none text-sm w-full h-full" required />
+                    </div>
+
+                    <div className="flex items-center mt-6 w-full bg-transparent border border-stone-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2">
+                        <LuKeyRound className="text-stone-500/80" />
+                        <input {...register("password", { required: "Password is required" })}
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            className="bg-transparent text-stone-700 placeholder-stone-500/80 outline-none text-sm w-full h-full"
+                            required
+                        />
+                        {showPassword ? (
+                            <FiEye
+                                className="text-stone-500/80 mr-5 text-xl cursor-pointer"
+                                onClick={togglePasswordVisibility}
+                            />
+                        ) : (
+                            <FiEyeOff
+                                className="text-stone-500/80 mr-5 text-xl cursor-pointer"
+                                onClick={togglePasswordVisibility}
+                            />
+                        )}
+                    </div>
+
+                    <div className="w-full flex items-center justify-end mt-8 ">
+                        <a className="text-sm underline text-stone-500 hover:text-stone-600" href="#">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" disabled={loading} className="mt-8 w-full h-11 rounded-full text-white bg-[#E41F66] hover:scale-101 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                        {loading ? 'Signing in...' : 'Sign In'}
+                    </button>
+                    <p className="text-stone-500/90 text-sm mt-4">Don't have an account? <Link className="text-stone-700 hover:underline" to="/register">Sign Up</Link></p>
+                </form>
+            </div>
+        </div>
+    );
+}
+
+export default Login

@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+* {
+  font-family: "Outfit", sans-serif;
+}
+
+.mySwiper .swiper-button-next,
+.mySwiper .swiper-button-prev {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background-color: #E41F66;
+  color: white;
+  border-radius: 9999px;
+  transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.mySwiper .swiper-button-prev {
+  left: 15px;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.mySwiper .swiper-button-next {
+  right: 15px;
+}
+
+.mySwiper .swiper-button-next::after,
+.mySwiper .swiper-button-prev::after {
+  font-size: 1rem;
+  font-weight: 700;
+}
