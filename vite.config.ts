@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: env.VITE_API_URL,
+        target: "https://vivah-store-backend.onrender.com",
         changeOrigin: true,
         secure: false,
       },
