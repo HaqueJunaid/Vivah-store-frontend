@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
 const api = axios.create({
-  baseURL: "https://vivah-store-backend.onrender.com/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',

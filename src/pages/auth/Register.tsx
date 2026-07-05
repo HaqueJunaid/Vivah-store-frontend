@@ -67,6 +67,7 @@ const Register = () => {
                 callback: handleGoogleResponse,
                 ux_mode: 'popup',
                 credential_helper: 'none',
+                itp_support: true,
             });
 
             if (googleButtonRef.current) {
