@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import ScrollToTop from "./utils/ScrollToTop.tsx"; // Path to your helper file
+import ProgressBar from "./components/common/ProgressBar.tsx";
 import UserLayout from './components/layout/userLayout.tsx'
 import HomePage from './pages/home/HomePage.tsx'
 import Faqs from './pages/faqs/Faqs.tsx'
@@ -49,6 +50,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <ProgressBar />
       <Routes >
         <Route path="register" element={<Register />} />
         <Route path="verify-otp" element={<VerifyOTP />} />

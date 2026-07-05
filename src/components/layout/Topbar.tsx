@@ -27,7 +27,7 @@ const Topbar: React.FC = () => {
 
   return (
     <div className="w-full h-fit relative flex items-center justify-center bg-stone-900 text-stone-100 leading-none px-10 py-2.5 text-sm text-center">
-      <span>Shipping & 18% GST will be calculated at checkout.</span>
+      <span className='text-xs md:text-sm'>Shipping & 18% GST will be calculated at checkout.</span>
       <button
         onClick={handleClose}
         className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-100 hover:text-stone-300"
