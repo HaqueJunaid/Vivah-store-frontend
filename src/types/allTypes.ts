@@ -103,9 +103,10 @@ export interface Product {
 
 export interface ProductStore {
   products: Product[];
+  total: number;
   loading: boolean;
   error?: string;
-  fetchProducts: () => Promise<void>;
+  fetchProducts: (page?: number, limit?: number, append?: boolean) => Promise<void>;
   fetchProductsByCategory: (category: string) => Promise<void>;
   addProduct: (productData: FormData, onUploadProgress?: (progressEvent: any) => void) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;

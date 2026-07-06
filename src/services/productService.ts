@@ -2,7 +2,13 @@ import api from './api';
 
 import type { AxiosProgressEvent } from 'axios';
 
-export const getProducts = () => api.get('/products');
+export const getProducts = (page?: number, limit?: number) => {
+  const params = new URLSearchParams();
+  if (page) params.append('page', page.toString());
+  if (limit) params.append('limit', limit.toString());
+  const queryString = params.toString();
+  return api.get(`/products${queryString ? `?${queryString}` : ''}`);
+};
 export const getProductsByCategory = (category: string) => api.get(`/products/category/${encodeURIComponent(category)}`);
 export const createProduct = (
   productData: FormData,

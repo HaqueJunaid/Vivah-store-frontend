@@ -4,14 +4,19 @@ import type { Product, ProductStore } from '../types/allTypes';
 
 export const useProductStore = create<ProductStore>()((set) => ({
   products: [],
+  total: 0,
   loading: false,
   error: undefined,
-  fetchProducts: async () => {
+  fetchProducts: async (page?: number, limit?: number, append?: boolean) => {
     set({ loading: true, error: undefined });
 
     try {
-      const { data } = await getProducts();
-      set({ products: data.products || [], loading: false });
+      const { data } = await getProducts(page, limit);
+      set((state) => ({
+        products: append ? [...state.products, ...(data.products || [])] : (data.products || []),
+        total: data.total ?? (data.products || []).length,
+        loading: false,
+      }));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to load products.';
       set({ error: message, loading: false });
@@ -22,7 +27,11 @@ export const useProductStore = create<ProductStore>()((set) => ({
 
     try {
       const { data } = await getProductsByCategory(category);
-      set({ products: data.products || [], loading: false });
+      set({
+        products: data.products || [],
+        total: data.products?.length || 0,
+        loading: false,
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to load category products.';
       set({ error: message, loading: false });
