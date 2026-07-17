@@ -6,9 +6,11 @@ import AddAddressForm from '../../components/profile/AddAddressForm';
 import AddressPreview from '../../components/profile/AddressPreview';
 import OrderTable from '../../components/profile/OrderTable';
 import { WishList } from '../../components/wishlist/WishList';
-import { AddressSkeleton } from '../../components/common/Skeletons';
+import { AddressSkeleton, TableRowSkeleton } from '../../components/common/Skeletons';
 import { getAddresses, deleteAddress } from '../../services/addressService';
 import { getCurrentUser } from '../../services/authService';
+import { getMyOrders } from '../../services/orderService';
+import toast from 'react-hot-toast';
 import type { AddressItem } from '../../types/allTypes';
 import { useAuthStore } from '../../store/authStore';
 
@@ -25,6 +27,7 @@ const Profile = () => {
     const [addresses, setAddresses] = useState<AddressItem[]>([]);
     const [orders, setOrders] = useState<any[]>([]); // Dynamic order state
     const [loadingAddresses, setLoadingAddresses] = useState(false);
+    const [loadingOrders, setLoadingOrders] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     // Sync current user info from backend
@@ -57,6 +60,19 @@ const Profile = () => {
 
     useEffect(() => {
         fetchAddresses();
+        setLoadingOrders(true);
+        getMyOrders()
+            .then((res) => {
+                if (res.data.success) {
+                    setOrders(res.data.orders);
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to load user orders:", err);
+            })
+            .finally(() => {
+                setLoadingOrders(false);
+            });
     }, []);
 
     const handleDeleteAddress = async (id?: string) => {
@@ -66,10 +82,11 @@ const Profile = () => {
             const res = await deleteAddress(id);
             if (res.data.success) {
                 setAddresses(prev => prev.filter(a => a._id !== id));
+                toast.success("Address deleted successfully!");
             }
         } catch (err) {
             console.error("Failed to delete address:", err);
-            alert("Failed to delete address.");
+            toast.error("Failed to delete address.");
         }
     };
 
@@ -120,7 +137,35 @@ const Profile = () => {
                             <p>Hello <span className='font-semibold'>{user?.name || "User"}</span> (not <span className='font-semibold'>{user?.name || "User"}</span>? <button onClick={logout} className='hover:underline cursor-pointer'>Log Out</button>)</p>
                             <div className='mt-10'>
                                 <h2 className='mb-6 text-2xl leading-none'>Order History</h2>
-                                {!orders.length ? <p className='flex items-center gap-4 md:gap-2 bg-emerald-200 px-3 py-2 rounded-sm text-emerald-700'><MdDone className='size-4.5' /> <Link to={"/products"} className='font-semibold underline'>Make your first order.</Link> You haven't placed any orders yet.</p> : <OrderTable orders={orders} />}
+                                {loadingOrders ? (
+                                    <div className="border border-stone-200 rounded-lg overflow-x-auto bg-white">
+                                        <table className="w-full min-w-[600px] border-separate border-spacing-0">
+                                            <thead>
+                                                <tr className="bg-stone-200">
+                                                    <th className="px-3.5 py-2 text-start text-xs font-semibold text-stone-700 uppercase tracking-wider">Order ID</th>
+                                                    <th className="px-3.5 py-2 text-start text-xs font-semibold text-stone-700 uppercase tracking-wider">Product Name</th>
+                                                    <th className="px-3.5 py-2 text-start text-xs font-semibold text-stone-700 uppercase tracking-wider">Quantity</th>
+                                                    <th className="px-3.5 py-2 text-start text-xs font-semibold text-stone-700 uppercase tracking-wider">Price</th>
+                                                    <th className="px-3.5 py-2 text-start text-xs font-semibold text-stone-700 uppercase tracking-wider">Payment Method</th>
+                                                    <th className="px-3.5 py-2 text-start text-xs font-semibold text-stone-700 uppercase tracking-wider">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <TableRowSkeleton columns={6} />
+                                                <TableRowSkeleton columns={6} />
+                                                <TableRowSkeleton columns={6} />
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : !orders.length ? (
+                                    <p className='flex items-center gap-4 md:gap-2 bg-emerald-200 px-3 py-2 rounded-sm text-emerald-700'>
+                                        <MdDone className='size-4.5' /> 
+                                        <Link to={"/products"} className='font-semibold underline'>Make your first order.</Link> 
+                                        You haven't placed any orders yet.
+                                    </p>
+                                ) : (
+                                    <OrderTable orders={orders} />
+                                )}
                             </div>
                             <div className='mt-10'>
                                 <h2 className='mb-6 text-2xl leading-none'>Account Details</h2>

@@ -19,13 +19,21 @@ const OrderTable = ({orders}: {orders: any[]}) => {
         </thead>
         <tbody>
         {orders.map((order) => (
-            <tr key={order.orderId}>
-                <td className="px-3.5 py-2 text-start cursor-default">{order.orderId}</td>
-                <td onClick={() => navigate(`/orders/${order.orderId}`)} className="px-3.5 py-2 text-start hover:underline cursor-pointer">{order.productName}</td>
-                <td className="px-3.5 py-2 text-start cursor-default">{order.quantity}</td>
-                <td className="px-3.5 py-2 text-start cursor-default">{order.price}</td>
-                <td className="px-3.5 py-2 text-start cursor-default">{order.paymentMethod === "cod" ? "Cash On Delivery" : "Pre-Paid"}</td>
-                <td className="px-3.5 py-2 text-start cursor-default">{order.status === "delivered" ? <Badge text="Delivered" variant="delivered"/> : <Badge text="Pending" variant="pending"/>}</td>
+            <tr key={order._id}>
+                <td className="px-3.5 py-2 text-start cursor-default font-mono text-xs max-w-[120px] truncate">{order._id}</td>
+                <td onClick={() => navigate(`/orders/${order._id}`)} className="px-3.5 py-2 text-start hover:underline cursor-pointer text-[#E41F66] font-medium">
+                    {order.items?.[0]?.name || 'N/A'}
+                    {order.items?.length > 1 ? ` (+${order.items.length - 1} more)` : ''}
+                </td>
+                <td className="px-3.5 py-2 text-start cursor-default">{order.items?.reduce((total: number, item: any) => total + item.quantity, 0) || 0}</td>
+                <td className="px-3.5 py-2 text-start cursor-default font-semibold">₹{order.totalAmount?.toLocaleString()}</td>
+                <td className="px-3.5 py-2 text-start cursor-default uppercase text-xs">{order.paymentMethod === 'cod' ? 'Cash On Delivery' : 'Mock Payment'}</td>
+                <td className="px-3.5 py-2 text-start cursor-default">
+                    <Badge 
+                        text={order.status} 
+                        variant={order.status?.toLowerCase() === 'delivered' ? 'delivered' : 'pending'}
+                    />
+                </td>
             </tr>
         ))}
         </tbody>

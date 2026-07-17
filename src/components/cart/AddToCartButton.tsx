@@ -87,38 +87,39 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
     if (isInCart) {
         if (variant === 'luxury') {
             return (
-                <div className="flex flex-col sm:flex-row items-stretch gap-1.5 w-full">
-                    {/* Quantity Control */}
-                    <div className="flex-grow flex items-center justify-between border border-stone-900 bg-white text-stone-900 px-2.5 py-2 font-semibold text-[10px] sm:text-xs tracking-[0.15em] uppercase select-none">
+                <div className="flex items-center gap-1.5 w-full select-none">
+                    {/* Quantity Selector */}
+                    <div className="flex-grow flex items-center justify-between bg-stone-50 border border-stone-200 rounded-lg p-1">
                         <button
                             type="button"
                             onClick={() => handleUpdateQty(quantityInCart - 1)}
-                            className="px-2 py-0.5 hover:text-[#E41F66] transition cursor-pointer text-sm font-bold active:scale-90"
+                            className="flex items-center justify-center hover:bg-white border border-stone-150/50 rounded-full w-6.5 h-6.5 cursor-pointer transition-colors shadow-2xs active:scale-90"
                             aria-label="Decrease quantity"
                         >
-                            -
+                            <span className="text-stone-600 font-bold text-xs leading-none">-</span>
                         </button>
-                        <span className="text-stone-900 font-semibold text-[9px] sm:text-[10px]">
-                            Qty: {quantityInCart}
+                        <span className="text-stone-850 font-bold text-[10px] sm:text-xs">
+                            QTY: {quantityInCart}
                         </span>
                         <button
                             type="button"
                             onClick={() => handleUpdateQty(quantityInCart + 1)}
-                            className="px-2 py-0.5 hover:text-[#E41F66] transition cursor-pointer text-sm font-bold active:scale-90"
+                            className="flex items-center justify-center hover:bg-white border border-stone-150/50 rounded-full w-6.5 h-6.5 cursor-pointer transition-colors shadow-2xs active:scale-90"
                             aria-label="Increase quantity"
                         >
-                            +
+                            <span className="text-stone-600 font-bold text-xs leading-none">+</span>
                         </button>
                     </div>
 
-                    {/* Remove Action */}
+                    {/* Remove Button */}
                     <button
                         type="button"
                         onClick={handleRemove}
-                        className="flex items-center justify-center border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 px-3 py-2 font-semibold text-[9px] sm:text-[10px] tracking-[0.15em] uppercase transition duration-300 cursor-pointer active:scale-95"
+                        className="flex items-center justify-center border border-red-200 bg-red-50 hover:bg-red-100 text-red-650 hover:text-red-700 rounded-lg w-9 h-9 cursor-pointer transition-colors active:scale-95 shrink-0"
                         aria-label="Remove product from cart"
+                        title="Remove from cart"
                     >
-                        Remove
+                        <Trash2 className="size-4" />
                     </button>
                 </div>
             );
@@ -166,7 +167,7 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
         return (
             <button
                 type='button'
-                className='w-full flex flex-nowrap items-center justify-center gap-2 cursor-pointer text-[10px] sm:text-xs font-semibold tracking-[0.15em] uppercase py-3 border border-stone-900 bg-stone-900 text-stone-50 hover:bg-[#E41F66] hover:border-[#E41F66] transition-all duration-300 ease-in-out'
+                className='w-full flex flex-nowrap items-center justify-center gap-2 cursor-pointer text-[10px] sm:text-xs font-semibold tracking-[0.15em] uppercase py-3 border border-stone-900 bg-stone-900 text-stone-50 hover:bg-[#E41F66] hover:border-[#E41F66] rounded-lg transition-all duration-300 ease-in-out'
                 onClick={handleAddToCart}
             >
                 <ShoppingBag className="text-stone-50 hidden size-4 group-hover:inline-block group-hover:opacity-100 transition-all duration-300 ease-in-out" />

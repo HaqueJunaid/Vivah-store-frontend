@@ -93,11 +93,11 @@ const ProductContent: React.FC<ProductContentProps> = ({
             {/* Quantity selection */}
             <div className='flex flex-col gap-3 pb-6 border-b border-stone-200/80'>
                 <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Quantity</span>
-                <div className='flex items-center border border-stone-300 w-fit rounded-none bg-white'>
+                <div className='flex items-center border border-stone-300 w-fit rounded-xl bg-white overflow-hidden'>
                     <button 
                         type="button" 
                         onClick={() => handleQunatityChange('dec')} 
-                        className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-r border-stone-200'
+                        className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-r border-stone-250'
                     >
                         -
                     </button>
@@ -118,8 +118,8 @@ const ProductContent: React.FC<ProductContentProps> = ({
                     <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Upload Custom Image</span>
                     {uploadedImage ? (
                         <div className='flex flex-col items-start gap-3 w-80'>
-                            <div className='border border-stone-200 rounded-none p-1 bg-white relative group'>
-                                <img src={uploadedImage} alt='Uploaded preview' className='w-auto h-48 object-cover' />
+                            <div className='border border-stone-200 rounded-2xl p-1 bg-white relative group overflow-hidden'>
+                                <img src={uploadedImage} alt='Uploaded preview' className='w-auto h-48 object-cover rounded-xl' />
                                 <button
                                     type='button'
                                     onClick={clearUploadedImage}
@@ -131,7 +131,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
                             </div>
                         </div>
                     ) : (
-                        <label htmlFor="fileInput" className="flex flex-col items-center gap-3 p-8 border border-stone-300 hover:border-[#E41F66]/50 border-dashed rounded-none w-full max-w-md text-sm transition-colors cursor-pointer bg-white group">
+                        <label htmlFor="fileInput" className="flex flex-col items-center gap-3 p-8 border border-stone-300 hover:border-[#E41F66]/50 border-dashed rounded-2xl w-full max-w-md text-sm transition-colors cursor-pointer bg-white group">
                             <svg className="size-8 text-stone-400 group-hover:text-[#E41F66] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
@@ -160,13 +160,13 @@ const ProductContent: React.FC<ProductContentProps> = ({
                                 type="button"
                                 key={index} 
                                 onClick={() => { setActiveVariant(index); handleVariantChange(index); }} 
-                                className={`relative flex flex-col items-center gap-1.5 bg-white p-0.5 border transition-all duration-300 cursor-pointer rounded-none ${
+                                className={`relative flex flex-col items-center gap-1.5 bg-white p-0.5 border transition-all duration-300 cursor-pointer rounded-xl ${
                                     activeVariant === index 
                                         ? 'border-[#E41F66] ring-1 ring-[#E41F66]/30' 
                                         : 'border-stone-200 hover:border-stone-400'
                                 }`}
                             >
-                                <img src={variant.images[0]} alt={variant.name} className='w-16 h-20 object-cover' />
+                                <img src={variant.images[0]} alt={variant.name} className='w-16 h-20 object-cover rounded-lg' />
                                 <span className='text-[10px] tracking-wide text-stone-600 px-1 py-0.5'>{variant.name}</span>
                             </button>
                         ))}
@@ -193,7 +193,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
                                         placeholder={config.placeholder} 
                                         value={customizations[key] || ''} 
                                         onChange={(e) => handleCustomizationChange(key, e.target.value)} 
-                                        className='p-3 border border-stone-200 focus:border-[#E41F66] rounded-none outline-none text-sm transition bg-white' 
+                                        className='p-3 border border-stone-200 focus:border-[#E41F66] rounded-xl outline-none text-sm transition bg-white' 
                                     />
                                 </div>
                             );

@@ -47,7 +47,14 @@ const DetailProduct: React.FC = () => {
         variants: dbProduct.hasVariants 
             ? [
                 {
-                    name: dbProduct.variantTitle || "Default",
+                    name: "Default",
+                    images: dbProduct.imageUrls && dbProduct.imageUrls.length > 0
+                        ? dbProduct.imageUrls
+                        : ['https://picsum.photos/600/500'],
+                    inStock: (dbProduct.quantity ?? 0) > 0
+                },
+                {
+                    name: dbProduct.variantTitle || "Variant",
                     images: dbProduct.variantImages && dbProduct.variantImages.length > 0 
                         ? dbProduct.variantImages 
                         : (dbProduct.imageUrls && dbProduct.imageUrls.length > 0 ? dbProduct.imageUrls : ['https://picsum.photos/600/500']),
@@ -72,20 +79,20 @@ const DetailProduct: React.FC = () => {
             <div className='relative bg-stone-50 w-full min-h-screen py-10 sm:py-16'>
                 <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start'>
                     <div className="w-full space-y-4">
-                        <Skeleton className="w-full aspect-[4/5] md:aspect-square rounded-none" />
+                        <Skeleton className="w-full aspect-[4/5] md:aspect-square rounded-2xl" />
                         <div className="flex gap-2.5">
-                            <Skeleton className="w-20 h-24 rounded-none" />
-                            <Skeleton className="w-20 h-24 rounded-none" />
-                            <Skeleton className="w-20 h-24 rounded-none" />
+                            <Skeleton className="w-20 h-24 rounded-xl" />
+                            <Skeleton className="w-20 h-24 rounded-xl" />
+                            <Skeleton className="w-20 h-24 rounded-xl" />
                         </div>
                     </div>
                     <div className="w-full space-y-6 pt-2">
-                        <Skeleton className="w-1/4 h-3.5 rounded-none" />
-                        <Skeleton className="w-3/4 h-8 rounded-none" />
-                        <Skeleton className="w-1/3 h-6 rounded-none" />
-                        <Skeleton className="w-1/2 h-5 rounded-none" />
-                        <Skeleton className="w-full h-32 rounded-none" />
-                        <Skeleton className="w-full h-12 rounded-none" />
+                        <Skeleton className="w-1/4 h-3.5 rounded-lg" />
+                        <Skeleton className="w-3/4 h-8 rounded-xl" />
+                        <Skeleton className="w-1/3 h-6 rounded-lg" />
+                        <Skeleton className="w-1/2 h-5 rounded-lg" />
+                        <Skeleton className="w-full h-32 rounded-2xl" />
+                        <Skeleton className="w-full h-12 rounded-xl" />
                     </div>
                 </div>
             </div>

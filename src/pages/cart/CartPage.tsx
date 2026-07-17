@@ -6,19 +6,24 @@ import { AddressSkeleton } from '../../components/common/Skeletons';
 import { useCartStore } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
 import { getAddresses } from '../../services/addressService';
+import { createOrder } from '../../services/orderService';
+import toast from 'react-hot-toast';
 import type { AddressItem } from '../../types/allTypes';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CartPage = () => {
     const { user } = useAuthStore();
     const cartItems = useCartStore((state) => state.cartItems);
     const updateCartItemQuantity = useCartStore((state) => state.updateCartItemQuantity);
+    const clearCart = useCartStore((state) => state.clearCart);
+    const navigate = useNavigate();
 
     const [addresses, setAddresses] = useState<AddressItem[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [showAddForm, setShowAddForm] = useState(false);
     const [loadingAddresses, setLoadingAddresses] = useState(false);
+    const [checkingOut, setCheckingOut] = useState(false);
 
     useEffect(() => {
         document.title = "VivahStore | Cart";
@@ -59,6 +64,45 @@ const CartPage = () => {
 
     const subtotal = useCartStore((state) => state.getCartTotal());
     const selectedAddress = addresses.find((a) => a._id === selectedAddressId) || addresses[0];
+
+    const handleCheckout = async () => {
+        if (!user) {
+            toast.error("Please sign in to complete your checkout.");
+            navigate("/login");
+            return;
+        }
+
+        if (cartItems.length === 0) {
+            toast.error("Your cart is empty.");
+            return;
+        }
+
+        if (!selectedAddressId) {
+            toast.error("Please select or add a shipping address.");
+            return;
+        }
+
+        setCheckingOut(true);
+        try {
+            const res = await createOrder({
+                addressId: selectedAddressId,
+                paymentMethod: 'mock'
+            });
+
+            if (res.data.success) {
+                toast.success("Order placed successfully!");
+                clearCart();
+                navigate(`/orders/${res.data.order._id}`);
+            } else {
+                toast.error(res.data.message || "Failed to place order.");
+            }
+        } catch (err: any) {
+            console.error("Checkout error:", err);
+            toast.error(err.response?.data?.message || "Failed to place order.");
+        } finally {
+            setCheckingOut(false);
+        }
+    };
 
     return (
         <div className="bg-stone-50 min-h-screen">
@@ -167,7 +211,11 @@ const CartPage = () => {
                     </div>
 
                     {/* Order Summary */}
-                    <OrderSummary subtotal={subtotal} />
+                    <OrderSummary 
+                        subtotal={subtotal} 
+                        onCheckout={handleCheckout} 
+                        disabled={checkingOut || cartItems.length === 0} 
+                    />
                 </div>
             </div>
         </div>

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { X } from "lucide-react";
 import { navigationDropdown } from "../../constants/navigation";
+import toast from 'react-hot-toast';
 import type { ProductFormInputs as Product, ProductEditFormProps } from "../../types/allTypes";
-
 
 const CUSTOMIZATION_OPTIONS = [
   { label: "Custom Image Uploader", value: "customImage" },
@@ -35,6 +35,11 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
   const [customizationSlots, setCustomizationSlots] = useState<string[]>([]);
   const [customizationError, setCustomizationError] = useState<string | null>(null);
 
+  // Variant image states
+  const [variantImagePreviews, setVariantImagePreviews] = useState<string[]>([]);
+  const [variantObjectUrls, setVariantObjectUrls] = useState<string[]>([]);
+  const [selectedVariantFiles, setSelectedVariantFiles] = useState<File[]>([]);
+
   const validateCustomizationSlots = React.useCallback((slots: string[]) => {
     const filled = slots.filter((s) => s !== "");
     const hasDuplicates = new Set(filled).size !== filled.length;
@@ -61,6 +66,15 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
     });
     setImagePreviews([]);
     setSelectedFiles([]);
+  }, []);
+
+  const clearVariantImagePreviews = React.useCallback(() => {
+    setVariantObjectUrls((prevUrls) => {
+      prevUrls.forEach(URL.revokeObjectURL);
+      return [];
+    });
+    setVariantImagePreviews([]);
+    setSelectedVariantFiles([]);
   }, []);
 
   const handleImageChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,18 +104,38 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
     });
   }, []);
 
-  useEffect(() => {
-    if (selectedCategory && selectedCategory !== productToEdit?.category) {
-      setValue("subCategory", "");
-    }
-  }, [selectedCategory, setValue, productToEdit]);
+  const handleVariantImageChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files ? Array.from(event.target.files) : [];
+    setSelectedVariantFiles((prev) => [...prev, ...files]);
+    const urls = files.map((file) => URL.createObjectURL(file));
+
+    setVariantObjectUrls((prev) => [...prev, ...urls]);
+    setVariantImagePreviews((prev) => [...prev, ...urls]);
+  }, []);
+
+  const handleRemoveVariantImage = React.useCallback((idxToRemove: number) => {
+    setVariantImagePreviews((prevPreviews) => {
+      const srcToRemove = prevPreviews[idxToRemove];
+      if (srcToRemove && srcToRemove.startsWith('blob:')) {
+        setVariantObjectUrls((prevUrls) => {
+          const blobIdx = prevUrls.indexOf(srcToRemove);
+          if (blobIdx !== -1) {
+            URL.revokeObjectURL(srcToRemove);
+            setSelectedVariantFiles((prevFiles) => prevFiles.filter((_, i) => i !== blobIdx));
+            return prevUrls.filter((_, i) => i !== blobIdx);
+          }
+          return prevUrls;
+        });
+      }
+      return prevPreviews.filter((_, i) => i !== idxToRemove);
+    });
+  }, []);
 
   useEffect(() => {
     if (isOpen && productToEdit) {
       const matchedCategory = navigationDropdown.find(
         (item) => item.title.toLowerCase() === productToEdit.category?.toLowerCase()
-      )?.title || productToEdit.category || "Assets";
-
+      )?.title || "Assets";
       const categoryItem = navigationDropdown.find(
         (item) => item.title.toLowerCase() === matchedCategory.toLowerCase()
       );
@@ -113,9 +147,6 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
         ...productToEdit,
         category: matchedCategory,
         subCategory: matchedSubCategory,
-        variantImages: Array.isArray(productToEdit.variantImages)
-          ? productToEdit.variantImages.join(', ')
-          : productToEdit.variantImages || "",
         isCustomizable: !!productToEdit.isCustomizable,
       };
       reset(normalized);
@@ -130,6 +161,19 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
       }
       setSelectedFiles([]);
       setObjectUrls([]);
+
+      // Prepopulate variants
+      if (productToEdit.variantImages) {
+        setVariantImagePreviews(
+          Array.isArray(productToEdit.variantImages) 
+            ? productToEdit.variantImages 
+            : [productToEdit.variantImages]
+        );
+      } else {
+        setVariantImagePreviews([]);
+      }
+      setSelectedVariantFiles([]);
+      setVariantObjectUrls([]);
     }
   }, [isOpen, productToEdit, reset]);
 
@@ -143,12 +187,30 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
     if (data.subCategory) {
       formData.append("subCategory", data.subCategory);
     }
+    
+    // Variant info
     formData.append("hasVariants", String(data.hasVariants));
-    if (data.hasVariants && data.variantTitle) {
+    if (data.hasVariants) {
+      if (!data.variantTitle) {
+        toast.error("Variant title is required.");
+        return;
+      }
+      if (variantImagePreviews.length === 0) {
+        toast.error("Please upload at least one variant image.");
+        return;
+      }
       formData.append("variantTitle", data.variantTitle);
-    }
-    if (data.hasVariants && data.variantImages) {
-      formData.append("variantImages", data.variantImages);
+      
+      // Existing URLs
+      const existingVariantUrls = variantImagePreviews.filter(url => !url.startsWith('blob:'));
+      existingVariantUrls.forEach(url => {
+        formData.append("variantImages", url);
+      });
+      
+      // New selected files
+      selectedVariantFiles.forEach((file) => {
+        formData.append("variantImages", file);
+      });
     }
 
     formData.append("isCustomizable", String(data.isCustomizable));
@@ -178,6 +240,7 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
         setUploadProgress(progress);
       });
       clearImagePreviews();
+      clearVariantImagePreviews();
       reset();
       onClose();
     } catch (err: any) {
@@ -194,13 +257,14 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
       <div 
         className="absolute inset-0 bg-stone-950/40 backdrop-blur-xs" 
         onClick={() => {
-          if (isUploading) return;
-          onClose();
-          reset();
+          if (!isUploading) {
+            onClose();
+            reset();
+          }
         }} 
       />
-      <div className="relative z-10 w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-3xl border border-stone-200 bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl border border-stone-200 shadow-2xl p-6 overflow-y-auto max-h-[90vh] z-10">
+        <div className="flex justify-between items-center pb-3 border-b border-stone-100">
           <h2 className="text-xl font-semibold text-stone-900">
             Edit Product
           </h2>
@@ -223,6 +287,7 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
             <select
               disabled={isUploading}
               {...register("category", { required: "Category is required" })}
+              defaultValue="Assets"
               className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm text-stone-700 outline-none focus:border-stone-900 focus:bg-white transition-all disabled:opacity-60"
             >
               <option value="Assets">Assets</option>
@@ -296,17 +361,30 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">Variant Images</label>
-                <textarea
-                  rows={3}
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
                   disabled={isUploading}
-                  {...register("variantImages", {
-                    required: hasVariants ? "Variant images are required" : false,
-                  })}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm text-stone-700 outline-none focus:border-stone-900 focus:bg-white transition-all resize-none disabled:opacity-60"
-                  placeholder="Add image URLs separated by commas"
+                  onChange={handleVariantImageChange}
+                  className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm text-stone-700 outline-none file:text-stone-700 file:bg-white file:border file:border-stone-200 file:rounded-md file:px-3 file:py-2 disabled:opacity-60"
                 />
-                {errors.variantImages && (
-                  <p className="text-red-500 text-xs mt-1">{errors.variantImages.message}</p>
+                {variantImagePreviews.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    {variantImagePreviews.map((src, idx) => (
+                      <div key={`${src}-${idx}`} className="group relative h-20 rounded-xl overflow-hidden border border-stone-200 bg-stone-100">
+                        <img src={src} alt={`Variant Preview ${idx + 1}`} className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          disabled={isUploading}
+                          onClick={() => handleRemoveVariantImage(idx)}
+                          className="absolute top-1 right-1 bg-stone-900/80 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer hover:bg-stone-950"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </>
@@ -370,7 +448,7 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
                           setCustomizationSlots(nextSlots);
                           validateCustomizationSlots(nextSlots);
                         }}
-                        className="w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 outline-none focus:border-stone-900 transition-all"
+                        className="w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 outline-none focus:border-stone-950 transition-all"
                       >
                         <option value="">Select customization option</option>
                         {CUSTOMIZATION_OPTIONS.map((opt) => (

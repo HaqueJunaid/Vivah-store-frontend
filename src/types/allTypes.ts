@@ -11,7 +11,9 @@ export interface CartItem {
 }
 
 export interface OrderSummaryProps {
-    subtotal: number
+    subtotal: number;
+    onCheckout?: () => void;
+    disabled?: boolean;
 }
 
 export interface CartItemProps {
@@ -106,7 +108,7 @@ export interface ProductStore {
   total: number;
   loading: boolean;
   error?: string;
-  fetchProducts: (page?: number, limit?: number, append?: boolean) => Promise<void>;
+  fetchProducts: (page?: number, limit?: number, append?: boolean, search?: string, category?: string, stockStatus?: string, sortBy?: string) => Promise<void>;
   fetchProductsByCategory: (category: string) => Promise<void>;
   addProduct: (productData: FormData, onUploadProgress?: (progressEvent: any) => void) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;

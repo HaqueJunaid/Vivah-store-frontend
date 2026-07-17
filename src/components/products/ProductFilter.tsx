@@ -158,7 +158,7 @@ const ProductFilterSideBar: React.FC = () => {
                         <button
                             type="button"
                             onClick={handleClearFilters}
-                            className="w-full flex items-center justify-center gap-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 px-4 py-2.5 rounded-none text-xs font-semibold uppercase tracking-wider text-rose-700 transition cursor-pointer"
+                            className="w-full flex items-center justify-center gap-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider text-rose-700 transition cursor-pointer"
                         >
                             <X className="size-3.5 text-rose-700" />
                             <span>Clear All Filters</span>

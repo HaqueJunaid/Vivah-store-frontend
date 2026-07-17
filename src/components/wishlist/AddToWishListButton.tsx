@@ -51,7 +51,7 @@ const AddToWishListButton = ({ id, title, price, imageUrl, variant = 'default' }
         return (
             <button
                 type='button'
-                className='flex items-center justify-center border border-stone-300 hover:border-[#E41F66] text-stone-900 px-5 transition-all duration-300 cursor-pointer shrink-0 rounded-none bg-white hover:text-[#E41F66] active:scale-95'
+                className='flex items-center justify-center border border-stone-300 hover:border-[#E41F66] text-stone-900 px-5 transition-all duration-300 cursor-pointer shrink-0 rounded-lg bg-white hover:text-[#E41F66] active:scale-95'
                 onClick={toggleWishlist}
                 aria-label='Wishlist'
             >

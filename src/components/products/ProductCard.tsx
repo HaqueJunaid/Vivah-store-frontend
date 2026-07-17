@@ -16,9 +16,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 
   if (layout === 'list') {
     return (
-      <div className='group relative flex flex-row items-stretch bg-white border border-stone-200/50 hover:border-[#E41F66] rounded-none overflow-hidden shadow-xs hover:shadow-[#E41F66] transition-all duration-500 ease-out w-full gap-4 md:gap-6 p-4 md:p-5'>
+      <div className='group relative flex flex-row items-stretch bg-white border border-stone-200/40 hover:border-[#E41F66]/30 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-500 ease-out w-full gap-4 md:gap-6 p-4 md:p-5'>
         {/* Image Section */}
-        <div className='relative w-32 sm:w-48 md:w-56 shrink-0 aspect-square overflow-hidden bg-stone-50 border border-stone-100'>
+        <div className='relative w-32 sm:w-48 md:w-56 shrink-0 aspect-square overflow-hidden bg-stone-50 border border-stone-150 rounded-xl'>
           <Link to={`/products/${id}/details`} className='block w-full h-full'>
             <img
               src={imageUrl}
@@ -47,17 +47,17 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
         {/* Info Section */}
         <div className='flex flex-col justify-between flex-grow py-1 sm:py-2'>
           <div className='space-y-1.5'>
-            <span className='text-[8px] sm:text-[9px] uppercase tracking-[0.2em] text-stone-400 font-medium block'>
-              Vivah Store
+            <span className='text-[10px] uppercase tracking-[0.25em] text-[#E41F66]/70 font-semibold block'>
+              VIVAH STORE
             </span>
 
             <Link to={`/products/${id}/details`} className='block group/title'>
-              <h3 className='text-stone-900 font-medium text-sm sm:text-base md:text-lg tracking-wide line-clamp-2 group-hover/title:text-[#E41F66] transition-colors duration-300'>
+              <h3 className='text-stone-900 font-bold text-base sm:text-lg md:text-xl tracking-wide line-clamp-2 group-hover/title:text-[#E41F66] transition-colors duration-300'>
                 {title}
               </h3>
             </Link>
 
-            <p className='text-stone-900 font-semibold text-xs sm:text-sm md:text-base tracking-wide'>
+            <p className='text-stone-950 font-extrabold text-sm sm:text-base md:text-lg tracking-wide'>
               ₹{formattedPrice}
             </p>
           </div>
@@ -74,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
   }
 
   return (
-    <div className='group relative flex flex-col h-full bg-white border border-stone-200/50 hover:border-[#E41F66]/30 rounded-none overflow-hidden shadow-xs hover:shadow-[0_12px_24px_rgba(0,0,0,0.04)] transition-all duration-500 ease-out'>
+    <div className='group relative flex flex-col h-full bg-white border border-stone-200/40 hover:border-[#E41F66]/20 rounded-2xl overflow-hidden shadow-xs hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500 ease-out'>
       {/* Image container */}
       <div className='relative w-full aspect-square overflow-hidden bg-stone-50 border-b border-stone-100'>
         <Link to={`/products/${id}/details`} className='block w-full h-full'>
@@ -107,19 +107,19 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
       {/* Product Info Section */}
       <div className='p-4 md:p-5 flex flex-col flex-grow'>
         {/* Collection Subtitle */}
-        <span className='text-[9px] uppercase tracking-[0.2em] text-stone-400 font-medium mb-1.5 block'>
-          Vivah Store
+        <span className='text-[10px] uppercase tracking-[0.25em] text-[#E41F66]/70 font-semibold mb-1.5 block'>
+          VIVAH STORE
         </span>
 
         {/* Product Title */}
         <Link to={`/products/${id}/details`} className='block mb-1 group/title'>
-          <h3 className='text-stone-900 font-medium text-sm md:text-[15px] tracking-wide line-clamp-1 group-hover/title:text-[#E41F66] transition-colors duration-300'>
+          <h3 className='text-stone-900 font-bold text-sm md:text-base tracking-wide line-clamp-1 group-hover/title:text-[#E41F66] transition-colors duration-300'>
             {title}
           </h3>
         </Link>
 
         {/* Price */}
-        <p className='text-stone-900 font-semibold text-xs md:text-sm tracking-wide mb-4'>
+        <p className='text-stone-950 font-extrabold text-sm md:text-base tracking-wide mb-4'>
           ₹{formattedPrice}
         </p>
 

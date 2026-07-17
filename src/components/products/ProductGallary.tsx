@@ -27,20 +27,20 @@ const ProductGallary: React.FC<{ images: string[], mainImage: string, handleVari
                             type="button"
                             key={image + i}
                             onClick={() => handleThumbnailClick?.(i)}
-                            className={`w-18 h-22 shrink-0 overflow-hidden border transition-all duration-300 cursor-pointer rounded-none bg-white p-0.5 ${
+                            className={`w-18 h-22 shrink-0 overflow-hidden border transition-all duration-300 cursor-pointer rounded-xl bg-white p-0.5 ${
                                 mainImage === image
                                     ? "border-[#E41F66] ring-1 ring-[#E41F66]/30"
                                     : "border-stone-200 hover:border-stone-400"
                             }`}
                         >
-                            <img src={image} alt={`Thumbnail ${i + 1}`} className='w-full h-full object-center object-cover' />
+                            <img src={image} alt={`Thumbnail ${i + 1}`} className='w-full h-full object-center object-cover rounded-xl' />
                         </button>
                     ))}
                 </div>
             )}
             <div
                 ref={containerRef}
-                className='w-full aspect-[4/5] md:aspect-square overflow-hidden cursor-zoom-in border border-stone-200/50 bg-white rounded-none relative'
+                className='w-full aspect-[4/5] md:aspect-square overflow-hidden cursor-zoom-in border border-stone-200/50 bg-white rounded-2xl relative'
                 onMouseMove={handleMouseMove}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}

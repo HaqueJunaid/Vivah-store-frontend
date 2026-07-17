@@ -7,11 +7,19 @@ export const useProductStore = create<ProductStore>()((set) => ({
   total: 0,
   loading: false,
   error: undefined,
-  fetchProducts: async (page?: number, limit?: number, append?: boolean) => {
+  fetchProducts: async (
+    page?: number,
+    limit?: number,
+    append?: boolean,
+    search?: string,
+    category?: string,
+    stockStatus?: string,
+    sortBy?: string
+  ) => {
     set({ loading: true, error: undefined });
 
     try {
-      const { data } = await getProducts(page, limit);
+      const { data } = await getProducts(page, limit, search, category, stockStatus, sortBy);
       set((state) => ({
         products: append ? [...state.products, ...(data.products || [])] : (data.products || []),
         total: data.total ?? (data.products || []).length,

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { X } from "lucide-react";
 import { navigationDropdown } from "../../constants/navigation";
+import toast from 'react-hot-toast';
 import type { ProductFormInputs as Product, ProductAddFormProps } from "../../types/allTypes";
-
 
 const CUSTOMIZATION_OPTIONS = [
   { label: "Custom Image Uploader", value: "customImage" },
@@ -34,6 +34,11 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
   const [customizationSlots, setCustomizationSlots] = useState<string[]>([]);
   const [customizationError, setCustomizationError] = useState<string | null>(null);
 
+  // Variant image states
+  const [variantImagePreviews, setVariantImagePreviews] = useState<string[]>([]);
+  const [variantObjectUrls, setVariantObjectUrls] = useState<string[]>([]);
+  const [selectedVariantFiles, setSelectedVariantFiles] = useState<File[]>([]);
+
   const validateCustomizationSlots = React.useCallback((slots: string[]) => {
     const filled = slots.filter((s) => s !== "");
     const hasDuplicates = new Set(filled).size !== filled.length;
@@ -60,6 +65,15 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
     });
     setImagePreviews([]);
     setSelectedFiles([]);
+  }, []);
+
+  const clearVariantImagePreviews = React.useCallback(() => {
+    setVariantObjectUrls((prevUrls) => {
+      prevUrls.forEach(URL.revokeObjectURL);
+      return [];
+    });
+    setVariantImagePreviews([]);
+    setSelectedVariantFiles([]);
   }, []);
 
   const handleImageChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,6 +103,33 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
     });
   }, []);
 
+  const handleVariantImageChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files ? Array.from(event.target.files) : [];
+    setSelectedVariantFiles((prev) => [...prev, ...files]);
+    const urls = files.map((file) => URL.createObjectURL(file));
+
+    setVariantObjectUrls((prev) => [...prev, ...urls]);
+    setVariantImagePreviews((prev) => [...prev, ...urls]);
+  }, []);
+
+  const handleRemoveVariantImage = React.useCallback((idxToRemove: number) => {
+    setVariantImagePreviews((prevPreviews) => {
+      const srcToRemove = prevPreviews[idxToRemove];
+      if (srcToRemove && srcToRemove.startsWith('blob:')) {
+        setVariantObjectUrls((prevUrls) => {
+          const blobIdx = prevUrls.indexOf(srcToRemove);
+          if (blobIdx !== -1) {
+            URL.revokeObjectURL(srcToRemove);
+            setSelectedVariantFiles((prevFiles) => prevFiles.filter((_, i) => i !== blobIdx));
+            return prevUrls.filter((_, i) => i !== blobIdx);
+          }
+          return prevUrls;
+        });
+      }
+      return prevPreviews.filter((_, i) => i !== idxToRemove);
+    });
+  }, []);
+
   useEffect(() => {
     if (selectedCategory) {
       setValue("subCategory", "");
@@ -108,7 +149,6 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
         subCategory: "",
         hasVariants: false,
         variantTitle: "",
-        variantImages: "",
         isCustomizable: false,
       });
       setCustomizationSlots([]);
@@ -116,26 +156,9 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
       setImagePreviews([]);
       setSelectedFiles([]);
       setObjectUrls([]);
-    } else {
-      reset({
-        id: "",
-        title: "",
-        description: "",
-        quantity: 0,
-        price: 0,
-        imageUrl: "",
-        category: "Assets",
-        subCategory: "",
-        hasVariants: false,
-        variantTitle: "",
-        variantImages: "",
-        isCustomizable: false,
-      });
-      setCustomizationSlots([]);
-      setCustomizationError(null);
-      setImagePreviews([]);
-      setSelectedFiles([]);
-      setObjectUrls([]);
+      setVariantImagePreviews([]);
+      setSelectedVariantFiles([]);
+      setVariantObjectUrls([]);
     }
   }, [isOpen, reset]);
 
@@ -149,12 +172,22 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
     if (data.subCategory) {
       formData.append("subCategory", data.subCategory);
     }
+    
+    // Variant info
     formData.append("hasVariants", String(data.hasVariants));
-    if (data.hasVariants && data.variantTitle) {
+    if (data.hasVariants) {
+      if (!data.variantTitle) {
+        toast.error("Variant title is required.");
+        return;
+      }
+      if (selectedVariantFiles.length === 0) {
+        toast.error("Please upload at least one variant image.");
+        return;
+      }
       formData.append("variantTitle", data.variantTitle);
-    }
-    if (data.hasVariants && data.variantImages) {
-      formData.append("variantImages", data.variantImages);
+      selectedVariantFiles.forEach((file) => {
+        formData.append("variantImages", file);
+      });
     }
 
     formData.append("isCustomizable", String(data.isCustomizable));
@@ -184,6 +217,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
         setUploadProgress(progress);
       });
       clearImagePreviews();
+      clearVariantImagePreviews();
       reset();
       onClose();
     } catch (err: any) {
@@ -200,13 +234,14 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
       <div 
         className="absolute inset-0 bg-stone-950/40 backdrop-blur-xs" 
         onClick={() => {
-          if (isUploading) return;
-          onClose();
-          reset();
+          if (!isUploading) {
+            onClose();
+            reset();
+          }
         }} 
       />
-      <div className="relative z-10 w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-3xl border border-stone-200 bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl border border-stone-200 shadow-2xl p-6 overflow-y-auto max-h-[90vh] z-10">
+        <div className="flex justify-between items-center pb-3 border-b border-stone-100">
           <h2 className="text-xl font-semibold text-stone-900">
             Add New Product
           </h2>
@@ -303,17 +338,30 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">Variant Images</label>
-                <textarea
-                  rows={3}
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
                   disabled={isUploading}
-                  {...register("variantImages", {
-                    required: hasVariants ? "Variant images are required" : false,
-                  })}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm text-stone-700 outline-none focus:border-stone-900 focus:bg-white transition-all resize-none disabled:opacity-60"
-                  placeholder="Add image URLs separated by commas"
+                  onChange={handleVariantImageChange}
+                  className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm text-stone-700 outline-none file:text-stone-700 file:bg-white file:border file:border-stone-200 file:rounded-md file:px-3 file:py-2 disabled:opacity-60"
                 />
-                {errors.variantImages && (
-                  <p className="text-red-500 text-xs mt-1">{errors.variantImages.message}</p>
+                {variantImagePreviews.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    {variantImagePreviews.map((src, idx) => (
+                      <div key={`${src}-${idx}`} className="group relative h-20 rounded-xl overflow-hidden border border-stone-200 bg-stone-100">
+                        <img src={src} alt={`Variant Preview ${idx + 1}`} className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          disabled={isUploading}
+                          onClick={() => handleRemoveVariantImage(idx)}
+                          className="absolute top-1 right-1 bg-stone-900/80 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer hover:bg-stone-950"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </>

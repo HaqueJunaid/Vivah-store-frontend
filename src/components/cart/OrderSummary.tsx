@@ -1,7 +1,7 @@
 import { Info } from "lucide-react"
 import type { OrderSummaryProps } from "../../types/allTypes";
 
-const OrderSummary = ({ subtotal }: OrderSummaryProps) => {
+const OrderSummary = ({ subtotal, onCheckout, disabled }: OrderSummaryProps) => {
     return (
         <div className="lg:col-span-1 ">
             <div className="top-8 sticky p-6 border border-stone-200 bg-white rounded-lg">
@@ -25,7 +25,11 @@ const OrderSummary = ({ subtotal }: OrderSummaryProps) => {
                     </div>
                 </div>
 
-                <button className="bg-black hover:bg-gray-800 mb-6 py-3 rounded-lg w-full font-semibold text-white transition-colors">
+                <button 
+                    onClick={onCheckout}
+                    disabled={disabled}
+                    className="bg-black hover:bg-gray-800 disabled:bg-gray-400 mb-6 py-3 rounded-lg w-full font-semibold text-white transition-colors cursor-pointer disabled:cursor-not-allowed"
+                >
                     Check Out
                 </button>
 

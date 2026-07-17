@@ -63,7 +63,7 @@ const WishListPage = () => {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {wishlistItems.map((item) => (
-              <div key={item.productId} className="group relative flex flex-col h-full bg-white border border-stone-200/50 hover:border-[#E41F66]/30 rounded-none overflow-hidden shadow-xs hover:shadow-[0_12px_24px_rgba(0,0,0,0.04)] transition-all duration-500 ease-out">
+              <div key={item.productId} className="group relative flex flex-col h-full bg-white border border-stone-200/40 hover:border-[#E41F66]/20 rounded-2xl overflow-hidden shadow-xs hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500 ease-out">
                 {/* Image Container with Hover Zoom & Floating Close */}
                 <div className="relative w-full aspect-square overflow-hidden bg-stone-50 border-b border-stone-100">
                   <Link to={`/products/${item.productId}/details`} className="block w-full h-full">
