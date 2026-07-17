@@ -133,7 +133,9 @@ const Register = () => {
                     <h2 className="text-4xl text-stone-900 font-medium">Sign up</h2>
                     <p className="text-sm text-stone-500/90 mt-3">Create an account to get started</p>
 
-                    <div ref={googleButtonRef} className="w-full mt-8" />
+                    <div className="flex items-center justify-center w-full mt-6">
+                        <div ref={googleButtonRef} className="w-full" />
+                    </div>
 
                     <div className="flex items-center gap-4 w-full my-5">
                         <div className="w-full h-px bg-stone-300/90"></div>
