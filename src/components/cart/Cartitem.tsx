@@ -73,7 +73,7 @@ const Cartitem = React.memo(({ cartItems, updateQuantity }: CartItemProps) => {
                                                     className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] text-xs px-2.5 py-0.5 rounded-md font-medium"
                                                 >
                                                     <span className="opacity-70 capitalize mr-1">{key.replace(/([A-Z])/g, ' $1')}:</span>
-                                                    <span className="font-semibold">{val}</span>
+                                                    <span className="font-semibold">{val as React.ReactNode}</span>
                                                 </span>
                                             ))}
                                         </div>
