@@ -97,7 +97,7 @@ const OrderDetail = () => {
           </div>
           <Badge
             text={order.status}
-            variant={order.status?.toLowerCase() === 'delivered' ? 'delivered' : 'pending'}
+            variant={order.status?.toLowerCase() as any}
           />
         </div>
 
@@ -110,7 +110,13 @@ const OrderDetail = () => {
               <div className='space-y-4'>
                 <div className='flex justify-between items-center'>
                   <div className='flex items-center gap-3'>
-                    <div className={`w-3 h-3 rounded-full ${order.status?.toLowerCase() === 'delivered' ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`}></div>
+                    <div className={`w-3 h-3 rounded-full ${
+                      order.status?.toLowerCase() === 'delivered' ? 'bg-green-500' :
+                      order.status?.toLowerCase() === 'cancelled' ? 'bg-red-500' :
+                      order.status?.toLowerCase() === 'processing' ? 'bg-blue-500 animate-pulse' :
+                      order.status?.toLowerCase() === 'shipped' ? 'bg-indigo-500 animate-pulse' :
+                      'bg-yellow-500 animate-pulse'
+                    }`}></div>
                     <span className='text-stone-700 font-medium capitalize'>
                       {order.status}
                     </span>
@@ -141,10 +147,15 @@ const OrderDetail = () => {
                           </span>
                         )}
                         {item.customizations && Object.entries(item.customizations).map(([k, v]: any) => (
-                          <span key={k} className="bg-stone-100 px-2 py-0.5 rounded text-stone-600">
-                            {k}: {v}
+                          <span key={k} className="bg-stone-100 px-2 py-0.5 rounded text-stone-600 capitalize">
+                            {k.replace(/([A-Z])/g, ' $1')}: {v}
                           </span>
                         ))}
+                        {item.uploadedImage && (
+                          <span className="bg-indigo-50 border border-indigo-150 px-2 py-0.5 rounded text-indigo-650 font-semibold">
+                            Custom Image Uploaded
+                          </span>
+                        )}
                       </div>
                       <p className='mt-2 font-semibold text-stone-900'>₹{item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                     </div>

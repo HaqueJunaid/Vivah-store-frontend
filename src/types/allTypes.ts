@@ -129,6 +129,8 @@ export interface cartItemInterface {
 
 export interface cartStoreInterface {
     cartItems: cartItemInterface[];
+    isHydrated: boolean;
+    setHydrated: (val: boolean) => void;
     addCartItem: (cartItem: cartItemInterface) => void;
     removeCartItem: (productId: string, customizations?: Record<string, string>, selectedVariant?: any) => void;
     updateCartItemQuantity: (productId: string, quantity: number, customizations?: Record<string, string>, selectedVariant?: any) => void;

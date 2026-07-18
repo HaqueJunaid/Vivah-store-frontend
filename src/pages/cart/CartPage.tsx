@@ -17,6 +17,7 @@ const CartPage = () => {
     const cartItems = useCartStore((state) => state.cartItems);
     const updateCartItemQuantity = useCartStore((state) => state.updateCartItemQuantity);
     const clearCart = useCartStore((state) => state.clearCart);
+    const syncWithBackend = useCartStore((state) => state.syncWithBackend);
     const navigate = useNavigate();
 
     const [addresses, setAddresses] = useState<AddressItem[]>([]);
@@ -84,6 +85,9 @@ const CartPage = () => {
 
         setCheckingOut(true);
         try {
+            // Synchronize cart with the backend to ensure it is not empty before creating the order
+            await syncWithBackend();
+
             const res = await createOrder({
                 addressId: selectedAddressId,
                 paymentMethod: 'mock'

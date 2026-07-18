@@ -77,6 +77,22 @@ const Orders = () => {
   const calcQty = (items: any[]) => items?.reduce((s, it) => s + it.quantity, 0) || 0;
   const totalPages = Math.ceil(total / limit) || 1;
 
+  const getStatusSelectClass = (status: string) => {
+    switch (status) {
+      case "Delivered":
+        return "border-green-300 bg-green-50 text-green-700 focus:border-green-500";
+      case "Cancelled":
+        return "border-red-300 bg-red-50 text-red-700 focus:border-red-500";
+      case "Processing":
+        return "border-blue-300 bg-blue-50 text-blue-700 focus:border-blue-500";
+      case "Shipped":
+        return "border-indigo-300 bg-indigo-50 text-indigo-700 focus:border-indigo-500";
+      case "Pending":
+      default:
+        return "border-yellow-350 bg-yellow-50 text-yellow-650 focus:border-yellow-500";
+    }
+  };
+
   return (
     <div className="p-5 w-full min-h-screen overflow-x-hidden bg-stone-50">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-3">
@@ -167,7 +183,7 @@ const Orders = () => {
                       <select
                         value={order.status}
                         onChange={(e) => updateStatus(order._id, e.target.value)}
-                        className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-semibold text-stone-700 focus:outline-none focus:border-[#E41F66] transition cursor-pointer"
+                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold focus:outline-none transition cursor-pointer ${getStatusSelectClass(order.status)}`}
                       >
                         <option value="Pending">Pending</option>
                         <option value="Processing">Processing</option>
@@ -220,7 +236,7 @@ const Orders = () => {
                   <select
                     value={order.status}
                     onChange={(e) => updateStatus(order._id, e.target.value)}
-                    className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1 text-xs font-semibold text-stone-700 focus:outline-none cursor-pointer"
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold focus:outline-none transition cursor-pointer ${getStatusSelectClass(order.status)}`}
                   >
                     <option value="Pending">Pending</option>
                     <option value="Processing">Processing</option>
@@ -310,17 +326,55 @@ const Orders = () => {
 
                 <div className="space-y-4">
                   {selectedOrder.items?.map((item: any, index: number) => (
-                    <div key={index} className="grid gap-4 rounded-3xl bg-white p-4 shadow-2xs border border-stone-100 sm:grid-cols-[1fr_auto]">
-                      <div>
-                        <p className="font-semibold text-stone-900">{item.name}</p>
+                    <div key={index} className="flex gap-4 rounded-3xl bg-white p-4 shadow-2xs border border-stone-100 items-start">
+                      {/* Image Thumbnail */}
+                      <div className="relative shrink-0 rounded-lg w-16 h-16 sm:w-20 sm:h-20 overflow-hidden border border-stone-150 bg-stone-50">
+                        <img
+                          src={item.uploadedImage || item.productImage || 'https://picsum.photos/600/500'}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      
+                      {/* Details */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-stone-900 truncate">{item.name}</p>
                         <p className="mt-1 text-xs text-stone-500">Qty: {item.quantity}</p>
                         {item.selectedVariant && (
-                          <p className="text-xs text-stone-400 mt-0.5">Variant: {typeof item.selectedVariant === 'string' ? item.selectedVariant : JSON.stringify(item.selectedVariant)}</p>
+                          <p className="text-xs text-stone-450 mt-1">
+                            <span className="font-medium bg-stone-100 px-2 py-0.5 rounded text-stone-600">
+                              Variant: {typeof item.selectedVariant === 'string' ? item.selectedVariant : JSON.stringify(item.selectedVariant)}
+                            </span>
+                          </p>
+                        )}
+                        {item.customizations && Object.entries(item.customizations).length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {Object.entries(item.customizations).map(([k, v]: any) => (
+                              <span key={k} className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] text-[10px] sm:text-xs px-2 py-0.5 rounded-md font-medium capitalize">
+                                <span className="opacity-70 capitalize mr-1">{k.replace(/([A-Z])/g, ' $1')}:</span>
+                                <span className="font-semibold">{v}</span>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {item.uploadedImage && (
+                          <div className="mt-2">
+                            <a 
+                              href={item.uploadedImage} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-indigo-650 hover:text-indigo-850 hover:underline font-semibold"
+                            >
+                              View Custom Uploaded Image
+                            </a>
+                          </div>
                         )}
                       </div>
-                      <div className="text-right">
+                      
+                      {/* Price Details */}
+                      <div className="text-right shrink-0">
                         <p className="text-xs text-stone-400 font-semibold">Unit price</p>
-                        <p className="mt-1 text-base font-bold text-stone-900">₹{item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                        <p className="mt-1 text-sm sm:text-base font-bold text-stone-900">₹{item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                   ))}

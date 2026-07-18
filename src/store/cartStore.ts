@@ -29,6 +29,8 @@ export const useCartStore = create<cartStoreInterface>()(
     persist(
         (set, get) => ({
             cartItems: [],
+            isHydrated: false,
+            setHydrated: (val) => set({ isHydrated: val }),
             addCartItem: (cartItem) => {
                 const normalizedItem: cartItemInterface = {
                     ...cartItem,
@@ -136,6 +138,13 @@ export const useCartStore = create<cartStoreInterface>()(
         }),
         {
             name: 'cart-storage',
+            onRehydrateStorage: (state) => {
+                return (state, error) => {
+                    if (!error) {
+                        state?.setHydrated(true);
+                    }
+                };
+            }
         }
     )
 );

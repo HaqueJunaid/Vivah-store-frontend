@@ -38,14 +38,15 @@ import { useCartStore } from './store/cartStore';
 
 const App = () => {
   const token = useAuthStore((state) => state.token);
+  const isHydrated = useCartStore((state) => state.isHydrated);
   const syncWithBackend = useCartStore((state) => state.syncWithBackend);
 
   useEffect(() => {
     setAuthToken(token ?? undefined);
-    if (token) {
+    if (token && isHydrated) {
       syncWithBackend();
     }
-  }, [token, syncWithBackend]);
+  }, [token, isHydrated, syncWithBackend]);
 
   return (
     <BrowserRouter>
