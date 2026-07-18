@@ -50,14 +50,22 @@ const Cartitem = React.memo(({ cartItems, updateQuantity }: CartItemProps) => {
                                 </h3>
 
                                 {/* Variant Badge */}
-                                {item.selectedVariant && (
-                                    <div className="mt-1.5 flex items-center gap-1.5 text-stone-500 text-xs font-semibold">
-                                        <Box className="w-3.5 h-3.5 text-stone-400" />
-                                        <span className="bg-stone-100 px-2.5 py-0.5 rounded-md border border-stone-250/50 text-stone-700 capitalize">
-                                            Variant: {typeof item.selectedVariant === 'string' ? item.selectedVariant : JSON.stringify(item.selectedVariant)}
-                                        </span>
-                                    </div>
-                                )}
+                                {item.selectedVariant && (() => {
+                                    const variant = item.selectedVariant;
+                                    const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
+                                    const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
+                                    return (
+                                        <div className="mt-1.5 flex items-center gap-1.5 text-stone-500 text-xs font-semibold">
+                                            <Box className="w-3.5 h-3.5 text-stone-400" />
+                                            <span className="inline-flex items-center gap-1.5 bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md text-stone-700 font-medium capitalize">
+                                                {imageUrl && (
+                                                    <img src={imageUrl} className="w-3.5 h-3.5 object-cover rounded-full border border-stone-300" alt={name} />
+                                                )}
+                                                <span>Variant: {name}</span>
+                                            </span>
+                                        </div>
+                                    );
+                                })()}
 
                                 {/* Customizations List */}
                                 {item.customizations && Object.entries(item.customizations).length > 0 && (

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import toast from 'react-hot-toast';
-import { Eye, SearchIcon, ShoppingCartIcon, ChevronLeft, ChevronRight } from "lucide-react";
-import { getAllOrdersAdmin, updateOrderStatus } from "../../services/orderService";
+import { Eye, SearchIcon, ShoppingCartIcon, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { getAllOrdersAdmin, updateOrderStatus, deleteOrder as deleteOrderApi } from "../../services/orderService";
 
 const Orders = () => {
   const [orders, setOrders] = useState<any[]>([]);
@@ -73,6 +73,28 @@ const Orders = () => {
       toast.error(err.response?.data?.message || "Failed to update order status.");
     }
   };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!window.confirm("Are you sure you want to delete this order? This will permanently remove the order data and all associated customization images.")) {
+      return;
+    }
+    try {
+      const res = await deleteOrderApi(orderId);
+      if (res.data.success) {
+        toast.success("Order deleted successfully!");
+        setOrders((prev) => prev.filter((o) => o._id !== orderId));
+        setTotal((t) => Math.max(0, t - 1));
+        const deletedOrder = orders.find((o) => o._id === orderId);
+        if (deletedOrder) {
+          setTotalRevenue((rev) => Math.max(0, rev - (deletedOrder.totalAmount || 0)));
+        }
+      }
+    } catch (err: any) {
+      console.error("Error deleting order:", err);
+      toast.error(err.response?.data?.message || "Failed to delete order.");
+    }
+  };
+
 
   const calcQty = (items: any[]) => items?.reduce((s, it) => s + it.quantity, 0) || 0;
   const totalPages = Math.ceil(total / limit) || 1;
@@ -192,7 +214,7 @@ const Orders = () => {
                         <option value="Cancelled">Cancelled</option>
                       </select>
                     </td>
-                    <td className="px-5 py-5 align-top text-right">
+                    <td className="px-5 py-5 align-top text-right flex justify-end gap-2">
                       <button
                         type="button"
                         className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition hover:border-[#E41F66] hover:text-[#E41F66] cursor-pointer shadow-2xs"
@@ -200,6 +222,20 @@ const Orders = () => {
                         onClick={() => handleDetailToggle(order._id)}
                       >
                         <Eye size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!['Delivered', 'Cancelled'].includes(order.status)}
+                        className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition shadow-2xs ${
+                          ['Delivered', 'Cancelled'].includes(order.status)
+                            ? "border-stone-200 bg-white text-red-500 hover:border-red-500 hover:bg-red-50 cursor-pointer"
+                            : "border-stone-100 bg-stone-50 text-stone-300 cursor-not-allowed"
+                        }`}
+                        aria-label="Delete order"
+                        onClick={() => handleDeleteOrder(order._id)}
+                        title={['Delivered', 'Cancelled'].includes(order.status) ? "Delete Order" : "Only fulfilled/cancelled orders can be deleted"}
+                      >
+                        <Trash2 size={16} />
                       </button>
                     </td>
                   </tr>
@@ -244,14 +280,30 @@ const Orders = () => {
                     <option value="Delivered">Delivered</option>
                     <option value="Cancelled">Cancelled</option>
                   </select>
-                  <button
-                    type="button"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition hover:border-[#E41F66] hover:text-[#E41F66] cursor-pointer"
-                    aria-label="Show order details"
-                    onClick={() => handleDetailToggle(order._id)}
-                  >
-                    <Eye size={16} />
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition hover:border-[#E41F66] hover:text-[#E41F66] cursor-pointer"
+                      aria-label="Show order details"
+                      onClick={() => handleDetailToggle(order._id)}
+                    >
+                      <Eye size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!['Delivered', 'Cancelled'].includes(order.status)}
+                      className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition ${
+                        ['Delivered', 'Cancelled'].includes(order.status)
+                          ? "border-stone-200 bg-white text-red-500 hover:border-red-500 hover:bg-red-50 cursor-pointer"
+                          : "border-stone-100 bg-stone-50 text-stone-300 cursor-not-allowed"
+                      }`}
+                      aria-label="Delete order"
+                      onClick={() => handleDeleteOrder(order._id)}
+                      title={['Delivered', 'Cancelled'].includes(order.status) ? "Delete Order" : "Only fulfilled/cancelled orders can be deleted"}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -340,13 +392,21 @@ const Orders = () => {
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-stone-900 truncate">{item.name}</p>
                         <p className="mt-1 text-xs text-stone-500">Qty: {item.quantity}</p>
-                        {item.selectedVariant && (
-                          <p className="text-xs text-stone-450 mt-1">
-                            <span className="font-medium bg-stone-100 px-2 py-0.5 rounded text-stone-600">
-                              Variant: {typeof item.selectedVariant === 'string' ? item.selectedVariant : JSON.stringify(item.selectedVariant)}
-                            </span>
-                          </p>
-                        )}
+                        {item.selectedVariant && (() => {
+                          const variant = item.selectedVariant;
+                          const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
+                          const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
+                          return (
+                            <p className="text-xs mt-1">
+                              <span className="inline-flex items-center gap-1 bg-stone-100 border border-stone-200 px-2 py-0.5 rounded text-stone-600 font-medium capitalize">
+                                {imageUrl && (
+                                  <img src={imageUrl} className="w-3.5 h-3.5 object-cover rounded-full border border-stone-300" alt={name} />
+                                )}
+                                <span>Variant: {name}</span>
+                              </span>
+                            </p>
+                          );
+                        })()}
                         {item.customizations && Object.entries(item.customizations).length > 0 && (
                           <div className="mt-2 flex flex-wrap gap-1.5">
                             {Object.entries(item.customizations).map(([k, v]: any) => (

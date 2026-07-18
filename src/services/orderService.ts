@@ -25,3 +25,7 @@ export const getAllOrdersAdmin = (page: number, limit: number, search?: string) 
 export const updateOrderStatus = (id: string, status: string) => {
   return api.put(`/orders/${id}/status`, { status });
 };
+
+export const deleteOrder = (id: string) => {
+  return api.delete(`/orders/${id}`);
+};

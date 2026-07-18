@@ -139,20 +139,29 @@ const OrderDetail = () => {
                     </div>
                     <div className='flex-1 min-w-0'>
                       <h3 className='font-medium text-stone-900 truncate'>{item.name}</h3>
-                      <div className='flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-stone-500 text-xs'>
-                        <span>Qty: {item.quantity}</span>
-                        {item.selectedVariant && (
-                          <span className="bg-stone-100 px-2 py-0.5 rounded text-stone-600">
-                            Variant: {typeof item.selectedVariant === 'string' ? item.selectedVariant : JSON.stringify(item.selectedVariant)}
-                          </span>
-                        )}
+                      <div className='flex flex-wrap items-center gap-2 mt-1 text-stone-500 text-xs'>
+                        <span className="bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md text-stone-700 font-medium">Qty: {item.quantity}</span>
+                        {item.selectedVariant && (() => {
+                          const variant = item.selectedVariant;
+                          const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
+                          const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
+                          return (
+                            <span className="inline-flex items-center gap-1 bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md text-stone-700 font-medium capitalize">
+                              {imageUrl && (
+                                <img src={imageUrl} className="w-3.5 h-3.5 object-cover rounded-full border border-stone-300" alt={name} />
+                              )}
+                              <span>Variant: {name}</span>
+                            </span>
+                          );
+                        })()}
                         {item.customizations && Object.entries(item.customizations).map(([k, v]: any) => (
-                          <span key={k} className="bg-stone-100 px-2 py-0.5 rounded text-stone-600 capitalize">
-                            {k.replace(/([A-Z])/g, ' $1')}: {v}
+                          <span key={k} className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] px-2.5 py-0.5 rounded-md font-semibold capitalize">
+                            <span className="opacity-70 mr-1">{k.replace(/([A-Z])/g, ' $1')}:</span>
+                            <span>{v}</span>
                           </span>
                         ))}
                         {item.uploadedImage && (
-                          <span className="bg-indigo-50 border border-indigo-150 px-2 py-0.5 rounded text-indigo-650 font-semibold">
+                          <span className="bg-indigo-50 border border-indigo-150 px-2.5 py-0.5 rounded-md text-indigo-650 font-semibold text-xs">
                             Custom Image Uploaded
                           </span>
                         )}
