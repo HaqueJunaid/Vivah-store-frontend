@@ -9,38 +9,37 @@ createRoot(document.getElementById('root')!).render(
     <Toaster 
       position='bottom-right'
       toastOptions={{
-        className: '',
-        duration: 3000,
+        duration: 3500,
         style: {
-          background: '#1c1917',
-          color: '#fafaf9',
-          borderRadius: '0px',
-          border: '1px solid #2e2a24',
-          fontSize: '11px',
-          letterSpacing: '0.07em',
-          textTransform: 'uppercase',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(8px)',
+          color: '#1c1917',
+          borderRadius: '16px',
+          border: '1px solid rgba(28, 25, 23, 0.08)',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          fontSize: '14px',
           fontWeight: '500',
-          padding: '10px 16px',
-          minWidth: '220px',
-          maxWidth: '300px',
+          padding: '12px 22px',
+          minWidth: '280px',
+          maxWidth: '400px',
           fontFamily: '"Outfit", sans-serif',
         },
         success: {
           iconTheme: {
             primary: '#E41F66',
-            secondary: '#fafaf9',
+            secondary: '#ffffff',
           },
           style: {
-            border: '1px solid rgba(228, 31, 102, 0.25)',
+            border: '1px solid rgba(228, 31, 102, 0.15)',
           }
         },
         error: {
           iconTheme: {
             primary: '#ef4444',
-            secondary: '#fafaf9',
+            secondary: '#ffffff',
           },
           style: {
-            border: '1px solid rgba(239, 68, 68, 0.25)',
+            border: '1px solid rgba(239, 68, 68, 0.15)',
           }
         }
       }}
