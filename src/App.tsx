@@ -44,7 +44,9 @@ const App = () => {
   useEffect(() => {
     setAuthToken(token ?? undefined);
     if (token && isHydrated) {
-      syncWithBackend();
+      syncWithBackend().catch((err) => {
+        console.error("Initial cart sync failed:", err);
+      });
     }
   }, [token, isHydrated, syncWithBackend]);
 

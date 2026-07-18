@@ -121,6 +121,7 @@ export const useCartStore = create<cartStoreInterface>()(
                     }
                 } catch (error) {
                     console.error("Sync with backend failed:", error);
+                    throw error;
                 }
             },
             fetchCartFromBackend: async () => {
