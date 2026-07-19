@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AddToCartButton from '../cart/AddToCartButton'
 import AddToWishListButton from '../wishlist/AddToWishListButton'
 import type { ProductCardProps, LayoutMode } from '../../types/allTypes'
+import { FaEye } from 'react-icons/fa'
+import ProductPreviewModal from './ProductPreviewModal'
 
 const ProductCard: React.FC<ProductCardProps> = React.memo(({
   title,
@@ -12,6 +14,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
   inStock,
   layout = 'grid-4'
 }) => {
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const formattedPrice = price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
   if (layout === 'list') {
@@ -42,6 +45,14 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
             imageUrl={imageUrl}
             variant="floating"
           />
+          <button
+            type='button'
+            className='absolute top-14 right-3 z-30 flex items-center justify-center size-9 bg-white/95 hover:bg-white backdrop-blur-xs text-stone-900 rounded-full shadow-xs hover:scale-105 active:scale-95 transition-all duration-300 border border-stone-200/40 cursor-pointer group/btn'
+            onClick={() => setIsPreviewOpen(true)}
+            aria-label='Quick View'
+          >
+            <FaEye className='size-4 text-stone-900 group-hover/btn:text-[#E41F66] transition-all duration-300' />
+          </button>
         </div>
 
         {/* Info Section */}
@@ -69,6 +80,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
             />
           </div>
         </div>
+        <ProductPreviewModal
+          productId={id}
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+        />
       </div>
     )
   }
@@ -102,6 +118,14 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
           imageUrl={imageUrl}
           variant="floating"
         />
+        <button
+          type='button'
+          className='absolute top-14 right-3 z-30 flex items-center justify-center size-9 bg-white/95 hover:bg-white backdrop-blur-xs text-stone-900 rounded-full shadow-xs hover:scale-105 active:scale-95 transition-all duration-300 border border-stone-200/40 cursor-pointer group/btn'
+          onClick={() => setIsPreviewOpen(true)}
+          aria-label='Quick View'
+        >
+          <FaEye className='size-4 text-stone-900 group-hover/btn:text-[#E41F66] transition-all duration-300' />
+        </button>
       </div>
 
       {/* Product Info Section */}
@@ -131,6 +155,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
           />
         </div>
       </div>
+      <ProductPreviewModal
+        productId={id}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+      />
     </div>
   )
 });
