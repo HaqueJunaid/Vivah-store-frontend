@@ -8,6 +8,7 @@ const ProductGallary: React.FC<{ images: string[], mainImage: string, handleVari
 
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (typeof window !== 'undefined' && (window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches)) return
         if (!containerRef.current) return
         const { left, top, width, height } = containerRef.current.getBoundingClientRect()
         const x = ((e.clientX - left) / width) * 100
@@ -15,7 +16,11 @@ const ProductGallary: React.FC<{ images: string[], mainImage: string, handleVari
         setZoomPos({ x, y })
     }
 
-    const handleMouseEnter = () => setIsZoomed(true)
+    const handleMouseEnter = () => {
+        if (typeof window !== 'undefined' && window.innerWidth >= 768 && !window.matchMedia('(pointer: coarse)').matches) {
+            setIsZoomed(true)
+        }
+    }
     const handleMouseLeave = () => setIsZoomed(false)
 
     return (
@@ -40,7 +45,7 @@ const ProductGallary: React.FC<{ images: string[], mainImage: string, handleVari
             )}
             <div
                 ref={containerRef}
-                className='w-full aspect-[4/5] md:aspect-square overflow-hidden cursor-zoom-in border border-stone-200/50 bg-white rounded-2xl relative'
+                className='w-full aspect-[4/5] md:aspect-square overflow-hidden md:cursor-zoom-in cursor-default border border-stone-200/50 bg-white rounded-2xl relative'
                 onMouseMove={handleMouseMove}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}

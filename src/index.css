@@ -41,3 +41,31 @@ html, body {
   font-size: 1rem;
   font-weight: 700;
 }
+
+/* Custom Sleek Scrollbar Styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d6d3d1 #f5f5f4; /* stone-300 and stone-100 to match design system */
+}
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f4; /* stone-100 track background */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1; /* stone-300 thumb */
+  border-radius: 9999px;
+  border: 1.5px solid #f5f5f4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e; /* stone-400 on hover */
+}
+

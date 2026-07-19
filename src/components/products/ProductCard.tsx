@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import AddToCartButton from '../cart/AddToCartButton'
 import AddToWishListButton from '../wishlist/AddToWishListButton'
 import type { ProductCardProps, LayoutMode } from '../../types/allTypes'
-import { FaEye } from 'react-icons/fa'
+import { LuEye } from "react-icons/lu";
 import ProductPreviewModal from './ProductPreviewModal'
 
 const ProductCard: React.FC<ProductCardProps> = React.memo(({
@@ -51,7 +51,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
             onClick={() => setIsPreviewOpen(true)}
             aria-label='Quick View'
           >
-            <FaEye className='size-4 text-stone-900 group-hover/btn:text-[#E41F66] transition-all duration-300' />
+            <LuEye className='size-4 text-stone-900 group-hover/btn:text-[#E41F66] transition-all duration-300' />
           </button>
         </div>
 
@@ -124,7 +124,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
           onClick={() => setIsPreviewOpen(true)}
           aria-label='Quick View'
         >
-          <FaEye className='size-4 text-stone-900 group-hover/btn:text-[#E41F66] transition-all duration-300' />
+          <LuEye className='size-4 text-stone-900 group-hover/btn:text-[#E41F66] transition-all duration-300' />
         </button>
       </div>
 
