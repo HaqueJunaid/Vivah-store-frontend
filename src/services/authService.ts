@@ -1,5 +1,5 @@
 import api from './api';
-import type { RegisterPayload, LoginPayload, VerifyOTPPayload, ResendOTPPayload, GoogleAuthPayload } from '../types/allTypes';
+import type { RegisterPayload, LoginPayload, VerifyOTPPayload, ResendOTPPayload, GoogleAuthPayload, ForgotPasswordPayload, ResetPasswordPayload } from '../types/allTypes';
 
 export const registerUser = (payload: RegisterPayload) => api.post('/auth/register', payload);
 export const verifyOTP = (payload: VerifyOTPPayload) => api.post('/auth/verify-otp', payload);
@@ -11,3 +11,5 @@ export const resendOTP = (payload: ResendOTPPayload) => api.post('/auth/resend-o
 export const refreshTokenApi = () => api.post('/auth/refresh-token');
 export const getAdminUsers = () => api.get('/auth/users');
 export const updateAdminUserStatus = (id: string, status: string) => api.put(`/auth/users/${id}/status`, { status });
+export const forgotPasswordApi = (payload: ForgotPasswordPayload) => api.post('/auth/forgot-password', payload);
+export const resetPasswordApi = (token: string, payload: ResetPasswordPayload) => api.put(`/auth/reset-password/${token}`, payload);

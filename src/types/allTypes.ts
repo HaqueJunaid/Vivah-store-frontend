@@ -202,6 +202,14 @@ export interface GoogleAuthPayload {
   token: string;
 }
 
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  password: string;
+}
+
 // Address Service Types
 export interface AddressData {
     _id?: string;

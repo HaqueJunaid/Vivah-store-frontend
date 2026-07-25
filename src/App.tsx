@@ -12,6 +12,8 @@ import CartPage from './pages/cart/CartPage.tsx'
 import Register from './pages/auth/Register.tsx'
 import Login from './pages/auth/Login.tsx'
 import VerifyOTP from './pages/auth/VerifyOTP.tsx'
+import ForgotPassword from './pages/auth/ForgotPassword.tsx'
+import ResetPassword from './pages/auth/ResetPassword.tsx'
 import Profile from './pages/profile/Profile.tsx'
 import OrderDetail from './components/profile/OrderDetail.tsx'
 import WishListPage from './pages/wishlist/WishListPage.tsx'
@@ -58,6 +60,8 @@ const App = () => {
         <Route path="register" element={<Register />} />
         <Route path="verify-otp" element={<VerifyOTP />} />
         <Route path="login" element={<Login />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password/:token" element={<ResetPassword />} />
         <Route element={<UserLayout />}>
           <Route path='/' element={<HomePage />} />
           <Route path='cart' element={<CartPage />} />
