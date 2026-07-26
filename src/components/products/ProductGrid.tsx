@@ -12,7 +12,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ children, layout = 'grid-4' }
           : 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
 
   return (
-    <div className={`gap-8 mt-10 mb-3 ${layoutClassName}`}>
+    <div className={`gap-4 md:gap-6 mt-10 mb-3 ${layoutClassName}`}>
       {children}
     </div>
   )

@@ -123,7 +123,7 @@ const DetailProduct: React.FC = () => {
 
     return (
         <div className='relative bg-stone-50 w-full min-h-screen py-10 sm:py-16'>
-            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start'> 
+            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start relative'> 
                 <ProductGallary images={currentVariant.images} handleThumbnailClick={handleThumbnailClick} mainImage={currentVariant.images[selectedImage]} />
                 {/* @ts-ignore */}
                 <ProductContent id={product.id} handleVariantChange={handleVariantChange} title={product.title} price={normalizedPrice} description={product.description} inStock={product.inStock} canUploadImage={product.canUploadImage} variants={product.variants} isCustomizable={product.isCustomizable} customizations={product.customizations} />

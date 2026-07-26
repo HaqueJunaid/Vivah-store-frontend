@@ -67,7 +67,7 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
                 <button
                     type="button"
                     disabled
-                    className="w-full flex items-center justify-center gap-2 text-[10px] sm:text-xs font-semibold tracking-[0.15em] uppercase py-3 border border-stone-200 bg-stone-100 text-stone-400 cursor-not-allowed select-none"
+                    className="w-full flex items-center justify-center gap-2 text-[10px] sm:text-xs font-semibold tracking-[0.15em] uppercase py-3 border border-stone-200 bg-stone-100 text-stone-400 cursor-not-allowed select-none rounded-lg"
                 >
                     Out of stock
                 </button>

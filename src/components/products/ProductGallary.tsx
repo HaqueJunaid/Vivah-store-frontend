@@ -45,7 +45,7 @@ const ProductGallary: React.FC<{ images: string[], mainImage: string, handleVari
             )}
             <div
                 ref={containerRef}
-                className='w-full aspect-[4/5] md:aspect-square overflow-hidden md:cursor-zoom-in cursor-default border border-stone-200/50 bg-white rounded-2xl relative'
+                className='w-full aspect-[4/5] overflow-hidden md:cursor-zoom-in cursor-default border border-stone-200/50 bg-white rounded-2xl relative'
                 onMouseMove={handleMouseMove}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}

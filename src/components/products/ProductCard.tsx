@@ -105,7 +105,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 
         {/* Badges */}
         {!inStock && (
-          <span className='absolute top-3 left-3 z-10 bg-stone-900/90 text-stone-100 text-[9px] tracking-widest font-semibold uppercase px-2.5 py-1.5 border border-stone-800 backdrop-blur-xs'>
+          <span className='absolute top-3 left-3 z-10 bg-stone-900/90 text-stone-100 text-[9px] tracking-widest font-semibold uppercase px-2.5 py-1.5 border border-stone-800 backdrop-blur-xs rounded-md'>
             Out of Stock
           </span>
         )}
