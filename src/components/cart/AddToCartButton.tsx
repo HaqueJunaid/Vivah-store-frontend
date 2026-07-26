@@ -87,7 +87,7 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
     if (isInCart) {
         if (variant === 'luxury') {
             return (
-                <div className="flex items-center gap-1.5 w-full select-none">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full select-none">
                     {/* Quantity Selector */}
                     <div className="flex-grow flex items-center justify-between bg-stone-50 border border-stone-200 rounded-lg p-1">
                         <button
@@ -115,7 +115,7 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
                     <button
                         type="button"
                         onClick={handleRemove}
-                        className="flex items-center justify-center border border-red-200 bg-red-50 hover:bg-red-100 text-red-650 hover:text-red-700 rounded-lg w-9 h-9 cursor-pointer transition-colors active:scale-95 shrink-0"
+                        className="flex items-center justify-center border border-red-200 bg-red-50 hover:bg-red-100 text-red-650 hover:text-red-700 rounded-lg w-full sm:w-9 h-9 cursor-pointer transition-colors active:scale-95 shrink-0"
                         aria-label="Remove product from cart"
                         title="Remove from cart"
                     >
