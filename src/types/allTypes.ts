@@ -12,6 +12,8 @@ export interface CartItem {
 
 export interface OrderSummaryProps {
     subtotal: number;
+    gstRate?: number;
+    shippingCost?: number;
     onCheckout?: () => void;
     disabled?: boolean;
 }

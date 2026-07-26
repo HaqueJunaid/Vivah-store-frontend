@@ -213,15 +213,25 @@ const OrderDetail = () => {
               <div className='space-y-3 text-sm'>
                 <div className='flex justify-between text-stone-700'>
                   <span>Subtotal</span>
-                  <span className="font-medium text-stone-950">₹{order.totalAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  <span className="font-medium text-stone-950">
+                    ₹{(order.subtotal ?? order.totalAmount)?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </span>
                 </div>
                 <div className='flex justify-between text-stone-700'>
                   <span>Shipping</span>
-                  <span className='text-green-600 font-medium'>Free</span>
+                  {order.shippingCost ? (
+                    <span className="font-medium text-stone-950">₹{order.shippingCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  ) : (
+                    <span className='text-green-600 font-medium'>Free</span>
+                  )}
                 </div>
                 <div className='flex justify-between text-stone-700'>
                   <span>Tax (GST)</span>
-                  <span className="text-stone-400">Included</span>
+                  {order.gstAmount !== undefined ? (
+                    <span className="font-medium text-stone-950">₹{order.gstAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  ) : (
+                    <span className="text-stone-400">Included</span>
+                  )}
                 </div>
                 <div className='pt-3 border-stone-200 border-t'>
                   <div className='flex justify-between font-bold text-stone-900 text-lg'>

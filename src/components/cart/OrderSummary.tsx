@@ -1,16 +1,27 @@
 import { Info } from "lucide-react"
 import type { OrderSummaryProps } from "../../types/allTypes";
 
-const OrderSummary = ({ subtotal, onCheckout, disabled }: OrderSummaryProps) => {
+const OrderSummary = ({ subtotal, gstRate, shippingCost, onCheckout, disabled }: OrderSummaryProps) => {
+    const gstAmount = subtotal * ((gstRate || 0) / 100);
+    const delivery = shippingCost || 0;
+    const total = subtotal + gstAmount + delivery;
+
     return (
         <div className="lg:col-span-1 ">
             <div className="top-8 sticky p-6 border border-stone-200 bg-white rounded-lg">
-                <h2 className="mb-6 font-bold text-xl">Total</h2>
+                <h2 className="mb-6 font-bold text-xl">Order Summary</h2>
 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-4 mb-6 text-sm">
                     <div className="flex justify-between">
                         <span className="text-gray-600">Sub-Total</span>
                         <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="text-gray-600">GST ({gstRate}%)</span>
+                        </div>
+                        <span className="font-semibold">₹{gstAmount.toFixed(2)}</span>
                     </div>
 
                     <div className="flex justify-between items-start">
@@ -19,8 +30,15 @@ const OrderSummary = ({ subtotal, onCheckout, disabled }: OrderSummaryProps) => 
                             <Info className="w-4 h-4 text-gray-400" />
                         </div>
                         <div className="text-right">
-                            <p className="font-semibold">Standard Delivery</p>
-                            <p className="text-green-600 text-sm">Free</p>
+                            <p className="font-semibold">₹{delivery.toFixed(2)}</p>
+                            {delivery === 0 && <p className="text-green-600 text-xs mt-1">Free</p>}
+                        </div>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-stone-200">
+                        <div className="flex justify-between items-center text-lg">
+                            <span className="font-bold text-gray-900">Total</span>
+                            <span className="font-bold text-indigo-600">₹{total.toFixed(2)}</span>
                         </div>
                     </div>
                 </div>

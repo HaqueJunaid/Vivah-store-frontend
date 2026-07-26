@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import type { AddressItem } from '../../types/allTypes';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 
 const CartPage = () => {
     const { user } = useAuthStore();
@@ -25,6 +26,7 @@ const CartPage = () => {
     const [showAddForm, setShowAddForm] = useState(false);
     const [loadingAddresses, setLoadingAddresses] = useState(false);
     const [checkingOut, setCheckingOut] = useState(false);
+    const [settings, setSettings] = useState<{ gstRate: number, shippingCost: number } | null>(null);
 
     useEffect(() => {
         document.title = "VivahStore | Cart";
@@ -49,6 +51,14 @@ const CartPage = () => {
                     setLoadingAddresses(false);
                 });
         }
+        // Fetch public settings for cart computation
+        api.get('/settings').then((res) => {
+            if (res.data.success && res.data.settings) {
+                setSettings(res.data.settings);
+            }
+        }).catch(err => {
+            console.error("Failed to load settings:", err);
+        });
     }, [user]);
 
     const updateQuantity = (item: any, change: number) => {
@@ -120,7 +130,7 @@ const CartPage = () => {
                         <h1 className="font-bold text-stone-900 text-3xl">My Cart</h1>
                         <p className="mt-2 text-sm text-stone-500">You have {cartItems.length} item{cartItems.length === 1 ? '' : 's'} in your cart.</p>
                         {cartItems.length > 0 && (
-                            <p className="text-sm text-stone-500 mt-2">Estimated cart value: <span className="font-semibold text-stone-900">₹{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+                            <p className="text-sm text-stone-500 mt-2">Estimated cart value: <span className="font-semibold text-stone-900">₹{(subtotal + (subtotal * (settings?.gstRate || 0) / 100) + (settings?.shippingCost || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
                         )}
                     </div>
                 </div>
@@ -217,6 +227,8 @@ const CartPage = () => {
                     {/* Order Summary */}
                     <OrderSummary 
                         subtotal={subtotal} 
+                        gstRate={settings?.gstRate}
+                        shippingCost={settings?.shippingCost}
                         onCheckout={handleCheckout} 
                         disabled={checkingOut || cartItems.length === 0} 
                     />
