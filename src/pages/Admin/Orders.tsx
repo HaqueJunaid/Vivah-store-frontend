@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import toast from 'react-hot-toast';
-import { Eye, SearchIcon, ShoppingCartIcon, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { Eye, SearchIcon, ShoppingCartIcon, ChevronLeft, ChevronRight, Trash2, Download } from "lucide-react";
 import { getAllOrdersAdmin, updateOrderStatus, deleteOrder as deleteOrderApi } from "../../services/orderService";
+import { generateInvoicePDF } from "../../utils/pdfGenerator";
 
 const Orders = () => {
   const [orders, setOrders] = useState<any[]>([]);
@@ -218,6 +219,15 @@ const Orders = () => {
                       <button
                         type="button"
                         className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition hover:border-[#E41F66] hover:text-[#E41F66] cursor-pointer shadow-2xs"
+                        aria-label="Download Invoice"
+                        onClick={() => generateInvoicePDF(order)}
+                        title="Download Invoice PDF"
+                      >
+                        <Download size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition hover:border-[#E41F66] hover:text-[#E41F66] cursor-pointer shadow-2xs"
                         aria-label="Show order details"
                         onClick={() => handleDetailToggle(order._id)}
                       >
@@ -281,6 +291,15 @@ const Orders = () => {
                     <option value="Cancelled">Cancelled</option>
                   </select>
                   <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition hover:border-[#E41F66] hover:text-[#E41F66] cursor-pointer"
+                      aria-label="Download Invoice"
+                      onClick={() => generateInvoicePDF(order)}
+                      title="Download Invoice PDF"
+                    >
+                      <Download size={16} />
+                    </button>
                     <button
                       type="button"
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 transition hover:border-[#E41F66] hover:text-[#E41F66] cursor-pointer"
@@ -349,14 +368,24 @@ const Orders = () => {
                   {selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleDateString() : 'N/A'} • {selectedOrder.status}
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => handleDetailToggle(null)}
-                className="rounded-full border border-stone-200 bg-stone-100 p-2 text-stone-600 hover:bg-stone-200 hover:text-stone-900 font-bold text-lg cursor-pointer"
-                aria-label="Close order details"
-              >
-                ×
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => generateInvoicePDF(selectedOrder)}
+                  className="flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 hover:text-stone-900 shadow-sm cursor-pointer transition-colors"
+                  title="Download Invoice PDF"
+                >
+                  <Download size={16} />
+                  <span className="hidden sm:inline">Invoice</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDetailToggle(null)}
+                  className="rounded-full border border-stone-200 bg-stone-100 p-2 text-stone-600 hover:bg-stone-200 hover:text-stone-900 font-bold text-lg cursor-pointer flex items-center justify-center h-10 w-10 transition-colors"
+                  aria-label="Close order details"
+                >
+                  ×
+                </button>
+              </div>
             </div>
 
             <div className="p-6 overflow-y-auto max-h-[70vh]">

@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import Badge from '../common/badge';
-import { MdArrowBack, MdLocationOn, MdPayment } from 'react-icons/md';
+import { MdArrowBack, MdLocationOn, MdPayment, MdFileDownload } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { getOrderById } from '../../services/orderService';
+import { generateInvoicePDF } from '../../utils/pdfGenerator';
 
 const OrderDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -95,10 +96,20 @@ const OrderDetail = () => {
               Order <span className="font-mono text-stone-600 text-sm md:text-base">#{order._id}</span>
             </h1>
           </div>
-          <Badge
-            text={order.status}
-            variant={order.status?.toLowerCase() as any}
-          />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => generateInvoicePDF(order)}
+              className="flex items-center gap-2 bg-white border border-stone-200 text-stone-700 px-4 py-1.5 rounded-md hover:bg-stone-50 hover:text-stone-900 transition-colors font-medium text-sm shadow-xs cursor-pointer"
+              title="Download Invoice PDF"
+            >
+              <MdFileDownload className="size-4" />
+              <span>Invoice</span>
+            </button>
+            <Badge
+              text={order.status}
+              variant={order.status?.toLowerCase() as any}
+            />
+          </div>
         </div>
 
         <div className='gap-8 grid grid-cols-1 lg:grid-cols-3'>

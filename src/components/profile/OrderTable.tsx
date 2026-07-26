@@ -1,5 +1,7 @@
 import Badge from "../common/badge"
 import { useNavigate } from "react-router-dom"
+import { MdFileDownload } from "react-icons/md"
+import { generateInvoicePDF } from "../../utils/pdfGenerator"
 
 const OrderTable = ({ orders }: { orders: any[] }) => {
     const navigate = useNavigate();
@@ -15,6 +17,7 @@ const OrderTable = ({ orders }: { orders: any[] }) => {
                         <th className="px-3.5 py-2 text-start">Price</th>
                         <th className="px-3.5 py-2 text-start">Payment Method</th>
                         <th className="px-3.5 py-2 text-start">Status</th>
+                        <th className="px-3.5 py-2 text-center">Invoice</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,6 +66,15 @@ const OrderTable = ({ orders }: { orders: any[] }) => {
                                     text={order.status}
                                     variant={order.status?.toLowerCase() as any}
                                 />
+                            </td>
+                            <td className="px-3.5 py-2 text-center">
+                                <button
+                                    onClick={() => generateInvoicePDF(order)}
+                                    className="p-1.5 text-stone-500 hover:text-[#E41F66] hover:bg-rose-50 rounded-md transition-colors inline-flex justify-center"
+                                    title="Download PDF Invoice"
+                                >
+                                    <MdFileDownload className="size-5" />
+                                </button>
                             </td>
                         </tr>
                     ))}
