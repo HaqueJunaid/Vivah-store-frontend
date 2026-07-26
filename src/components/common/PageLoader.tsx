@@ -3,9 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const PageLoader: React.FC = () => {
   const [progress, setProgress] = useState<number>(0);
-  const [stage, setStage] = useState<'loading' | 'fading' | 'sliding' | 'complete'>('loading');
+  const [stage, setStage] = useState<'loading' | 'fading' | 'sliding' | 'complete'>(() => {
+    const today = new Date().toDateString();
+    const lastVisit = localStorage.getItem('lastVisitDate');
+    return lastVisit === today ? 'complete' : 'loading';
+  });
 
   useEffect(() => {
+    if (stage === 'complete') return;
+
+    const today = new Date().toDateString();
+    localStorage.setItem('lastVisitDate', today);
+
     // Real-time progress simulation & asset tracking
     let animationFrameId: number;
     let startTime: number | null = null;
@@ -33,7 +42,7 @@ export const PageLoader: React.FC = () => {
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [stage]);
 
   // When stage becomes fading, trigger sliding door animation after opacity transition completes
   useEffect(() => {
