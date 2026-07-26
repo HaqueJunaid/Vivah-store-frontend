@@ -80,11 +80,11 @@ const ResetPassword = () => {
 
             {/* Right Form Panel */}
             <div className="w-full flex flex-col items-center justify-center bg-stone-50 md:bg-white relative">
-                <div className="absolute top-8 left-8 md:hidden">
-                    <Link to="/"><img className='w-32' src="/Assets/Logo.svg" alt="Logo" /></Link>
+                <div className="absolute left-1/2 -translate-x-1/2 top-8 left-8 md:hidden">
+                    <Link to="/"><img className='w-38' src="/Assets/Logo.svg" alt="Logo" /></Link>
                 </div>
 
-                <div className="w-full max-w-md px-8 py-10 bg-white md:bg-transparent rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:shadow-none border border-stone-100 md:border-none flex flex-col items-center justify-center">
+                <div className="w-full max-w-md px-8 py-10 flex flex-col items-center justify-center">
                     <Link to="/" className="hidden md:block mb-8 hover:opacity-80 transition-opacity">
                         <img className="w-48" src="/Assets/Logo.svg" alt="Logo" />
                     </Link>
