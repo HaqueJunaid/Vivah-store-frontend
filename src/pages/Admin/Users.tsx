@@ -262,7 +262,7 @@ const Users = () => {
           <div>
             <p className="text-sm uppercase tracking-widest text-stone-500">Total Customer Value</p>
             <p className="text-2xl font-bold text-indigo-600">
-              ₹${users.reduce((acc, u) => acc + u.totalSpent, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{users.reduce((acc, u) => acc + u.totalSpent, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>

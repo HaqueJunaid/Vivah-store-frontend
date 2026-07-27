@@ -65,7 +65,7 @@ const Dashboard = () => {
                 <div>
                   <p className="text-sm uppercase tracking-[0.2em] text-stone-500">Total Orders</p>
                   <p className="mt-3 text-3xl font-semibold text-stone-900">
-                    {stats?.totalOrders.toLocaleString() || "0"}
+                    {stats?.totalOrders?.toLocaleString() || "0"}
                   </p>
                 </div>
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
@@ -93,7 +93,7 @@ const Dashboard = () => {
                 <div>
                   <p className="text-sm uppercase tracking-[0.2em] text-stone-500">Total Products</p>
                   <p className="mt-3 text-3xl font-semibold text-stone-900">
-                    {stats?.totalProducts.toLocaleString() || "0"}
+                    {stats?.totalProducts?.toLocaleString() || "0"}
                   </p>
                 </div>
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-50 text-sky-600">
