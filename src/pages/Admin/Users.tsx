@@ -159,7 +159,7 @@ const Users = () => {
                   </td>
                   <td className="px-5 py-5 align-top text-stone-700">{user.ordersCount}</td>
                   <td className="px-5 py-5 align-top text-stone-900 font-semibold">
-                    ${user.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ₹{user.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
                   <td className="px-5 py-5 align-top">
                     <select
@@ -221,7 +221,7 @@ const Users = () => {
               </div>
               <div className="flex items-center justify-between text-sm pt-2 border-t border-stone-100">
                 <span className="text-stone-600">Orders: <b className="text-stone-900">{user.ordersCount}</b></span>
-                <span className="text-stone-600">Spent: <b className="text-stone-900">${user.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b></span>
+                <span className="text-stone-600">Spent: <b className="text-stone-900">₹{user.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b></span>
               </div>
               <div className="flex items-center justify-between pt-1">
                 <select
@@ -262,7 +262,7 @@ const Users = () => {
           <div>
             <p className="text-sm uppercase tracking-widest text-stone-500">Total Customer Value</p>
             <p className="text-2xl font-bold text-indigo-600">
-              ${users.reduce((acc, u) => acc + u.totalSpent, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹${users.reduce((acc, u) => acc + u.totalSpent, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>

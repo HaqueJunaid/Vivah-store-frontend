@@ -1,7 +1,7 @@
 import { Gauge, ShoppingCart, DollarSign, Box, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
-import SalesChart from "../../components/admin/SalesChart";
+import SalesChart from "../../components/Admin/SalesChart";
 
 interface SalesData {
   date: string;
@@ -41,9 +41,9 @@ const Dashboard = () => {
 
   const formatCurrency = (value: number) => {
     if (value >= 1000) {
-      return `$${(value / 1000).toFixed(1)}K`;
+      return `₹${(value / 1000).toFixed(1)}K`;
     }
-    return `$${value.toFixed(2)}`;
+    return `₹${value.toFixed(2)}`;
   };
 
   return (

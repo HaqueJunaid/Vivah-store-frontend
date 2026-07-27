@@ -94,7 +94,7 @@ const Insights = () => {
     }
   };
 
-  const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
+  const formatCurrency = (value: number) => `₹${value.toFixed(2)}`;
 
   return (
     <div className="p-5 w-full min-h-screen">
@@ -149,7 +149,7 @@ const Insights = () => {
               </div>
               
               <div className="w-full md:w-64">
-                <label className="block text-sm font-medium text-stone-700 mb-2">Base Shipping Cost ($)</label>
+                <label className="block text-sm font-medium text-stone-700 mb-2">Base Shipping Cost (₹)</label>
                 <input
                   type="number"
                   step="0.01"
@@ -237,7 +237,7 @@ const Insights = () => {
                         axisLine={false} 
                         tickLine={false} 
                         tick={{ fontSize: 12, fill: '#6b7280' }}
-                        tickFormatter={(value) => `$${value}`}
+                        tickFormatter={(value) => `₹${value}`}
                       />
                       <YAxis 
                         yAxisId="right" 

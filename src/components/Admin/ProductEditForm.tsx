@@ -490,7 +490,7 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">Price ($)</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">Price (₹)</label>
               <input
                 type="number"
                 step="0.01"
