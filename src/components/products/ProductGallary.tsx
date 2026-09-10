@@ -51,13 +51,14 @@ const ProductGallary: React.FC<{ images: string[], mainImage: string, handleVari
                 onMouseLeave={handleMouseLeave}
             >
                 <img
-                    className='w-full h-full object-cover transition-transform duration-300 ease-in-out pointer-events-none'
+                    className='w-full h-full object-cover transition-transform duration-200 ease-out pointer-events-none will-change-transform transform-gpu'
                     style={{
                         transform: isZoomed ? 'scale(2)' : 'scale(1)',
                         transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
                     }}
                     src={mainImage}
                     alt='Product main image'
+                    decoding='async'
                 />
             </div>
         </div>

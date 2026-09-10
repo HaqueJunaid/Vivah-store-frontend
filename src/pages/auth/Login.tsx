@@ -111,6 +111,13 @@ const Login = () => {
             toast.success(message || 'Logged in successfully');
             navigate('/');
         } catch (error: any) {
+            if (error?.response?.data?.isUnverified) {
+                const unverifiedEmail = error.response.data.email || data.email;
+                localStorage.setItem('registerEmail', unverifiedEmail);
+                toast.error(error?.response?.data?.message || 'Please verify your email first');
+                navigate('/verify-otp', { state: { email: unverifiedEmail } });
+                return;
+            }
             const message = error?.response?.data?.message || 'Login failed';
             toast.error(message);
         } finally {

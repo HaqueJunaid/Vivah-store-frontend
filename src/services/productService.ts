@@ -45,3 +45,17 @@ export const updateProduct = (
 
 export const getSimilarProducts = (id: string) => api.get(`/products/${id}/similar`);
 
+export const uploadCustomizationImage = (
+  file: File,
+  onUploadProgress?: (progressEvent: AxiosProgressEvent) => void
+) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  return api.post('/products/upload-customization', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    onUploadProgress,
+  });
+};
+

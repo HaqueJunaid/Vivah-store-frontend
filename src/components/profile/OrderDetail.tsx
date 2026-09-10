@@ -4,6 +4,7 @@ import { MdArrowBack, MdLocationOn, MdPayment, MdFileDownload } from 'react-icon
 import { useEffect, useState } from 'react';
 import { getOrderById } from '../../services/orderService';
 import { generateInvoicePDF } from '../../utils/pdfGenerator';
+import UploadedImageCustomization from '../common/UploadedImageCustomization';
 
 const OrderDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -143,44 +144,53 @@ const OrderDetail = () => {
             <div className='bg-white shadow-xs p-6 border border-stone-200 rounded-lg'>
               <h2 className='mb-4 font-semibold text-stone-900 text-lg'>Order Items</h2>
               <div className='space-y-6'>
-                {order.items?.map((item: any, index: number) => (
-                  <div key={index} className='flex gap-4 pb-4 border-stone-100 last:border-0 border-b last:pb-0'>
-                    <div className='flex justify-center items-center bg-stone-100 rounded-lg w-20 h-20 overflow-hidden shrink-0 border border-stone-200'>
-                      <img src={item.uploadedImage || item.productImage || 'https://picsum.photos/600/500'} className='w-full h-full object-cover' />
-                    </div>
-                    <div className='flex-1 min-w-0'>
-                      <h3 className='font-medium text-stone-900 truncate'>{item.name}</h3>
-                      <div className='flex flex-wrap items-center gap-2 mt-1 text-stone-500 text-xs'>
-                        <span className="bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md text-stone-700 font-medium">Qty: {item.quantity}</span>
-                        {item.selectedVariant && (() => {
-                          const variant = item.selectedVariant;
-                          const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
-                          const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
-                          return (
-                            <span className="inline-flex items-center gap-1 bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md text-stone-700 font-medium capitalize">
-                              {imageUrl && (
-                                <img src={imageUrl} className="w-3.5 h-3.5 object-cover rounded-full border border-stone-300" alt={name} />
-                              )}
-                              <span>Variant: {name}</span>
-                            </span>
-                          );
-                        })()}
-                        {item.customizations && Object.entries(item.customizations).map(([k, v]: any) => (
-                          <span key={k} className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] px-2.5 py-0.5 rounded-md font-semibold capitalize">
-                            <span className="opacity-70 mr-1">{k.replace(/([A-Z])/g, ' $1')}:</span>
-                            <span>{v}</span>
-                          </span>
-                        ))}
-                        {item.uploadedImage && (
-                          <span className="bg-indigo-50 border border-indigo-150 px-2.5 py-0.5 rounded-md text-indigo-650 font-semibold text-xs">
-                            Custom Image Uploaded
-                          </span>
-                        )}
+                {order.items?.map((item: any, index: number) => {
+                  const itemMainImage = 
+                    (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) ||
+                    item.productImage || 
+                    (item.product?.imageUrls && item.product.imageUrls[0]) || 
+                    'https://picsum.photos/600/500';
+
+                  return (
+                    <div key={index} className='flex gap-4 pb-4 border-stone-100 last:border-0 border-b last:pb-0'>
+                      <div className='flex justify-center items-center bg-stone-100 rounded-lg w-20 h-20 overflow-hidden shrink-0 border border-stone-200'>
+                        <img src={itemMainImage} alt={item.name} className='w-full h-full object-cover' />
                       </div>
-                      <p className='mt-2 font-semibold text-stone-900'>₹{item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      <div className='flex-1 min-w-0'>
+                        <h3 className='font-medium text-stone-900 truncate'>{item.name}</h3>
+                        <div className='flex flex-wrap items-center gap-2 mt-1 text-stone-500 text-xs'>
+                          <span className="bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md text-stone-700 font-medium">Qty: {item.quantity}</span>
+                          {item.selectedVariant && (() => {
+                            const variant = item.selectedVariant;
+                            const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
+                            const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
+                            return (
+                              <span className="inline-flex items-center gap-1 bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md text-stone-700 font-medium capitalize">
+                                {imageUrl && (
+                                  <img src={imageUrl} className="w-3.5 h-3.5 object-cover rounded-full border border-stone-300" alt={name} />
+                                )}
+                                <span>Variant: {name}</span>
+                              </span>
+                            );
+                          })()}
+                          {item.customizations && Object.entries(item.customizations).map(([k, v]: any) => (
+                            <span key={k} className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] px-2.5 py-0.5 rounded-md font-semibold capitalize">
+                              <span className="opacity-70 mr-1">{k.replace(/([A-Z])/g, ' $1')}:</span>
+                              <span>{v}</span>
+                            </span>
+                          ))}
+                          {item.uploadedImage && (
+                            <UploadedImageCustomization 
+                              imageUrl={item.uploadedImage} 
+                              itemTitle={item.name} 
+                            />
+                          )}
+                        </div>
+                        <p className='mt-2 font-semibold text-stone-900'>₹{item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

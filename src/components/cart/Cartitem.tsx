@@ -1,7 +1,8 @@
 import React from "react";
-import { Minus, Plus, X, Paintbrush, Box, Image as ImageIcon } from "lucide-react";
+import { Minus, Plus, X, Paintbrush, Box } from "lucide-react";
 import { useCartStore } from "../../store/cartStore";
 import type { CartComponentItemProps as CartItemProps } from "../../types/allTypes";
+import UploadedImageCustomization from "../common/UploadedImageCustomization";
 
 const Cartitem = React.memo(({ cartItems, updateQuantity }: CartItemProps) => {
     const removeFromCart = useCartStore((state) => state.removeCartItem);
@@ -12,7 +13,7 @@ const Cartitem = React.memo(({ cartItems, updateQuantity }: CartItemProps) => {
                 const parsedPrice = typeof item.productPrice === 'string' ? parseFloat(item.productPrice) : item.productPrice;
                 const unitPrice = Number.isFinite(parsedPrice) ? parsedPrice : 0;
                 const totalPrice = unitPrice * item.productQuantity;
-                const mainImage = item.uploadedImage || item.productImage || 'https://picsum.photos/600/500';
+                const mainImage = (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) || item.productImage || 'https://picsum.photos/600/500';
 
                 return (
                     <div 
@@ -36,11 +37,6 @@ const Cartitem = React.memo(({ cartItems, updateQuantity }: CartItemProps) => {
                                     alt={item.productName}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                 />
-                                {item.uploadedImage && (
-                                    <div className="absolute bottom-1 right-1 bg-stone-900/80 backdrop-blur-xs text-white p-1 rounded-sm" title="Custom Uploaded Image">
-                                        <ImageIcon className="w-3.5 h-3.5" />
-                                    </div>
-                                )}
                             </div>
 
                             {/* Product Details Panel */}
@@ -68,14 +64,14 @@ const Cartitem = React.memo(({ cartItems, updateQuantity }: CartItemProps) => {
                                 })()}
 
                                 {/* Customizations List */}
-                                {item.customizations && Object.entries(item.customizations).length > 0 && (
+                                {((item.customizations && Object.entries(item.customizations).length > 0) || item.uploadedImage) && (
                                     <div className="mt-2.5">
                                         <div className="flex items-center gap-1.5 text-stone-500 text-xs font-bold uppercase tracking-wider mb-1.5">
                                             <Paintbrush className="w-3.5 h-3.5 text-[#E41F66]" />
                                             <span>Custom Specifications:</span>
                                         </div>
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {Object.entries(item.customizations).map(([key, val]) => (
+                                        <div className="flex flex-wrap gap-1.5 items-center">
+                                            {item.customizations && Object.entries(item.customizations).map(([key, val]) => (
                                                 <span 
                                                     key={key} 
                                                     className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] text-xs px-2.5 py-0.5 rounded-md font-medium"
@@ -84,6 +80,12 @@ const Cartitem = React.memo(({ cartItems, updateQuantity }: CartItemProps) => {
                                                     <span className="font-semibold">{val as React.ReactNode}</span>
                                                 </span>
                                             ))}
+                                            {item.uploadedImage && (
+                                                <UploadedImageCustomization 
+                                                    imageUrl={item.uploadedImage} 
+                                                    itemTitle={item.productName} 
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                 )}

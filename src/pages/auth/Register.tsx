@@ -106,9 +106,9 @@ const Register = () => {
                 email: data.email,
                 password: data.password,
             });
-            const { email } = response.data;
+            const { email, message } = response.data;
             localStorage.setItem('registerEmail', email);
-            toast.success('Registration successful. Verify OTP.');
+            toast.success(message || 'Registration successful. Verify OTP.');
             navigate('/verify-otp', { state: { email } });
         } catch (error: any) {
             const message = error?.response?.data?.message || 'Registration failed';

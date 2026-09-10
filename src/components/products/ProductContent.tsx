@@ -2,6 +2,9 @@ import React, { useState, useRef, type ChangeEvent } from 'react'
 import type { ProductContentProps } from "../../types/allTypes";
 import AddToCartButton from '../cart/AddToCartButton';
 import AddToWishListButton from '../wishlist/AddToWishListButton';
+import { uploadCustomizationImage } from '../../services/productService';
+import toast from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 const FIELD_CONFIG: Record<string, { label: string; placeholder: string; type: string }> = {
     coupleName: { label: "Couple Name", placeholder: "Enter couple name", type: "text" },
@@ -22,6 +25,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
     handleVariantChange 
 }) => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+    const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [quantity, setQuantity] = useState(1)
     const [activeVariant, setActiveVariant] = useState(0)
@@ -41,14 +45,35 @@ const ProductContent: React.FC<ProductContentProps> = ({
         }
     }
 
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-                setUploadedImage(reader.result as string)
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please upload a valid image file');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error('File size exceeds the 10MB limit');
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const res = await uploadCustomizationImage(file);
+            if (res.data.success && res.data.url) {
+                setUploadedImage(res.data.url);
+                toast.success('Customization image uploaded successfully');
+            } else {
+                toast.error(res.data.message || 'Failed to upload image');
             }
-            reader.readAsDataURL(file)
+        } catch (error: any) {
+            console.error('Custom image upload error:', error);
+            const msg = error?.response?.data?.message || 'Failed to upload custom image. Please try again.';
+            toast.error(msg);
+        } finally {
+            setIsUploading(false);
         }
     }
 
@@ -97,7 +122,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
                     <button 
                         type="button" 
                         onClick={() => handleQunatityChange('dec')} 
-                        className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-r border-stone-250'
+                        className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-r border-stone-300'
                     >
                         -
                     </button>
@@ -105,7 +130,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
                     <button 
                         type="button" 
                         onClick={() => handleQunatityChange('inc')} 
-                        className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-l border-stone-200'
+                        className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-l border-stone-300'
                     >
                         +
                     </button>
@@ -116,9 +141,15 @@ const ProductContent: React.FC<ProductContentProps> = ({
             {canUploadImage && (
                 <div className='flex flex-col gap-3 pt-3 pb-6 border-b border-stone-200/80'>
                     <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Upload Custom Image</span>
-                    {uploadedImage ? (
+                    {isUploading ? (
+                        <div className="flex flex-col items-center justify-center gap-3 p-8 border border-[#E41F66]/30 border-dashed rounded-2xl w-full max-w-md text-sm bg-[#E41F66]/5">
+                            <Loader2 className="w-8 h-8 text-[#E41F66] animate-spin" />
+                            <p className="text-stone-700 text-xs font-semibold">Uploading to ImageKit...</p>
+                            <p className="text-stone-400 text-[11px]">Please wait while your image is being processed</p>
+                        </div>
+                    ) : uploadedImage ? (
                         <div className='flex flex-col items-start gap-3 w-80'>
-                            <div className='border border-stone-200 rounded-2xl p-1 bg-white relative group overflow-hidden'>
+                            <div className='border border-stone-200 rounded-2xl p-1 bg-white relative group overflow-hidden shadow-xs'>
                                 <img src={uploadedImage} alt='Uploaded preview' className='w-auto h-48 object-cover rounded-xl' />
                                 <button
                                     type='button'

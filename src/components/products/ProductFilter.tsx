@@ -81,22 +81,20 @@ const ProductFilterSideBar: React.FC = () => {
             </div>
 
             {/* Mobile/Tablet Slide-over Drawer (Visible below lg) */}
-            <div 
-                className={`lg:hidden fixed inset-0 z-[100] transition-opacity duration-300 ${
-                    open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-                }`}
+            <div
+                className={`lg:hidden fixed inset-0 z-[100] transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                    }`}
             >
                 {/* Backdrop Overlay */}
-                <div 
-                    className="absolute inset-0 bg-black/45 backdrop-blur-xs" 
-                    onClick={() => setOpen(false)} 
+                <div
+                    className="absolute inset-0 bg-black/45 backdrop-blur-xs"
+                    onClick={() => setOpen(false)}
                 />
-                
+
                 {/* Drawer Panel */}
-                <div 
-                    className={`absolute top-0 left-0 h-full w-80 max-w-[85vw] bg-stone-50 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
-                        open ? 'translate-x-0' : '-translate-x-full'
-                    }`}
+                <div
+                    className={`absolute top-0 left-0 h-full w-80 max-w-[85vw] bg-stone-50 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${open ? 'translate-x-0' : '-translate-x-full'
+                        }`}
                 >
                     {/* Drawer Header */}
                     <div className="flex justify-between items-center px-5 py-4.5 border-b border-stone-200 bg-white">

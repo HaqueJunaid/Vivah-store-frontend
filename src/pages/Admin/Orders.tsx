@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { Eye, SearchIcon, ShoppingCartIcon, ChevronLeft, ChevronRight, Trash2, Download } from "lucide-react";
 import { getAllOrdersAdmin, updateOrderStatus, deleteOrder as deleteOrderApi } from "../../services/orderService";
 import { generateInvoicePDF } from "../../utils/pdfGenerator";
+import UploadedImageCustomization from "../../components/common/UploadedImageCustomization";
 
 const Orders = () => {
   const [orders, setOrders] = useState<any[]>([]);
@@ -406,67 +407,70 @@ const Orders = () => {
                 </div>
 
                 <div className="space-y-4">
-                  {selectedOrder.items?.map((item: any, index: number) => (
-                    <div key={index} className="flex gap-4 rounded-3xl bg-white p-4 shadow-2xs border border-stone-100 items-start">
-                      {/* Image Thumbnail */}
-                      <div className="relative shrink-0 rounded-lg w-16 h-16 sm:w-20 sm:h-20 overflow-hidden border border-stone-150 bg-stone-50">
-                        <img
-                          src={item.uploadedImage || item.productImage || 'https://picsum.photos/600/500'}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
+                  {selectedOrder.items?.map((item: any, index: number) => {
+                    const itemMainImage = 
+                      (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) ||
+                      item.productImage || 
+                      (item.product?.imageUrls && item.product.imageUrls[0]) || 
+                      'https://picsum.photos/600/500';
+
+                    return (
+                      <div key={index} className="flex gap-4 rounded-3xl bg-white p-4 shadow-2xs border border-stone-100 items-start">
+                        {/* Image Thumbnail */}
+                        <div className="relative shrink-0 rounded-lg w-16 h-16 sm:w-20 sm:h-20 overflow-hidden border border-stone-150 bg-stone-50">
+                          <img
+                            src={itemMainImage}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        
+                        {/* Details */}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-stone-900 truncate">{item.name}</p>
+                          <p className="mt-1 text-xs text-stone-500">Qty: {item.quantity}</p>
+                          {item.selectedVariant && (() => {
+                            const variant = item.selectedVariant;
+                            const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
+                            const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
+                            return (
+                              <p className="text-xs mt-1">
+                                <span className="inline-flex items-center gap-1 bg-stone-100 border border-stone-200 px-2 py-0.5 rounded text-stone-600 font-medium capitalize">
+                                  {imageUrl && (
+                                    <img src={imageUrl} className="w-3.5 h-3.5 object-cover rounded-full border border-stone-300" alt={name} />
+                                  )}
+                                  <span>Variant: {name}</span>
+                                </span>
+                              </p>
+                            );
+                          })()}
+                          {((item.customizations && Object.entries(item.customizations).length > 0) || item.uploadedImage) && (
+                            <div className="mt-2 flex flex-wrap gap-1.5 items-center">
+                              {item.customizations && Object.entries(item.customizations).map(([k, v]: any) => (
+                                <span key={k} className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] text-[10px] sm:text-xs px-2 py-0.5 rounded-md font-medium capitalize">
+                                  <span className="opacity-70 capitalize mr-1">{k.replace(/([A-Z])/g, ' $1')}:</span>
+                                  <span className="font-semibold">{v}</span>
+                                </span>
+                              ))}
+                              {item.uploadedImage && (
+                                <UploadedImageCustomization 
+                                  imageUrl={item.uploadedImage} 
+                                  itemTitle={item.name} 
+                                  compact
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Price Details */}
+                        <div className="text-right shrink-0">
+                          <p className="text-xs text-stone-400 font-semibold">Unit price</p>
+                          <p className="mt-1 text-sm sm:text-base font-bold text-stone-900">₹{item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                        </div>
                       </div>
-                      
-                      {/* Details */}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-stone-900 truncate">{item.name}</p>
-                        <p className="mt-1 text-xs text-stone-500">Qty: {item.quantity}</p>
-                        {item.selectedVariant && (() => {
-                          const variant = item.selectedVariant;
-                          const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
-                          const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
-                          return (
-                            <p className="text-xs mt-1">
-                              <span className="inline-flex items-center gap-1 bg-stone-100 border border-stone-200 px-2 py-0.5 rounded text-stone-600 font-medium capitalize">
-                                {imageUrl && (
-                                  <img src={imageUrl} className="w-3.5 h-3.5 object-cover rounded-full border border-stone-300" alt={name} />
-                                )}
-                                <span>Variant: {name}</span>
-                              </span>
-                            </p>
-                          );
-                        })()}
-                        {item.customizations && Object.entries(item.customizations).length > 0 && (
-                          <div className="mt-2 flex flex-wrap gap-1.5">
-                            {Object.entries(item.customizations).map(([k, v]: any) => (
-                              <span key={k} className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] text-[10px] sm:text-xs px-2 py-0.5 rounded-md font-medium capitalize">
-                                <span className="opacity-70 capitalize mr-1">{k.replace(/([A-Z])/g, ' $1')}:</span>
-                                <span className="font-semibold">{v}</span>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {item.uploadedImage && (
-                          <div className="mt-2">
-                            <a 
-                              href={item.uploadedImage} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-indigo-650 hover:text-indigo-850 hover:underline font-semibold"
-                            >
-                              View Custom Uploaded Image
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* Price Details */}
-                      <div className="text-right shrink-0">
-                        <p className="text-xs text-stone-400 font-semibold">Unit price</p>
-                        <p className="mt-1 text-sm sm:text-base font-bold text-stone-900">₹{item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div className="mt-6 flex flex-col gap-3 border-t border-stone-200 pt-5 text-sm text-stone-700 sm:flex-row sm:items-center sm:justify-between">

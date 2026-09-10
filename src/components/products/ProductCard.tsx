@@ -80,11 +80,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
             />
           </div>
         </div>
-        <ProductPreviewModal
-          productId={id}
-          isOpen={isPreviewOpen}
-          onClose={() => setIsPreviewOpen(false)}
-        />
+        {isPreviewOpen && (
+          <ProductPreviewModal
+            productId={id}
+            isOpen={isPreviewOpen}
+            onClose={() => setIsPreviewOpen(false)}
+          />
+        )}
       </div>
     )
   }
@@ -155,11 +157,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
           />
         </div>
       </div>
-      <ProductPreviewModal
-        productId={id}
-        isOpen={isPreviewOpen}
-        onClose={() => setIsPreviewOpen(false)}
-      />
+      {isPreviewOpen && (
+        <ProductPreviewModal
+          productId={id}
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+        />
+      )}
     </div>
   )
 });
