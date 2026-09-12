@@ -4,8 +4,32 @@ import { useCartStore } from "../../store/cartStore";
 import type { CartComponentItemProps as CartItemProps } from "../../types/allTypes";
 import UploadedImageCustomization from "../common/UploadedImageCustomization";
 
-const Cartitem = React.memo(({ cartItems, updateQuantity }: CartItemProps) => {
+const Cartitem = React.memo(({ cartItems, updateQuantity, setQuantity }: CartItemProps) => {
     const removeFromCart = useCartStore((state) => state.removeCartItem);
+    const updateCartItemQuantity = useCartStore((state) => state.updateCartItemQuantity);
+
+    const handleDirectQuantity = (item: any, valStr: string) => {
+        const val = parseInt(valStr, 10);
+        if (!isNaN(val)) {
+            const clamped = Math.max(1, val);
+            if (setQuantity) {
+                setQuantity(item, clamped);
+            } else {
+                updateCartItemQuantity(item.productId, clamped, item.customizations, item.selectedVariant);
+            }
+        }
+    };
+
+    const handleBlurQuantity = (item: any, valStr: string) => {
+        const val = parseInt(valStr, 10);
+        if (isNaN(val) || val < 1) {
+            if (setQuantity) {
+                setQuantity(item, 1);
+            } else {
+                updateCartItemQuantity(item.productId, 1, item.customizations, item.selectedVariant);
+            }
+        }
+    };
 
     return (
         <div className="space-y-5">
@@ -94,21 +118,29 @@ const Cartitem = React.memo(({ cartItems, updateQuantity }: CartItemProps) => {
                             {/* Quantity Selector & Price Alignment */}
                             <div className="flex flex-row sm:flex-col md:flex-row items-center justify-between sm:justify-center gap-4 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-stone-150">
                                 {/* Quantity Selector */}
-                                <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 rounded-full p-1.5">
+                                <div className="flex items-center gap-1 bg-stone-50 border border-stone-200 rounded-full p-1 shadow-2xs">
                                     <button
+                                        type="button"
                                         onClick={() => updateQuantity(item, -1)}
                                         disabled={item.productQuantity <= 1}
-                                        className="flex justify-center items-center hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent border border-stone-200 rounded-full w-7 h-7 cursor-pointer transition-colors shadow-2xs"
+                                        className="flex justify-center items-center hover:bg-white disabled:opacity-40 disabled:hover:bg-transparent border border-stone-200 rounded-full w-7 h-7 cursor-pointer transition-colors shadow-2xs active:scale-90"
                                         title="Decrease Quantity"
                                     >
                                         <Minus className="w-3.5 h-3.5 text-stone-600" />
                                     </button>
-                                    <span className="w-9 text-sm font-semibold text-center text-stone-850">
-                                        {item.productQuantity.toString().padStart(2, '0')}
-                                    </span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={item.productQuantity}
+                                        onChange={(e) => handleDirectQuantity(item, e.target.value)}
+                                        onBlur={(e) => handleBlurQuantity(item, e.target.value)}
+                                        className="w-10 text-sm font-semibold text-center text-stone-850 outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        aria-label="Item quantity"
+                                    />
                                     <button
+                                        type="button"
                                         onClick={() => updateQuantity(item, 1)}
-                                        className="flex justify-center items-center hover:bg-white border border-stone-200 rounded-full w-7 h-7 cursor-pointer transition-colors shadow-2xs"
+                                        className="flex justify-center items-center hover:bg-white border border-stone-200 rounded-full w-7 h-7 cursor-pointer transition-colors shadow-2xs active:scale-90"
                                         title="Increase Quantity"
                                     >
                                         <Plus className="w-3.5 h-3.5 text-stone-600" />

@@ -85,7 +85,7 @@ const ProductLayout: React.FC = () => {
       category: product.category,
       subCategory: product.subCategory,
       imageUrl: product.imageUrls?.[0] || product.thumbnail || 'https://picsum.photos/600/500',
-      inStock: (product.quantity ?? 0) > 0,
+      inStock: product.inStock !== false && (product.inStock !== undefined || (product.quantity ?? 0) > 0),
       date: product.createdAt || new Date().toISOString(),
     }));
   }, [products]);

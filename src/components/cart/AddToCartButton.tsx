@@ -98,9 +98,28 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
                         >
                             <span className="text-stone-600 font-bold text-xs leading-none">-</span>
                         </button>
-                        <span className="text-stone-850 font-bold text-[10px] sm:text-xs">
-                            QTY: {quantityInCart}
-                        </span>
+                        <div className="flex items-center justify-center gap-0.5 px-1">
+                            <span className="text-stone-400 font-bold text-[9px] uppercase tracking-wider">QTY:</span>
+                            <input
+                                type="number"
+                                min="1"
+                                value={quantityInCart}
+                                onChange={(e) => {
+                                    const val = parseInt(e.target.value, 10);
+                                    if (!isNaN(val)) {
+                                        handleUpdateQty(Math.max(1, val));
+                                    }
+                                }}
+                                onBlur={(e) => {
+                                    const val = parseInt(e.target.value, 10);
+                                    if (isNaN(val) || val < 1) {
+                                        handleUpdateQty(1);
+                                    }
+                                }}
+                                className="w-10 text-stone-850 font-bold text-[11px] sm:text-xs text-center outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                aria-label="Cart quantity"
+                            />
+                        </div>
                         <button
                             type="button"
                             onClick={() => handleUpdateQty(quantityInCart + 1)}
@@ -128,7 +147,7 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
         return (
             <div className="flex flex-col sm:flex-row items-stretch gap-1.5 w-full">
                 {/* Quantity Control */}
-                <div className="flex-grow flex items-center justify-between border border-stone-300 bg-white text-stone-850 px-3 py-2 rounded-md text-xs font-medium select-none">
+                <div className="flex-grow flex items-center justify-between border border-stone-300 bg-white text-stone-850 px-2.5 py-1.5 rounded-md text-xs font-medium select-none">
                     <button
                         type="button"
                         onClick={() => handleUpdateQty(quantityInCart - 1)}
@@ -137,9 +156,28 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
                     >
                         -
                     </button>
-                    <span className="text-stone-800 text-[11px] font-medium">
-                        Qty: {quantityInCart}
-                    </span>
+                    <div className="flex items-center justify-center gap-0.5">
+                        <span className="text-stone-400 text-[10px] font-medium">Qty:</span>
+                        <input
+                            type="number"
+                            min="1"
+                            value={quantityInCart}
+                            onChange={(e) => {
+                                const val = parseInt(e.target.value, 10);
+                                if (!isNaN(val)) {
+                                    handleUpdateQty(Math.max(1, val));
+                                }
+                            }}
+                            onBlur={(e) => {
+                                const val = parseInt(e.target.value, 10);
+                                if (isNaN(val) || val < 1) {
+                                    handleUpdateQty(1);
+                                }
+                            }}
+                            className="w-10 text-stone-800 text-[11px] font-semibold text-center outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            aria-label="Cart quantity"
+                        />
+                    </div>
                     <button
                         type="button"
                         onClick={() => handleUpdateQty(quantityInCart + 1)}

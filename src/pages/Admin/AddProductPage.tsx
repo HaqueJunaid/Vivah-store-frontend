@@ -54,7 +54,7 @@ const AddProductPage: React.FC = () => {
       variantTitle: "",
       isCustomizable: false,
       price: 0,
-      quantity: 1,
+      inStock: true,
       description: "",
       about: "",
       note: "",
@@ -271,7 +271,8 @@ const AddProductPage: React.FC = () => {
     const formData = new FormData();
     formData.append("title", data.title.trim());
     formData.append("price", String(data.price));
-    formData.append("quantity", String(data.quantity));
+    formData.append("inStock", String(data.inStock !== false));
+    formData.append("quantity", data.inStock !== false ? "1" : "0");
     formData.append("category", data.category || "Assets");
     if (data.subCategory) {
       formData.append("subCategory", data.subCategory);
@@ -499,23 +500,32 @@ const AddProductPage: React.FC = () => {
                 {errors.price && <p className="text-xs text-red-500 mt-1.5">{errors.price.message}</p>}
               </div>
 
-              {/* Stock Quantity */}
+              {/* Stock Status Checkbox */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">
-                  Stock Quantity <span className="text-red-500">*</span>
+                  Availability / Stock Status
                 </label>
-                <input
-                  type="number"
-                  disabled={isSubmitting}
-                  {...register("quantity", {
-                    required: "Quantity is required",
-                    valueAsNumber: true,
-                    min: { value: 0, message: "Quantity cannot be negative" },
-                  })}
-                  placeholder="e.g. 25"
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition disabled:opacity-60 font-mono"
-                />
-                {errors.quantity && <p className="text-xs text-red-500 mt-1.5">{errors.quantity.message}</p>}
+                <label className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-stone-200 bg-stone-50/50 hover:bg-stone-50 transition-colors cursor-pointer select-none">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      disabled={isSubmitting}
+                      {...register("inStock")}
+                      className="size-5 text-[#E41F66] rounded-md border-stone-300 focus:ring-[#E41F66] accent-[#E41F66] cursor-pointer"
+                    />
+                    <div>
+                      <span className="text-sm font-semibold text-stone-900 block">
+                        In Stock
+                      </span>
+                      <span className="text-xs text-stone-500">
+                        {watch("inStock") ? "Available for ordering" : "Marked as out of stock"}
+                      </span>
+                    </div>
+                  </div>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${watch("inStock") ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
+                    {watch("inStock") ? "In Stock" : "Out of Stock"}
+                  </span>
+                </label>
               </div>
             </div>
           </div>

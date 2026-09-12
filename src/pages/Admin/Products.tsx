@@ -14,6 +14,8 @@ const ProductListItem: React.FC<ProductListItemProps> = React.memo(({ product, o
   const image = getProductImage(product);
   const displayDescription = product.productInfo?.description || product.description || "";
 
+  const isProductInStock = product.inStock !== false && (product.inStock !== undefined || product.quantity > 0);
+
   return (
     <li className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4">
       <img className="size-28 md:size-20 object-cover rounded-lg sm:mx-0 border border-stone-100" src={image} alt={product.title} />
@@ -26,8 +28,8 @@ const ProductListItem: React.FC<ProductListItemProps> = React.memo(({ product, o
                 {product.category}
               </span>
             )}
-            <span className={`text-xs w-fit font-semibold px-3 py-1 rounded-full ${product.quantity > 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
-              {product.quantity > 0 ? `${product.quantity} in stock` : "Out of stock"}
+            <span className={`text-xs w-fit font-semibold px-3 py-1 rounded-full ${isProductInStock ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
+              {isProductInStock ? "In Stock" : "Out of Stock"}
             </span>
           </div>
           <p className="text-stone-600 text-sm mb-2 line-clamp-2">{displayDescription}</p>

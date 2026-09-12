@@ -38,13 +38,23 @@ const ProductContent: React.FC<ProductContentProps> = ({
 
     const handleQunatityChange = (incOrDec: 'inc' | 'dec') => {
         if (incOrDec === 'inc') {
-            setQuantity(quantity + 1)
+            setQuantity(prev => prev + 1);
         } else {
-            if (quantity > 1) {
-                setQuantity(quantity - 1)
-            }
+            setQuantity(prev => (prev > 1 ? prev - 1 : 1));
         }
-    }
+    };
+
+    const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        if (val === '') {
+            setQuantity(1);
+            return;
+        }
+        const parsed = parseInt(val, 10);
+        if (!isNaN(parsed)) {
+            setQuantity(Math.max(1, parsed));
+        }
+    };
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -109,19 +119,35 @@ const ProductContent: React.FC<ProductContentProps> = ({
             {/* Quantity selection */}
             <div className='flex flex-col gap-3 pb-6 border-b border-stone-200/80'>
                 <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Quantity</span>
-                <div className='flex items-center border border-stone-300 w-fit rounded-xl bg-white overflow-hidden'>
+                <div className='flex items-center border border-stone-300 w-fit rounded-xl bg-white overflow-hidden shadow-2xs'>
                     <button 
                         type="button" 
                         onClick={() => handleQunatityChange('dec')} 
-                        className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-r border-stone-300'
+                        disabled={quantity <= 1}
+                        className='px-4 py-2.5 hover:bg-stone-50 disabled:opacity-40 disabled:hover:bg-transparent text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-r border-stone-300'
+                        aria-label="Decrease quantity"
                     >
                         -
                     </button>
-                    <span className='px-6 text-stone-900 font-medium min-w-12 text-center select-none text-sm'>{quantity}</span>
+                    <input 
+                        type="number"
+                        min="1"
+                        value={quantity}
+                        onChange={handleQuantityInput}
+                        onBlur={(e) => {
+                            const val = parseInt(e.target.value, 10);
+                            if (isNaN(val) || val < 1) {
+                                setQuantity(1);
+                            }
+                        }}
+                        className='w-16 px-2 py-2 text-stone-900 font-semibold text-center text-sm outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        aria-label="Product quantity"
+                    />
                     <button 
                         type="button" 
                         onClick={() => handleQunatityChange('inc')} 
                         className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-l border-stone-300'
+                        aria-label="Increase quantity"
                     >
                         +
                     </button>

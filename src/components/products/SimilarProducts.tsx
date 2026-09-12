@@ -114,7 +114,7 @@ export default function SimilarProducts({ productId }: SimilarProductsProps) {
                             title={item.title}
                             price={item.price}
                             imageUrl={item.imageUrls?.[0] || ''}
-                            inStock={item.quantity > 0}
+                            inStock={item.inStock !== false && (item.inStock !== undefined || (item.quantity ?? 0) > 0)}
                             layout="grid-4"
                         />
                     </SwiperSlide>

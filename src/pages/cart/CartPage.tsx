@@ -66,6 +66,11 @@ const CartPage = () => {
         updateCartItemQuantity(item.productId, newQuantity, item.customizations, item.selectedVariant);
     };
 
+    const setQuantity = (item: any, quantity: number) => {
+        const newQuantity = Math.max(1, quantity);
+        updateCartItemQuantity(item.productId, newQuantity, item.customizations, item.selectedVariant);
+    };
+
     const handleAddressAdded = (newAddr: AddressItem) => {
         setAddresses((prev) => [newAddr, ...prev]);
         if (newAddr._id) {
@@ -219,7 +224,7 @@ const CartPage = () => {
                                     <p className="text-stone-500">Your cart is empty</p>
                                 </div>
                             ) : (
-                                <Cartitem cartItems={cartItems} updateQuantity={updateQuantity} />
+                                <Cartitem cartItems={cartItems} updateQuantity={updateQuantity} setQuantity={setQuantity} />
                             )}
                         </div>
                     </div>

@@ -109,6 +109,7 @@ export interface Product {
   title: string;
   price: number;
   quantity?: number;
+  inStock?: boolean;
   category: string;
   subCategory?: string;
   imageUrls?: string[];
@@ -418,6 +419,7 @@ export interface CartComponentItem {
 export interface CartComponentItemProps {
     cartItems: any[];
     updateQuantity: (item: any, change: number) => void;
+    setQuantity?: (item: any, quantity: number) => void;
 }
 
 // Add To Cart Button Product Type
@@ -452,7 +454,8 @@ export interface ProductFormInputs {
   about?: string;
   note?: string;
   productInfo?: ProductInfo;
-  quantity: number;
+  quantity?: number;
+  inStock: boolean;
   price: number;
   category?: string;
   subCategory?: string;

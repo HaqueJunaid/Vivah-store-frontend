@@ -94,7 +94,7 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
       about: '',
       note: ''
     },
-    inStock: (dbProduct.quantity ?? 0) > 0,
+    inStock: dbProduct.inStock !== false && (dbProduct.inStock !== undefined || (dbProduct.quantity ?? 0) > 0),
     canUploadImage: !!(dbProduct.isCustomizable && dbProduct.customizations?.includes("customImage")),
     variants: (() => {
       const mainImages = cleanImages(
@@ -103,12 +103,14 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
           : (dbProduct.imageUrl ? [dbProduct.imageUrl] : ['https://picsum.photos/600/500'])
       );
 
+      const isStock = dbProduct.inStock !== false && (dbProduct.inStock !== undefined || (dbProduct.quantity ?? 0) > 0);
+
       if (dbProduct.hasVariants) {
         if (Array.isArray(dbProduct.variants) && dbProduct.variants.length > 0) {
           const variantList = dbProduct.variants.map((v: any, idx: number) => ({
             name: (v.title || v.name || `Variant ${idx + 1}`).trim(),
             images: cleanImages(v.images && v.images.length > 0 ? v.images : mainImages),
-            inStock: (dbProduct.quantity ?? 0) > 0,
+            inStock: isStock,
           }));
 
           const hasDefaultAlready = variantList.some(
@@ -120,7 +122,7 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
               {
                 name: "Default",
                 images: mainImages,
-                inStock: (dbProduct.quantity ?? 0) > 0,
+                inStock: isStock,
               },
               ...variantList,
             ];
@@ -138,12 +140,12 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
             {
               name: "Default",
               images: mainImages,
-              inStock: (dbProduct.quantity ?? 0) > 0,
+              inStock: isStock,
             },
             {
               name: dbProduct.variantTitle.trim() || "Variant",
               images: vImages,
-              inStock: (dbProduct.quantity ?? 0) > 0,
+              inStock: isStock,
             },
           ];
         }
@@ -153,7 +155,7 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
         {
           name: "Default",
           images: mainImages,
-          inStock: (dbProduct.quantity ?? 0) > 0,
+          inStock: isStock,
         },
       ];
     })(),
