@@ -208,14 +208,14 @@ const ProductContent: React.FC<ProductContentProps> = ({
                                 type="button" 
                                 key={index} 
                                 onClick={() => { setActiveVariant(index); handleVariantChange(index); }} 
-                                className={`w-20 h-28 relative flex flex-col items-center gap-1.5 bg-white p-1 border transition-all duration-300 cursor-pointer rounded-xl ${
+                                className={`w-12 md:w-20 h-18 md:h-28 relative flex flex-col items-center gap-1.5 bg-white p-1 border transition-all duration-300 cursor-pointer rounded-xl ${
                                     activeVariant === index 
                                         ? 'border-[#E41F66] ring-1 ring-[#E41F66]/30' 
                                         : 'border-stone-200 hover:border-stone-400'
                                 }`}
                             >
                                 <img src={variant.images[0]} alt={variant.name} className='rounded-lg bg-stone-50/70 p-0.5 w-full h-full object-cover' />
-                                <span className='text-[10px] tracking-wide text-stone-600 px-1 py-0.5 font-medium'>{variant.name}</span>
+                                <span className='text-[8px] md:text-[10px] tracking-wide text-stone-600 px-1 py-0.5 font-medium'>{variant.name}</span>
                             </button>
                         ))}
                     </div>
