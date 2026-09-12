@@ -31,6 +31,8 @@ const NotFound = lazy(() => import('./pages/static/NotFound.tsx'));
 const AdminLayout = lazy(() => import('./components/layout/AdminLayout.tsx'));
 const Dashboard = lazy(() => import('./pages/Admin/Dashboard.tsx'));
 const Products = lazy(() => import('./pages/Admin/Products.tsx'));
+const AddProductPage = lazy(() => import('./pages/Admin/AddProductPage.tsx'));
+const EditProductPage = lazy(() => import('./pages/Admin/EditProductPage.tsx'));
 const Insights = lazy(() => import('./pages/Admin/Insights.tsx'));
 const Orders = lazy(() => import('./pages/Admin/Orders.tsx'));
 const Users = lazy(() => import('./pages/Admin/Users.tsx'));
@@ -77,6 +79,8 @@ const App = () => {
             <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/products" element={<Products />} />
+            <Route path="/admin/products/add" element={<AddProductPage />} />
+            <Route path="/admin/products/edit/:id" element={<EditProductPage />} />
             <Route path="/admin/orders" element={<Orders />} />
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/insights" element={<Insights />} />

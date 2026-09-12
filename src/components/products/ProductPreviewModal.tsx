@@ -78,39 +78,85 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
 
   if (!isOpen || !productId) return null
 
+  const cleanImages = (imgs: any[]) => {
+    if (!Array.isArray(imgs)) return ['https://picsum.photos/600/500'];
+    const unique = Array.from(new Set(imgs.filter(Boolean)));
+    return unique.length > 0 ? unique : ['https://picsum.photos/600/500'];
+  };
+
   const product = dbProduct ? {
     id: dbProduct._id,
     title: dbProduct.title,
     price: dbProduct.price.toString(),
-    description: dbProduct.description,
+    description: dbProduct.productInfo?.description || dbProduct.description || '',
+    productInfo: dbProduct.productInfo || {
+      description: dbProduct.description || '',
+      about: '',
+      note: ''
+    },
     inStock: (dbProduct.quantity ?? 0) > 0,
     canUploadImage: !!(dbProduct.isCustomizable && dbProduct.customizations?.includes("customImage")),
-    variants: dbProduct.hasVariants 
-        ? [
-            {
+    variants: (() => {
+      const mainImages = cleanImages(
+        dbProduct.imageUrls && dbProduct.imageUrls.length > 0
+          ? dbProduct.imageUrls
+          : (dbProduct.imageUrl ? [dbProduct.imageUrl] : ['https://picsum.photos/600/500'])
+      );
+
+      if (dbProduct.hasVariants) {
+        if (Array.isArray(dbProduct.variants) && dbProduct.variants.length > 0) {
+          const variantList = dbProduct.variants.map((v: any, idx: number) => ({
+            name: (v.title || v.name || `Variant ${idx + 1}`).trim(),
+            images: cleanImages(v.images && v.images.length > 0 ? v.images : mainImages),
+            inStock: (dbProduct.quantity ?? 0) > 0,
+          }));
+
+          const hasDefaultAlready = variantList.some(
+            (v: any) => v.name.toLowerCase() === 'default'
+          );
+
+          if (!hasDefaultAlready && mainImages.length > 0) {
+            return [
+              {
                 name: "Default",
-                images: dbProduct.imageUrls && dbProduct.imageUrls.length > 0
-                    ? dbProduct.imageUrls
-                    : ['https://picsum.photos/600/500'],
-                inStock: (dbProduct.quantity ?? 0) > 0
+                images: mainImages,
+                inStock: (dbProduct.quantity ?? 0) > 0,
+              },
+              ...variantList,
+            ];
+          }
+          return variantList;
+        }
+
+        if (dbProduct.variantTitle) {
+          const vImages = cleanImages(
+            dbProduct.variantImages && dbProduct.variantImages.length > 0
+              ? dbProduct.variantImages
+              : mainImages
+          );
+          return [
+            {
+              name: "Default",
+              images: mainImages,
+              inStock: (dbProduct.quantity ?? 0) > 0,
             },
             {
-                name: dbProduct.variantTitle || "Variant",
-                images: dbProduct.variantImages && dbProduct.variantImages.length > 0 
-                    ? dbProduct.variantImages 
-                    : (dbProduct.imageUrls && dbProduct.imageUrls.length > 0 ? dbProduct.imageUrls : ['https://picsum.photos/600/500']),
-                inStock: (dbProduct.quantity ?? 0) > 0
-            }
-          ]
-        : [
-            {
-                name: "Default",
-                images: dbProduct.imageUrls && dbProduct.imageUrls.length > 0
-                    ? dbProduct.imageUrls
-                    : ['https://picsum.photos/600/500'],
-                inStock: (dbProduct.quantity ?? 0) > 0
-            }
-          ],
+              name: dbProduct.variantTitle.trim() || "Variant",
+              images: vImages,
+              inStock: (dbProduct.quantity ?? 0) > 0,
+            },
+          ];
+        }
+      }
+
+      return [
+        {
+          name: "Default",
+          images: mainImages,
+          inStock: (dbProduct.quantity ?? 0) > 0,
+        },
+      ];
+    })(),
     isCustomizable: dbProduct.isCustomizable ?? false,
     customizations: dbProduct.customizations || [],
   } : null
@@ -199,6 +245,7 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
                 title={product.title} 
                 price={normalizedPrice} 
                 description={product.description} 
+                productInfo={product.productInfo}
                 inStock={product.inStock} 
                 canUploadImage={product.canUploadImage} 
                 variants={product.variants} 

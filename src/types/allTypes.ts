@@ -24,11 +24,18 @@ export interface CartItemProps {
     removeItem: (id: number) => void;
 }
 
+export interface ProductInfo {
+    description: string;
+    about?: string;
+    note?: string;
+}
+
 export interface ProductContentProps {
     id: string;
     title: string;
     price: string;
     description?: string;
+    productInfo?: ProductInfo;
     inStock: boolean;
     canUploadImage?: boolean;
     variants?: {
@@ -88,6 +95,14 @@ export interface WishlistStoreInterface {
     isInWishlist: (productId: string) => boolean;
 }
 
+export interface ProductVariant {
+  _id?: string;
+  title: string;
+  name?: string;
+  images: string[];
+  inStock?: boolean;
+}
+
 // Product Store Types
 export interface Product {
   _id: string;
@@ -99,9 +114,13 @@ export interface Product {
   imageUrls?: string[];
   thumbnail?: string;
   description?: string;
+  productInfo?: ProductInfo;
   hasVariants?: boolean;
   variantTitle?: string;
   variantImages?: string[];
+  variants?: ProductVariant[];
+  isCustomizable?: boolean;
+  customizations?: string[];
   createdAt?: string;
 }
 
@@ -430,6 +449,9 @@ export interface ProductFormInputs {
   imageUrl?: string | "";
   imageUrls?: string[];
   description: string;
+  about?: string;
+  note?: string;
+  productInfo?: ProductInfo;
   quantity: number;
   price: number;
   category?: string;

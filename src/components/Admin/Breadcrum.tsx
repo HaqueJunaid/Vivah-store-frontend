@@ -6,6 +6,8 @@ const PATH_LABELS: Record<string, string> = {
     admin: 'Admin',
     dashboard: 'Dashboard',
     products: 'Products',
+    add: 'Add Product',
+    new: 'New Product',
     orders: 'Orders',
     users: 'Users',
     insights: 'Insights',

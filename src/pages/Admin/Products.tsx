@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Edit3, PackageSearch, Plus, Search, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import toast from 'react-hot-toast';
-import ProductAddForm from "../../components/Admin/ProductAddForm";
-import ProductEditForm from "../../components/Admin/ProductEditForm";
 import { ProductCardSkeleton } from "../../components/common/Skeletons";
 import { useProductStore } from "../../store/productStore";
 import type { ProductListItemProps } from "../../types/allTypes";
@@ -13,6 +12,7 @@ const getProductImage = (product: any) => product?.imageUrls?.[0] || product?.im
 const ProductListItem: React.FC<ProductListItemProps> = React.memo(({ product, onEdit, onDelete }) => {
   const id = getProductId(product);
   const image = getProductImage(product);
+  const displayDescription = product.productInfo?.description || product.description || "";
 
   return (
     <li className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4">
@@ -30,7 +30,7 @@ const ProductListItem: React.FC<ProductListItemProps> = React.memo(({ product, o
               {product.quantity > 0 ? `${product.quantity} in stock` : "Out of stock"}
             </span>
           </div>
-          <p className="text-stone-600 text-sm mb-2 line-clamp-2">{product.description}</p>
+          <p className="text-stone-600 text-sm mb-2 line-clamp-2">{displayDescription}</p>
           <div className="text-stone-500 text-xs font-mono">Product ID: {id}</div>
         </div>
         <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between md:justify-start gap-3 w-full md:w-fit">
@@ -61,10 +61,9 @@ const ProductListItem: React.FC<ProductListItemProps> = React.memo(({ product, o
 ProductListItem.displayName = "ProductListItem";
 
 const Products = () => {
-  const { products, total, loading, fetchProducts, addProduct, deleteProduct, updateProduct } = useProductStore();
+  const navigate = useNavigate();
+  const { products, total, loading, fetchProducts, deleteProduct } = useProductStore();
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [productToEdit, setProductToEdit] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -105,20 +104,12 @@ const Products = () => {
     "invites & planner"
   ];
 
-  const handleOpenAdd = useCallback(() => {
-    setProductToEdit(null);
-    setIsOpen(true);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setIsOpen(false);
-    setProductToEdit(null);
-  }, []);
-
   const handleEditClick = useCallback((product: any) => {
-    setProductToEdit(product);
-    setIsOpen(true);
-  }, []);
+    const id = getProductId(product);
+    if (id) {
+      navigate(`/admin/products/edit/${id}`);
+    }
+  }, [navigate]);
 
   const handleDeleteClick = useCallback(async (id: string, title: string) => {
     if (confirm(`Are you sure you want to delete ${title}?`)) {
@@ -134,54 +125,6 @@ const Products = () => {
     }
   }, [deleteProduct, page, debouncedSearch, selectedCategory, stockStatus, sortBy, fetchProducts]);
 
-  const handleSaveProduct = useCallback(async (
-    productData: FormData | any,
-    isEdit: boolean,
-    onProgress?: (progress: number) => void
-  ) => {
-    if (isEdit) {
-      try {
-        const id = getProductId(productToEdit);
-        if (!id) {
-          throw new Error("No product ID found for editing.");
-        }
-        await updateProduct(id, productData as FormData, (progressEvent) => {
-          if (progressEvent.total && onProgress) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            onProgress(percentCompleted);
-          }
-        });
-        toast.success("Product updated successfully!");
-      } catch (err: any) {
-        console.error(err);
-        toast.error(err.message || "Failed to update product");
-        throw err;
-      }
-    } else {
-      try {
-        await addProduct(productData as FormData, (progressEvent) => {
-          if (progressEvent.total && onProgress) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            onProgress(percentCompleted);
-          }
-        });
-        toast.success("Product created successfully!");
-      } catch (err: any) {
-        console.error(err);
-        toast.error(err.message || "Failed to create product");
-        throw err;
-      }
-    }
-    setIsOpen(false);
-    setProductToEdit(null);
-    // Refresh page
-    fetchProducts(page, limit, false, debouncedSearch, selectedCategory, stockStatus, sortBy);
-  }, [productToEdit, updateProduct, addProduct, page, debouncedSearch, selectedCategory, stockStatus, sortBy, fetchProducts]);
-
-  const existingIds = useMemo(() => {
-    return products.map((p: any) => getProductId(p));
-  }, [products]);
-
   const totalPages = Math.ceil(total / limit) || 1;
 
   return (
@@ -191,12 +134,12 @@ const Products = () => {
           <PackageSearch size={28} className="text-[#E41F66]" />
           <h1 className="text-2xl font-medium">All Products</h1>
         </div>
-        <button
-          onClick={handleOpenAdd}
+        <Link
+          to="/admin/products/add"
           className="flex items-center justify-center gap-2 px-4 py-2 bg-stone-900 text-stone-50 rounded-md hover:scale-95 transition-all duration-300 ease-in-out cursor-pointer font-semibold shadow-sm"
         >
           <Plus size={20} /> Add Product
-        </button>
+        </Link>
       </div>
 
       {/* Search and Filter Section */}
@@ -324,26 +267,6 @@ const Products = () => {
           </p>
         </div>
       </div>
-
-      {/* Add/Edit Product Modal */}
-      {isOpen && (
-        productToEdit ? (
-          <ProductEditForm
-            isOpen={isOpen}
-            onClose={handleClose}
-            onAddProduct={handleSaveProduct}
-            existingIds={existingIds}
-            productToEdit={productToEdit}
-          />
-        ) : (
-          <ProductAddForm
-            isOpen={isOpen}
-            onClose={handleClose}
-            onAddProduct={handleSaveProduct}
-            existingIds={existingIds}
-          />
-        )
-      )}
     </div>
   );
 };

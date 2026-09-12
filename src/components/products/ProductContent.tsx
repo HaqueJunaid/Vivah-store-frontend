@@ -17,6 +17,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
     title, 
     price, 
     description,
+    productInfo,
     inStock, 
     canUploadImage, 
     variants, 
@@ -89,7 +90,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
 
     return (
         <div className='flex flex-col gap-4 py-2 w-full'>
-            <div className='flex flex-col gap-2.5 mb-6 pb-6 border-b border-stone-200/80 text-stone-900'>
+            <div className='flex flex-col gap-2.5 mb-2 pb-6 border-b border-stone-200/80 text-stone-900'>
                 {inStock ? (
                     <span className='flex items-center gap-1.5 text-xs text-[#E41F66] font-semibold tracking-widest uppercase'>
                         <span className='size-1.5 rounded-full bg-[#E41F66] animate-pulse' />
@@ -104,16 +105,6 @@ const ProductContent: React.FC<ProductContentProps> = ({
                 <h1 className='font-sans font-medium text-3xl sm:text-4xl tracking-wide capitalize leading-tight text-stone-900'>{title}</h1>
                 <p className='text-[#E41F66] font-semibold text-2xl tracking-wide mt-1'>₹{price}</p>
             </div>
-
-            {/* Product Description */}
-            {description && (
-                <div className='pb-6 border-b border-stone-200/80'>
-                    <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold block mb-2'>Description</span>
-                    <p className='text-stone-600 text-sm leading-relaxed whitespace-pre-line font-light'>
-                        {description}
-                    </p>
-                </div>
-            )}
 
             {/* Quantity selection */}
             <div className='flex flex-col gap-3 pb-6 border-b border-stone-200/80'>
@@ -182,23 +173,23 @@ const ProductContent: React.FC<ProductContentProps> = ({
             )}
 
             {/* Design Variants */}
-            {variants && variants.length > 0 && (
+            {variants && variants.length > 1 && (
                 <div className='flex flex-col gap-3 pt-3 pb-6 border-b border-stone-200/80'>
                     <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Design Variants</span>
                     <div className='flex flex-wrap gap-4'>
                         {variants.map((variant, index) => (
                             <button 
-                                type="button"
+                                type="button" 
                                 key={index} 
                                 onClick={() => { setActiveVariant(index); handleVariantChange(index); }} 
-                                className={`relative flex flex-col items-center gap-1.5 bg-white p-0.5 border transition-all duration-300 cursor-pointer rounded-xl ${
+                                className={`relative flex flex-col items-center gap-1.5 bg-white p-1 border transition-all duration-300 cursor-pointer rounded-xl ${
                                     activeVariant === index 
                                         ? 'border-[#E41F66] ring-1 ring-[#E41F66]/30' 
                                         : 'border-stone-200 hover:border-stone-400'
                                 }`}
                             >
-                                <img src={variant.images[0]} alt={variant.name} className='w-16 h-20 object-cover rounded-lg' />
-                                <span className='text-[10px] tracking-wide text-stone-600 px-1 py-0.5'>{variant.name}</span>
+                                <img src={variant.images[0]} alt={variant.name} className='w-16 h-20 object-contain rounded-lg bg-stone-50/70 p-0.5' />
+                                <span className='text-[10px] tracking-wide text-stone-600 px-1 py-0.5 font-medium'>{variant.name}</span>
                             </button>
                         ))}
                     </div>

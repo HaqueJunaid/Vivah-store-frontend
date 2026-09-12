@@ -147,6 +147,9 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
         ...productToEdit,
         category: matchedCategory,
         subCategory: matchedSubCategory,
+        description: productToEdit.productInfo?.description || productToEdit.description || "",
+        about: productToEdit.productInfo?.about || productToEdit.about || "",
+        note: productToEdit.productInfo?.note || productToEdit.note || "",
         isCustomizable: !!productToEdit.isCustomizable,
       };
       reset(normalized);
@@ -180,7 +183,17 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
   const onSubmit: SubmitHandler<Product> = async (data) => {
     const formData = new FormData();
     formData.append("title", data.title);
-    formData.append("description", data.description);
+    
+    const productInfoObj = {
+      description: data.description?.trim() || "",
+      about: data.about?.trim() || "",
+      note: data.note?.trim() || "",
+    };
+    formData.append("productInfo", JSON.stringify(productInfoObj));
+    formData.append("description", productInfoObj.description);
+    formData.append("about", productInfoObj.about);
+    formData.append("note", productInfoObj.note);
+
     formData.append("price", String(data.price));
     formData.append("quantity", String(data.quantity));
     formData.append("category", data.category || "Assets");
@@ -552,15 +565,37 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">Description</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">Description *</label>
             <textarea
               rows={3}
               disabled={isUploading}
               {...register("description", { required: "Description is required" })}
               className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm text-stone-700 outline-none focus:border-stone-900 focus:bg-white transition-all resize-none disabled:opacity-60"
-              placeholder="Describe your product here..."
+              placeholder="Overview description of your product..."
             />
             {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">About Product</label>
+            <textarea
+              rows={3}
+              disabled={isUploading}
+              {...register("about")}
+              className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm text-stone-700 outline-none focus:border-stone-900 focus:bg-white transition-all resize-none disabled:opacity-60"
+              placeholder="Detailed info about materials, craftsmanship, dimensions, and specifications..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-amber-700 mb-1.5">Important Note</label>
+            <textarea
+              rows={2}
+              disabled={isUploading}
+              {...register("note")}
+              className="w-full rounded-xl border border-amber-200 bg-amber-50/40 px-4 py-2.5 text-sm text-stone-700 outline-none focus:border-amber-500 focus:bg-white transition-all resize-none disabled:opacity-60"
+              placeholder="Key notes, customer guidance, or delivery instructions..."
+            />
           </div>
 
           <div className="pt-4 border-t border-stone-100">

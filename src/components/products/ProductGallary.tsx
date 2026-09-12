@@ -6,6 +6,7 @@ const ProductGallary: React.FC<{ images: string[], mainImage: string, handleVari
     const [isZoomed, setIsZoomed] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
 
+    const uniqueImages = Array.from(new Set((images || []).filter(Boolean)));
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (typeof window !== 'undefined' && (window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches)) return
@@ -25,33 +26,33 @@ const ProductGallary: React.FC<{ images: string[], mainImage: string, handleVari
 
     return (
         <div className='md:sticky md:top-28 flex md:flex-row flex-col-reverse gap-4 w-full h-fit select-none'>
-            {images.length > 1 && (
+            {uniqueImages.length > 1 && (
                 <div className='flex flex-row md:flex-col flex-nowrap gap-3 overflow-auto max-h-[500px] shrink-0 scrollbar-none'>
-                    {images.map((image, i) => (
+                    {uniqueImages.map((image, i) => (
                         <button
                             type="button"
                             key={image + i}
                             onClick={() => handleThumbnailClick?.(i)}
-                            className={`w-18 h-22 shrink-0 overflow-hidden border transition-all duration-300 cursor-pointer rounded-xl bg-white p-0.5 ${
+                            className={`w-18 h-22 shrink-0 overflow-hidden border transition-all duration-300 cursor-pointer rounded-xl bg-white p-1 flex items-center justify-center ${
                                 mainImage === image
                                     ? "border-[#E41F66] ring-1 ring-[#E41F66]/30"
                                     : "border-stone-200 hover:border-stone-400"
                             }`}
                         >
-                            <img src={image} alt={`Thumbnail ${i + 1}`} className='w-full h-full object-center object-cover rounded-xl' />
+                            <img src={image} alt={`Thumbnail ${i + 1}`} className='w-full h-full object-center object-contain rounded-lg bg-stone-50/50' />
                         </button>
                     ))}
                 </div>
             )}
             <div
                 ref={containerRef}
-                className='w-full aspect-[4/5] overflow-hidden md:cursor-zoom-in cursor-default border border-stone-200/50 bg-white rounded-2xl relative'
+                className='w-full aspect-[4/5] sm:aspect-square overflow-hidden md:cursor-zoom-in cursor-default border border-stone-200/80 bg-white rounded-2xl relative flex items-center justify-center p-3 shadow-2xs'
                 onMouseMove={handleMouseMove}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
                 <img
-                    className='w-full h-full object-cover transition-transform duration-200 ease-out pointer-events-none will-change-transform transform-gpu'
+                    className='w-full h-full object-contain transition-transform duration-200 ease-out pointer-events-none will-change-transform transform-gpu'
                     style={{
                         transform: isZoomed ? 'scale(2)' : 'scale(1)',
                         transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
