@@ -5,17 +5,17 @@ export const Skeleton: React.FC<{ className?: string }> = ({ className = '' }) =
 );
 
 export const ProductCardSkeleton: React.FC = () => (
-    <div className="border border-stone-200/40 rounded-2xl bg-white shadow-xs flex flex-col h-full overflow-hidden">
+    <div className="border border-stone-200/60 rounded-xl sm:rounded-2xl bg-white shadow-xs flex flex-col h-full overflow-hidden">
         {/* Aspect Square image skeleton */}
         <div className="w-full aspect-square bg-stone-100 animate-pulse border-b border-stone-100" />
         
         {/* Info content skeleton */}
-        <div className="p-4 md:p-5 flex flex-col flex-grow space-y-3">
-            <Skeleton className="w-1/3 h-3 rounded-lg" />
-            <Skeleton className="w-3/4 h-4 rounded-lg" />
-            <Skeleton className="w-1/4 h-3.5 rounded-lg" />
-            <div className="pt-4 mt-auto">
-                <Skeleton className="w-full h-10 rounded-xl" />
+        <div className="p-2.5 sm:p-3.5 md:p-4 flex flex-col flex-grow space-y-2.5">
+            <Skeleton className="w-1/3 h-2.5 sm:h-3 rounded-md" />
+            <Skeleton className="w-4/5 h-3.5 sm:h-4 rounded-md" />
+            <Skeleton className="w-1/4 h-3 sm:h-3.5 rounded-md" />
+            <div className="pt-2 mt-auto">
+                <Skeleton className="w-full h-8 sm:h-9 rounded-lg sm:rounded-xl" />
             </div>
         </div>
     </div>

@@ -202,19 +202,19 @@ const ProductContent: React.FC<ProductContentProps> = ({
             {variants && variants.length > 1 && (
                 <div className='flex flex-col gap-3 pt-3 pb-6 border-b border-stone-200/80'>
                     <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Design Variants</span>
-                    <div className='flex flex-wrap gap-4'>
+                    <div className='flex flex-wrap gap-2'>
                         {variants.map((variant, index) => (
                             <button 
                                 type="button" 
                                 key={index} 
                                 onClick={() => { setActiveVariant(index); handleVariantChange(index); }} 
-                                className={`relative flex flex-col items-center gap-1.5 bg-white p-1 border transition-all duration-300 cursor-pointer rounded-xl ${
+                                className={`w-20 h-28 relative flex flex-col items-center gap-1.5 bg-white p-1 border transition-all duration-300 cursor-pointer rounded-xl ${
                                     activeVariant === index 
                                         ? 'border-[#E41F66] ring-1 ring-[#E41F66]/30' 
                                         : 'border-stone-200 hover:border-stone-400'
                                 }`}
                             >
-                                <img src={variant.images[0]} alt={variant.name} className='w-16 h-20 object-contain rounded-lg bg-stone-50/70 p-0.5' />
+                                <img src={variant.images[0]} alt={variant.name} className='rounded-lg bg-stone-50/70 p-0.5 w-full h-full object-cover' />
                                 <span className='text-[10px] tracking-wide text-stone-600 px-1 py-0.5 font-medium'>{variant.name}</span>
                             </button>
                         ))}

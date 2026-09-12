@@ -60,11 +60,10 @@ const DetailProduct: React.FC = () => {
     const [selectedVariant, setSelectedVariant] = useState(0)
     const [selectedImage, setSelectedImage] = useState(0)
 
-    // Collapsible accordion open sections
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-        description: true,
-        about: true,
-        note: true,
+        description: false,
+        about: false,
+        note: false,
         ordering: false,
     });
 

@@ -34,14 +34,14 @@ const AddToWishListButton = ({ id, title, price, imageUrl, variant = 'default' }
         return (
             <button
                 type='button'
-                className='absolute top-3 right-3 z-30 flex items-center justify-center size-9 bg-white/95 hover:bg-white backdrop-blur-xs text-stone-900 rounded-full shadow-xs hover:scale-105 active:scale-95 transition-all duration-300 border border-stone-200/40 cursor-pointer'
+                className='absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-20 flex items-center justify-center size-7 sm:size-8 md:size-9 bg-white/90 hover:bg-white backdrop-blur-md text-stone-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer'
                 onClick={toggleWishlist}
                 aria-label='Wishlist'
             >
                 {isAddedToWishList ? (
-                    <FaHeart className='size-4 text-[#E41F66] transition-all duration-300' />
+                    <FaHeart className='size-3.5 sm:size-4 text-[#E41F66] transition-all duration-300' />
                 ) : (
-                    <FaRegHeart className='size-4 text-stone-900 hover:text-[#E41F66] transition-all duration-300' />
+                    <FaRegHeart className='size-3.5 sm:size-4 text-stone-700 hover:text-[#E41F66] transition-all duration-300' />
                 )}
             </button>
         )
