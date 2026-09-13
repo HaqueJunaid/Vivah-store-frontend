@@ -1,4 +1,4 @@
-import React, { useEffect, lazy, Suspense } from 'react';
+import React, { useEffect, lazy, Suspense, memo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ScrollToTop from "./utils/ScrollToTop.tsx";
 import ProgressBar from "./components/common/ProgressBar.tsx";
@@ -10,32 +10,43 @@ import { useAuthStore } from './store/authStore';
 import { setAuthToken } from './services/api';
 import { useCartStore } from './store/cartStore';
 
-// Code-split pages for faster initial load and resource efficiency
-const CartPage = lazy(() => import('./pages/cart/CartPage.tsx'));
-const WishListPage = lazy(() => import('./pages/wishlist/WishListPage.tsx'));
-const Faqs = lazy(() => import('./pages/faqs/Faqs.tsx'));
-const AboutUs = lazy(() => import('./pages/static/AboutUs.tsx'));
-const ContactUs = lazy(() => import('./pages/static/ContactUs.tsx'));
-const ProductLayout = lazy(() => import('./components/layout/ProductLayout.tsx'));
-const DetailProduct = lazy(() => import('./components/products/DetailProduct.tsx'));
-const OrderDetail = lazy(() => import('./components/profile/OrderDetail.tsx'));
-const Profile = lazy(() => import('./pages/profile/Profile.tsx'));
-const Register = lazy(() => import('./pages/auth/Register.tsx'));
-const Login = lazy(() => import('./pages/auth/Login.tsx'));
-const VerifyOTP = lazy(() => import('./pages/auth/VerifyOTP.tsx'));
-const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword.tsx'));
-const ResetPassword = lazy(() => import('./pages/auth/ResetPassword.tsx'));
-const NotFound = lazy(() => import('./pages/static/NotFound.tsx'));
+// Helper to lazy-load and memoize components for optimal performance & prevent redundant re-renders
+const lazyWithMemo = <P extends object>(
+  factory: () => Promise<{ default: React.ComponentType<P> }>
+) => {
+  return lazy(() =>
+    factory().then((module) => ({
+      default: memo(module.default),
+    }))
+  );
+};
 
-// Admin Related Components (Lazy loaded)
-const AdminLayout = lazy(() => import('./components/layout/AdminLayout.tsx'));
-const Dashboard = lazy(() => import('./pages/Admin/Dashboard.tsx'));
-const Products = lazy(() => import('./pages/Admin/Products.tsx'));
-const AddProductPage = lazy(() => import('./pages/Admin/AddProductPage.tsx'));
-const EditProductPage = lazy(() => import('./pages/Admin/EditProductPage.tsx'));
-const Insights = lazy(() => import('./pages/Admin/Insights.tsx'));
-const Orders = lazy(() => import('./pages/Admin/Orders.tsx'));
-const Users = lazy(() => import('./pages/Admin/Users.tsx'));
+// User & Static Pages (Lazy Loaded + Memoized)
+const CartPage = lazyWithMemo(() => import('./pages/cart/CartPage.tsx'));
+const WishListPage = lazyWithMemo(() => import('./pages/wishlist/WishListPage.tsx'));
+const Faqs = lazyWithMemo(() => import('./pages/faqs/Faqs.tsx'));
+const AboutUs = lazyWithMemo(() => import('./pages/static/AboutUs.tsx'));
+const ContactUs = lazyWithMemo(() => import('./pages/static/ContactUs.tsx'));
+const ProductLayout = lazyWithMemo(() => import('./components/layout/ProductLayout.tsx'));
+const DetailProduct = lazyWithMemo(() => import('./components/products/DetailProduct.tsx'));
+const OrderDetail = lazyWithMemo(() => import('./components/profile/OrderDetail.tsx'));
+const Profile = lazyWithMemo(() => import('./pages/profile/Profile.tsx'));
+const Register = lazyWithMemo(() => import('./pages/auth/Register.tsx'));
+const Login = lazyWithMemo(() => import('./pages/auth/Login.tsx'));
+const VerifyOTP = lazyWithMemo(() => import('./pages/auth/VerifyOTP.tsx'));
+const ForgotPassword = lazyWithMemo(() => import('./pages/auth/ForgotPassword.tsx'));
+const ResetPassword = lazyWithMemo(() => import('./pages/auth/ResetPassword.tsx'));
+const NotFound = lazyWithMemo(() => import('./pages/static/NotFound.tsx'));
+
+// Admin Components (Lazy Loaded + Memoized)
+const AdminLayout = lazyWithMemo(() => import('./components/layout/AdminLayout.tsx'));
+const Dashboard = lazyWithMemo(() => import('./pages/Admin/Dashboard.tsx'));
+const Products = lazyWithMemo(() => import('./pages/Admin/Products.tsx'));
+const AddProductPage = lazyWithMemo(() => import('./pages/Admin/AddProductPage.tsx'));
+const EditProductPage = lazyWithMemo(() => import('./pages/Admin/EditProductPage.tsx'));
+const Insights = lazyWithMemo(() => import('./pages/Admin/Insights.tsx'));
+const Orders = lazyWithMemo(() => import('./pages/Admin/Orders.tsx'));
+const Users = lazyWithMemo(() => import('./pages/Admin/Users.tsx'));
 
 const App = () => {
   const token = useAuthStore((state) => state.token);
