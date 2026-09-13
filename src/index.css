@@ -5,6 +5,14 @@ html, body {
   max-width: 100%;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 * {
   font-family: "Outfit", sans-serif;
 }

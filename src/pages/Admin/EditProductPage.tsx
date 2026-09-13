@@ -440,35 +440,35 @@ const EditProductPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50/70 p-4 sm:p-6 lg:p-10">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen bg-stone-50/70 p-3.5 sm:p-6 lg:p-10">
+      <div className="max-w-5xl w-full mx-auto space-y-6 sm:space-y-8">
         
         {/* Top Header Navigation */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200 pb-5">
-          <div className="space-y-1">
+          <div className="space-y-1.5 min-w-0">
             <Link
               to="/admin/products"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-stone-900 transition-colors mb-1"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-stone-900 transition-colors mb-0.5"
             >
               <ChevronLeft size={16} /> Back to Products
             </Link>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">Edit Product</h1>
-              <span className="text-xs font-semibold bg-stone-100 text-stone-700 px-2.5 py-1 rounded-full border border-stone-200 font-mono">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-stone-900 tracking-tight">Edit Product</h1>
+              <span className="text-xs font-semibold bg-stone-100 text-stone-700 px-2.5 py-0.5 rounded-full border border-stone-200 font-mono shrink-0">
                 ID: {id}
               </span>
             </div>
-            <p className="text-sm text-stone-500 max-w-2xl">
+            <p className="text-xs sm:text-sm text-stone-500 max-w-2xl wrap-break-word leading-relaxed">
               Update product specs, structured overview, detailed about information, photography, and variant options.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto shrink-0">
             <button
               type="button"
               onClick={() => navigate("/admin/products")}
               disabled={isSubmitting}
-              className="px-4 py-2.5 text-sm font-medium text-stone-700 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition cursor-pointer disabled:opacity-50"
+              className="flex-1 sm:flex-none px-4 py-2.5 text-xs sm:text-sm font-medium text-stone-700 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition cursor-pointer disabled:opacity-50 text-center"
             >
               Cancel
             </button>
@@ -476,7 +476,7 @@ const EditProductPage: React.FC = () => {
               type="button"
               onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-stone-900 hover:bg-[#E41F66] rounded-xl shadow-sm transition-all duration-300 cursor-pointer disabled:opacity-60"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white bg-stone-900 hover:bg-[#E41F66] rounded-xl shadow-sm transition-all duration-300 cursor-pointer disabled:opacity-60 text-center whitespace-nowrap"
             >
               {isSubmitting ? (
                 <>
@@ -494,21 +494,21 @@ const EditProductPage: React.FC = () => {
         </div>
 
         {/* Form Container */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
           
           {/* Card 1: Basic Information */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-xs space-y-6">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
             <div className="flex items-center gap-3 pb-4 border-b border-stone-100">
-              <div className="p-2 bg-stone-100 rounded-xl text-stone-800">
+              <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
                 <Package size={20} />
               </div>
-              <div>
-                <h2 className="text-lg font-semibold text-stone-900">Basic Information</h2>
-                <p className="text-xs text-stone-500">Core listing identification, categories, and inventory parameters.</p>
+              <div className="min-w-0">
+                <h2 className="text-base sm:text-lg font-semibold text-stone-900">Basic Information</h2>
+                <p className="text-xs text-stone-500 break-words">Core listing identification, categories, and inventory parameters.</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {/* Product Title */}
               <div className="md:col-span-2">
                 <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">
@@ -522,7 +522,7 @@ const EditProductPage: React.FC = () => {
                     minLength: { value: 3, message: "Title must be at least 3 characters" }
                   })}
                   placeholder="e.g. Royal Golden Laser-Cut Wedding Invitation Suite"
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition disabled:opacity-60"
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-3.5 sm:px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition disabled:opacity-60"
                 />
                 {errors.title && <p className="text-xs text-red-500 mt-1.5">{errors.title.message}</p>}
               </div>
@@ -535,7 +535,7 @@ const EditProductPage: React.FC = () => {
                 <select
                   disabled={isSubmitting}
                   {...register("category", { required: "Category is required" })}
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition cursor-pointer disabled:opacity-60"
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-3.5 sm:px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition cursor-pointer disabled:opacity-60"
                 >
                   <option value="Assets">Assets</option>
                   <option value="Boards & Signage">Boards & Signage</option>
@@ -560,7 +560,7 @@ const EditProductPage: React.FC = () => {
                     validate: (value) =>
                       subCategoryOptions.length === 0 || value ? true : "Sub Category is required",
                   })}
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition cursor-pointer disabled:opacity-60"
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-3.5 sm:px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition cursor-pointer disabled:opacity-60"
                 >
                   <option value="">
                     {subCategoryOptions.length === 0 ? "No sub-categories available" : "Select sub-category"}
@@ -628,26 +628,26 @@ const EditProductPage: React.FC = () => {
           </div>
 
           {/* Card 2: Structured Product Information (productInfo) */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-xs space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-stone-100 flex-wrap gap-2">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-stone-100 gap-2">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#E41F66]/10 text-[#E41F66] rounded-xl">
+                <div className="p-2 bg-[#E41F66]/10 text-[#E41F66] rounded-xl shrink-0">
                   <FileText size={20} />
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-stone-900">Product Information & Story</h2>
-                  <p className="text-xs text-stone-500">Provide an overview, craftsmanship story, and vital notes for buyers.</p>
+                <div className="min-w-0">
+                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Product Information & Story</h2>
+                  <p className="text-xs text-stone-500 break-words">Provide an overview, craftsmanship story, and vital notes for buyers.</p>
                 </div>
               </div>
-              <span className="text-xs font-medium text-stone-500 bg-stone-100 px-3 py-1 rounded-full">
+              <span className="text-xs font-medium text-stone-500 bg-stone-100 px-3 py-1 rounded-full w-fit">
                 Structured Info Schema
               </span>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-5 sm:space-y-6">
               {/* Field 1: Description */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
                   <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
                     Product Description <span className="text-red-500">*</span>
                   </label>
@@ -657,27 +657,27 @@ const EditProductPage: React.FC = () => {
                   rows={3}
                   disabled={isSubmitting}
                   {...register("description", { required: "Product description is required" })}
-                  placeholder="Briefly describe the product's elegance, charm, and key highlights..."
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 p-4 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition resize-none disabled:opacity-60 leading-relaxed"
+                  placeholder="Description here..."
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 p-3.5 sm:p-4 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition resize-none disabled:opacity-60 leading-relaxed"
                 />
                 {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
               </div>
 
               {/* Field 2: About Product */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
                   <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-stone-700">
                     <Sparkles size={14} className="text-[#E41F66]" />
                     About This Product
                   </label>
-                  <span className="text-[11px] text-stone-400">Craftsmanship, materials & specs</span>
+                  <span className="text-[11px] text-stone-400">Craftsmanship & specs</span>
                 </div>
                 <textarea
                   rows={4}
                   disabled={isSubmitting}
                   {...register("about")}
-                  placeholder="Elaborate on the materials (e.g. 350 GSM matte cardstock, gold foil accents), dimensions, handcrafted details, and what makes it extraordinary..."
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 p-4 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition resize-none disabled:opacity-60 leading-relaxed"
+                  placeholder="About here..."
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 p-3.5 sm:p-4 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition resize-none disabled:opacity-60 leading-relaxed"
                 />
                 <p className="text-[11px] text-stone-400">
                   This detailed info will be displayed in an elegant dedicated section on the product page.
@@ -686,19 +686,19 @@ const EditProductPage: React.FC = () => {
 
               {/* Field 3: Important Note */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
                   <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700">
                     <AlertCircle size={14} className="text-amber-600" />
                     Important Note / Guidelines
                   </label>
-                  <span className="text-[11px] text-stone-400">Key customer guidance & alerts</span>
+                  <span className="text-[11px] text-stone-400">Key customer alerts</span>
                 </div>
                 <textarea
                   rows={2}
                   disabled={isSubmitting}
                   {...register("note")}
-                  placeholder="e.g. Note: As each suite is handcrafted, minor variations may occur. Customization digital proof will be emailed within 24 hours of placing the order."
-                  className="w-full rounded-2xl border border-amber-200/80 bg-amber-50/30 p-4 text-sm text-stone-900 outline-none focus:border-amber-500 focus:bg-white transition resize-none disabled:opacity-60 leading-relaxed"
+                  placeholder="Important note here..."
+                  className="w-full rounded-2xl border border-amber-200/80 bg-amber-50/30 p-3.5 sm:p-4 text-sm text-stone-900 outline-none focus:border-amber-500 focus:bg-white transition resize-none disabled:opacity-60 leading-relaxed"
                 />
                 <p className="text-[11px] text-stone-400">
                   Renders as a luxury highlighted callout banner to make essential instructions effortlessly visible.
@@ -708,18 +708,18 @@ const EditProductPage: React.FC = () => {
           </div>
 
           {/* Card 3: Media & Gallery */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-xs space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
+            <div className="flex items-center justify-between pb-4 border-b border-stone-100 gap-2">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-stone-100 rounded-xl text-stone-800">
+                <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
                   <Upload size={20} />
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-stone-900">Product Gallery</h2>
-                  <p className="text-xs text-stone-500">Upload high-resolution photography. The first image will be used as the primary card cover.</p>
+                <div className="min-w-0">
+                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Product Gallery</h2>
+                  <p className="text-xs text-stone-500 break-words">Upload high-resolution photography.</p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-stone-600 bg-stone-100 px-3 py-1 rounded-full">
+              <span className="text-xs font-bold text-stone-600 bg-stone-100 px-3 py-1 rounded-full shrink-0">
                 {imagePreviews.length} {imagePreviews.length === 1 ? "Image" : "Images"}
               </span>
             </div>
@@ -727,15 +727,15 @@ const EditProductPage: React.FC = () => {
             <div className="space-y-4">
               <label 
                 htmlFor="editMainImageInput"
-                className="flex flex-col items-center justify-center p-8 border-2 border-stone-200 border-dashed rounded-3xl hover:border-[#E41F66] transition-colors cursor-pointer bg-stone-50/40 hover:bg-stone-50/80 group text-center"
+                className="flex flex-col items-center justify-center p-6 sm:p-8 border-2 border-stone-200 border-dashed rounded-2xl sm:rounded-3xl hover:border-[#E41F66] transition-colors cursor-pointer bg-stone-50/40 hover:bg-stone-50/80 group text-center"
               >
-                <div className="size-12 rounded-full bg-white shadow-xs border border-stone-200 flex items-center justify-center text-stone-400 group-hover:text-[#E41F66] group-hover:scale-110 transition-all mb-3">
-                  <Upload size={22} />
+                <div className="size-11 sm:size-12 rounded-full bg-white shadow-xs border border-stone-200 flex items-center justify-center text-stone-400 group-hover:text-[#E41F66] group-hover:scale-110 transition-all mb-2.5">
+                  <Upload size={20} />
                 </div>
-                <p className="text-sm font-semibold text-stone-800">
+                <p className="text-xs sm:text-sm font-semibold text-stone-800">
                   Click or drag new images to add to the gallery
                 </p>
-                <p className="text-xs text-stone-400 mt-1">PNG, JPG, WEBP up to 10MB per file</p>
+                <p className="text-[11px] text-stone-400 mt-1">PNG, JPG, WEBP up to 10MB per file</p>
                 <input
                   id="editMainImageInput"
                   type="file"
@@ -748,7 +748,7 @@ const EditProductPage: React.FC = () => {
               </label>
 
               {imagePreviews.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 pt-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 sm:gap-3 pt-2">
                   {imagePreviews.map((src, idx) => (
                     <div key={`${src}-${idx}`} className="group relative aspect-square rounded-2xl overflow-hidden border border-stone-200 bg-stone-100 shadow-2xs">
                       <img src={src} alt={`Preview ${idx + 1}`} className="h-full w-full object-cover" />
@@ -761,7 +761,7 @@ const EditProductPage: React.FC = () => {
                         type="button"
                         disabled={isSubmitting}
                         onClick={() => handleRemoveImage(idx)}
-                        className="absolute top-1.5 right-1.5 bg-stone-900/80 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer"
+                        className="absolute top-1.5 right-1.5 bg-stone-900/80 hover:bg-red-600 text-white rounded-full p-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer"
                         title="Remove image"
                       >
                         <X size={14} />
@@ -774,18 +774,18 @@ const EditProductPage: React.FC = () => {
           </div>
 
           {/* Card 4: Variants Configuration */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-xs space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-stone-100 gap-2">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-stone-100 rounded-xl text-stone-800">
+                <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
                   <Layers size={20} />
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-stone-900">Product Variants</h2>
-                  <p className="text-xs text-stone-500">Enable if this item offers multiple designs, colorways, or pack options.</p>
+                <div className="min-w-0 flex flex-col md:flex-row">
+                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Product Variants</h2>
+                  <p className="text-xs text-stone-500 wrap-break-word">Enable for multiple designs, colorways, or pack options.</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <input
                   type="checkbox"
                   id="editHasVariantsToggle"
@@ -793,41 +793,41 @@ const EditProductPage: React.FC = () => {
                   {...register("hasVariants")}
                   className="size-5 rounded-md border-stone-300 text-[#E41F66] focus:ring-[#E41F66] cursor-pointer"
                 />
-                <label htmlFor="editHasVariantsToggle" className="text-sm font-semibold text-stone-800 cursor-pointer">
+                <label htmlFor="editHasVariantsToggle" className="text-xs sm:text-sm font-semibold text-stone-800 cursor-pointer whitespace-nowrap">
                   Has Variants
                 </label>
               </div>
             </div>
 
             {hasVariants && (
-              <div className="space-y-6 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between">
+              <div className="space-y-5 sm:space-y-6 animate-in fade-in duration-200">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                   <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
-                    Product Variants List ({variantsList.length})
+                    Product Variants ({variantsList.length})
                   </span>
                   <button
                     type="button"
                     disabled={isSubmitting}
                     onClick={handleAddVariant}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#E41F66]/10 hover:bg-[#E41F66]/20 text-[#E41F66] text-xs font-bold transition cursor-pointer"
+                    className="inline-flex items-center w-fit gap-1.5 px-3 py-1.5 rounded-xl bg-[#E41F66]/10 hover:bg-[#E41F66]/20 text-[#E41F66] text-xs font-bold transition cursor-pointer shrink-0"
                   >
                     <Plus size={14} />
-                    Add Another Variant
+                    Add Variant
                   </button>
                 </div>
 
-                <div className="space-y-5">
+                <div className="space-y-4 sm:space-y-5">
                   {variantsList.map((v, index) => (
                     <div
                       key={v.id}
-                      className="p-6 rounded-2xl bg-stone-50 border border-stone-200/90 space-y-4 shadow-2xs relative"
+                      className="p-4 sm:p-6 rounded-2xl bg-stone-50 border border-stone-200/90 space-y-4 shadow-2xs relative"
                     >
-                      <div className="flex items-center justify-between pb-3 border-b border-stone-200/70">
-                        <div className="flex items-center gap-2">
-                          <span className="size-6 rounded-full bg-stone-900 text-white text-xs font-bold flex items-center justify-center">
+                      <div className="flex items-center justify-between pb-3 border-b border-stone-200/70 gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="size-6 rounded-full bg-stone-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
                             {index + 1}
                           </span>
-                          <span className="text-sm font-bold text-stone-900">
+                          <span className="text-sm font-bold text-stone-900 truncate">
                             {v.title ? v.title : `Variant #${index + 1}`}
                           </span>
                         </div>
@@ -836,7 +836,7 @@ const EditProductPage: React.FC = () => {
                             type="button"
                             disabled={isSubmitting}
                             onClick={() => handleRemoveVariant(v.id)}
-                            className="text-stone-400 hover:text-red-600 transition p-1 rounded-lg hover:bg-red-50 cursor-pointer flex items-center gap-1 text-xs font-semibold"
+                            className="text-stone-400 hover:text-red-600 transition p-1 rounded-lg hover:bg-red-50 cursor-pointer flex items-center gap-1 text-xs font-semibold shrink-0"
                             title="Remove this variant"
                           >
                             <Trash2 size={14} />
@@ -856,7 +856,7 @@ const EditProductPage: React.FC = () => {
                           value={v.title}
                           onChange={(e) => handleVariantTitleChange(v.id, e.target.value)}
                           placeholder="e.g. Design 1, Emerald Green, Pack of 50"
-                          className="w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm text-stone-900 outline-none focus:border-[#E41F66] transition"
+                          className="w-full rounded-xl border border-stone-200 bg-white px-3.5 sm:px-4 py-2.5 text-sm text-stone-900 outline-none focus:border-[#E41F66] transition"
                         />
                       </div>
 
@@ -867,7 +867,7 @@ const EditProductPage: React.FC = () => {
                             Variant Images <span className="text-red-500">*</span>
                           </label>
                           <span className="text-[11px] text-stone-400">
-                            {v.imagePreviews.length} {v.imagePreviews.length === 1 ? "image" : "images"} total
+                            {v.imagePreviews.length} {v.imagePreviews.length === 1 ? "image" : "images"}
                           </span>
                         </div>
                         <input
@@ -876,10 +876,10 @@ const EditProductPage: React.FC = () => {
                           multiple
                           disabled={isSubmitting}
                           onChange={(e) => handleVariantImageChange(v.id, e)}
-                          className="w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm text-stone-700 outline-none file:text-xs file:font-semibold file:bg-stone-100 file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:mr-3 hover:file:bg-stone-200 cursor-pointer"
+                          className="w-full rounded-xl border border-stone-200 bg-white px-3 sm:px-4 py-2 text-xs sm:text-sm text-stone-700 outline-none file:text-xs file:font-semibold file:bg-stone-100 file:border-0 file:rounded-lg file:px-2.5 file:py-1 file:mr-2.5 hover:file:bg-stone-200 cursor-pointer"
                         />
                         {v.imagePreviews.length > 0 && (
-                          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-3">
+                          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 mt-3">
                             {v.imagePreviews.map((src, idx) => (
                               <div key={`${src}-${idx}`} className="group relative aspect-square rounded-xl overflow-hidden border border-stone-200 bg-stone-100">
                                 <img src={src} alt={`Variant Preview ${idx + 1}`} className="h-full w-full object-cover" />
@@ -887,7 +887,7 @@ const EditProductPage: React.FC = () => {
                                   type="button"
                                   disabled={isSubmitting}
                                   onClick={() => handleRemoveVariantImage(v.id, idx)}
-                                  className="absolute top-1 right-1 bg-stone-900/80 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition cursor-pointer hover:bg-red-600"
+                                  className="absolute top-1 right-1 bg-stone-900/80 text-white rounded-full p-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition cursor-pointer hover:bg-red-600"
                                   title="Remove image"
                                 >
                                   <X size={12} />
@@ -915,18 +915,18 @@ const EditProductPage: React.FC = () => {
           </div>
 
           {/* Card 5: Customization Configuration */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-xs space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-stone-100 gap-2">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-stone-100 rounded-xl text-stone-800">
+                <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
                   <Sliders size={20} />
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-stone-900">Customization & Personalization</h2>
-                  <p className="text-xs text-stone-500">Allow customers to input customized text or upload photos when ordering.</p>
+                <div className="min-w-0">
+                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Customization & Personalization</h2>
+                  <p className="text-xs text-stone-500 wrap-break-word">Allow customers to input customized text or upload photos.</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <input
                   type="checkbox"
                   id="editIsCustomizableToggle"
@@ -934,15 +934,15 @@ const EditProductPage: React.FC = () => {
                   {...register("isCustomizable")}
                   className="size-5 rounded-md border-stone-300 text-[#E41F66] focus:ring-[#E41F66] cursor-pointer"
                 />
-                <label htmlFor="editIsCustomizableToggle" className="text-sm font-semibold text-stone-800 cursor-pointer">
+                <label htmlFor="editIsCustomizableToggle" className="text-xs sm:text-sm font-semibold text-stone-800 cursor-pointer whitespace-nowrap">
                   Allow Customization
                 </label>
               </div>
             </div>
 
             {isCustomizable && (
-              <div className="p-6 rounded-2xl bg-stone-50 border border-stone-200/80 space-y-4 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between">
+              <div className="p-4 sm:p-6 rounded-2xl bg-stone-50 border border-stone-200/80 space-y-4 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold uppercase tracking-wider text-stone-700">Customization Fields</span>
                   {customizationSlots.length < CUSTOMIZATION_OPTIONS.length && (
                     <button
@@ -954,9 +954,9 @@ const EditProductPage: React.FC = () => {
                         setCustomizationSlots(nextSlots);
                         validateCustomizationSlots(nextSlots);
                       }}
-                      className="text-xs font-bold text-[#E41F66] hover:text-[#c41554] cursor-pointer"
+                      className="text-xs font-bold text-[#E41F66] hover:text-[#c41554] cursor-pointer shrink-0"
                     >
-                      + Add Customization Field
+                      + Add Field
                     </button>
                   )}
                 </div>
@@ -968,7 +968,7 @@ const EditProductPage: React.FC = () => {
                 )}
 
                 {customizationSlots.length === 0 ? (
-                  <p className="text-xs text-stone-400 italic">No customization fields added yet. Click "+ Add Customization Field" above.</p>
+                  <p className="text-xs text-stone-400 italic">No customization fields added yet. Click "+ Add Field" above.</p>
                 ) : (
                   <div className="space-y-2.5">
                     {customizationSlots.map((slotValue, idx) => (
@@ -983,7 +983,7 @@ const EditProductPage: React.FC = () => {
                             setCustomizationSlots(nextSlots);
                             validateCustomizationSlots(nextSlots);
                           }}
-                          className="w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm text-stone-800 outline-none focus:border-[#E41F66] transition"
+                          className="w-full rounded-xl border border-stone-200 bg-white px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm text-stone-800 outline-none focus:border-[#E41F66] transition"
                         >
                           <option value="">Select customization field</option>
                           {CUSTOMIZATION_OPTIONS.map((opt) => (
@@ -1000,7 +1000,7 @@ const EditProductPage: React.FC = () => {
                             setCustomizationSlots(nextSlots);
                             validateCustomizationSlots(nextSlots);
                           }}
-                          className="text-stone-400 hover:text-red-500 p-2 rounded-xl transition cursor-pointer hover:bg-red-50"
+                          className="text-stone-400 hover:text-red-500 p-2 rounded-xl transition cursor-pointer hover:bg-red-50 shrink-0"
                         >
                           <X size={18} />
                         </button>
@@ -1013,7 +1013,7 @@ const EditProductPage: React.FC = () => {
           </div>
 
           {/* Sticky/Bottom Actions */}
-          <div className="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm space-y-4">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-stone-200 shadow-sm space-y-4">
             {isSubmitting ? (
               <div className="w-full space-y-2">
                 <div className="flex justify-between items-center">
@@ -1029,20 +1029,20 @@ const EditProductPage: React.FC = () => {
               </div>
             ) : (
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-stone-500 text-center sm:text-left">
                   Changes will be saved and immediately updated across the live product catalog.
                 </p>
-                <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto shrink-0">
                   <button
                     type="button"
                     onClick={() => navigate("/admin/products")}
-                    className="flex-1 sm:flex-none px-6 py-3 rounded-2xl border border-stone-200 text-sm font-semibold text-stone-700 hover:bg-stone-50 transition cursor-pointer text-center"
+                    className="flex-1 sm:flex-none px-5 py-3 rounded-2xl border border-stone-200 text-xs sm:text-sm font-semibold text-stone-700 hover:bg-stone-50 transition cursor-pointer text-center"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-3 rounded-2xl bg-stone-900 hover:bg-[#E41F66] text-sm font-semibold text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-2xl bg-stone-900 hover:bg-[#E41F66] text-xs sm:text-sm font-semibold text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg whitespace-nowrap"
                   >
                     <CheckCircle2 size={18} />
                     <span>Save Changes</span>

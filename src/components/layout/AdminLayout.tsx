@@ -11,11 +11,20 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="relative w-full min-h-screen bg-stone-50 flex">
+    <div className="relative w-full min-h-screen bg-stone-50 flex overflow-x-hidden">
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-stone-950/40 backdrop-blur-xs z-40 lg:hidden transition-opacity"
+          onClick={handleSetIsOpen}
+          aria-hidden="true"
+        />
+      )}
       <Sidebar isOpen={isOpen} setIsOpen={handleSetIsOpen} />
-      <div className="flex-1 min-h-screen lg:pl-68">
+      <div className="flex-1 min-h-screen min-w-0 max-w-full lg:pl-68 flex flex-col">
         <Breadcrum setIsOpen={handleSetIsOpen} />
-        <Outlet />
+        <main className="flex-1 w-full min-w-0">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
