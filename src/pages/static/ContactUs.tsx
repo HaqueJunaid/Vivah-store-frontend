@@ -23,7 +23,7 @@ const ContactUs: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       const response = await api.post('/contact', formData)
       if (response.data.success) {
@@ -63,13 +63,13 @@ const ContactUs: React.FC = () => {
 
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          
+
           {/* Left Column: Contact Cards & Map */}
           <div className="lg:col-span-5 space-y-6">
-            
+
             {/* Contact Details List */}
             <div className="grid grid-cols-1 gap-4">
-              
+
               {/* Email Card */}
               <div className="flex items-center gap-4 bg-white border border-stone-200/60 rounded-2xl p-4 shadow-xs">
                 <div className="rounded-xl bg-[#E41F66]/10 p-3 text-[#E41F66] shrink-0">
@@ -77,8 +77,8 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs text-stone-400 font-semibold uppercase tracking-wider">Email Address</p>
-                  <a href="mailto:bishrish@gmail.com" className="text-sm font-semibold text-stone-800 hover:text-[#E41F66] transition-colors mt-0.5 block">
-                    bishrish@gmail.com
+                  <a href="mailto:vivahstore.india@gmail.com" className="text-sm font-semibold text-stone-800 hover:text-[#E41F66] transition-colors mt-0.5 block">
+                    vivahstore.india@gmail.com
                   </a>
                 </div>
               </div>
@@ -90,8 +90,8 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs text-stone-400 font-semibold uppercase tracking-wider">Call Concierge</p>
-                  <a href="tel:+917766888626" className="text-sm font-semibold text-stone-800 hover:text-[#E41F66] transition-colors mt-0.5 block">
-                    +91 77668 88626
+                  <a href="tel:+918507756877" className="text-sm font-semibold text-stone-800 hover:text-[#E41F66] transition-colors mt-0.5 block">
+                    +91 8507756877
                   </a>
                 </div>
               </div>
@@ -116,8 +116,8 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs text-stone-400 font-semibold uppercase tracking-wider">Studio Location</p>
-                  <p className="text-sm font-semibold text-stone-800 mt-0.5">
-                    Surat, Gujarat, India
+                  <p className="text-sm font-semibold text-stone-800 mt-0.5 leading-snug">
+                    Kagal Nagar, Sonari, Jamshedpur, Jharkhand - 831011
                   </p>
                 </div>
               </div>
@@ -128,8 +128,8 @@ const ContactUs: React.FC = () => {
             <div className="bg-white border border-stone-200/60 rounded-3xl overflow-hidden shadow-xs p-2">
               <div className="rounded-2xl overflow-hidden h-64 border border-stone-100">
                 <iframe
-                  title="Srishbish Location Map"
-                  src="https://www.google.com/maps?q=Surat%2C%20Gujarat%2C%20India&z=12&output=embed"
+                  title="Vivah Store Location Map"
+                  src="https://www.google.com/maps?q=Auto%20Stand%2C%20in%20front%20of%20ICICI%20Bank%2C%20near%20Kagal%20Nagar%2C%20Sonari%20East%2C%20Kagal%20Nagar%2C%20Sonari%2C%20Jamshedpur%2C%20Jharkhand%20831011&z=16&output=embed"
                   className="w-full h-full border-none"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"

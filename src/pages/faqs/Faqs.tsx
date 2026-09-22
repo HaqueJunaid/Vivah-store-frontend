@@ -66,7 +66,7 @@ const Faqs: React.FC = () => {
         {
             category: 'shipping',
             question: "How can I Track my Order?",
-            answer: "An Email containing your Tracking Id and details of the service provider is sent to you after the order is shipped. If you can't find the tracking information in your email, or if you have any other questions related to tracking, reach out to us on bishrish@gmail.com or contact us on +91 77668 88626. They will be glad to assist you and provide the necessary information.",
+            answer: "An Email containing your Tracking Id and details of the service provider is sent to you after the order is shipped. If you can't find the tracking information in your email, or if you have any other questions related to tracking, reach out to us on vivahstore.india@gmail.com or contact us on +91 8507756877. They will be glad to assist you and provide the necessary information.",
             icon: <Search className="size-5 text-[#E41F66]" />
         },
         {
@@ -78,7 +78,7 @@ const Faqs: React.FC = () => {
         {
             category: 'shipping',
             question: "Can I Update My Order?",
-            answer: "Kindly note that we work hard to get your order dispatched as quickly as possible, we may not be able to update your order in time. If your order has not been shipped, please reach out to us at bishrish@gmail.com or contact us on +91 77668 88626 with your details. Kindly note that we cannot guarantee that the change will be made as the order may have been already processed.",
+            answer: "Kindly note that we work hard to get your order dispatched as quickly as possible, we may not be able to update your order in time. If your order has not been shipped, please reach out to us at vivahstore.india@gmail.com or contact us on +91 8507756877 with your details. Kindly note that we cannot guarantee that the change will be made as the order may have been already processed.",
             icon: <Package className="size-5 text-[#E41F66]" />
         },
         {
@@ -90,7 +90,7 @@ const Faqs: React.FC = () => {
         {
             category: 'shipping',
             question: "I have received a Damaged Product, what should I do?",
-            answer: "In case you receive a damaged product, please capture an unboxing video for evidence and reach out to us on bishrish@gmail.com and we will resolve the issue ASAP.",
+            answer: "In case you receive a damaged product, please capture an unboxing video for evidence and reach out to us on vivahstore.india@gmail.com and we will resolve the issue ASAP.",
             icon: <ShieldAlert className="size-5 text-[#E41F66]" />
         },
 
@@ -98,7 +98,7 @@ const Faqs: React.FC = () => {
         {
             category: 'returns',
             question: "What is your Return Policy?",
-            answer: "You can return certain products upto 5 days from the date of delivery. You can send a request to bishrish@gmail.com or call our number +91 77668 88626. The returned product should be in its original packaging and in the same unused condition as received.",
+            answer: "You can return certain products upto 5 days from the date of delivery. You can send a request to vivahstore.india@gmail.com or call our number +91 8507756877. The returned product should be in its original packaging and in the same unused condition as received.",
             icon: <RefreshCcw className="size-5 text-[#E41F66]" />
         },
         {
@@ -116,7 +116,7 @@ const Faqs: React.FC = () => {
         {
             category: 'returns',
             question: "Where do I Ship the Returns?",
-            answer: "Please mail the item(s) to the address below. Do remember to mention your Order ID and Contact Number. Srishti Bhartia. 414-15, A, Villa, New City light, Althan, Surat, Gujarat, India, Contact Number - +91 77668 88626.",
+            answer: "Please mail the item(s) to the address below. Do remember to mention your Order ID and Contact Number. Srishti Bhartia. 414-15, A, Villa, New City light, Althan, Sonari, Jamshedpur, Jharkhand, Contact Number - +91 8507756877.",
             icon: <Package className="size-5 text-[#E41F66]" />
         },
         {
@@ -166,7 +166,7 @@ const Faqs: React.FC = () => {
         {
             category: 'payments',
             question: "Can I request a GST Invoice?",
-            answer: "An invoice is automatically emailed to you upon order confirmation. If you need a GST invoice or custom company billing info, please reach out to us at bishrish@gmail.com with your GST details.",
+            answer: "An invoice is automatically emailed to you upon order confirmation. If you need a GST invoice or custom company billing info, please reach out to us at vivahstore.india@gmail.com with your GST details.",
             icon: <FileText className="size-5 text-[#E41F66]" />
         }
     ], [])
@@ -228,7 +228,7 @@ const Faqs: React.FC = () => {
                         <div>
                             <h3 className="font-semibold text-stone-900 text-sm md:text-base mb-1">Returns &amp; Refunds</h3>
                             <p className="text-stone-500 text-xs md:text-sm leading-relaxed">
-                                Return damaged or defective products within 5 days of delivery. Reach out via email to <span className="font-semibold text-stone-800 hover:underline">bishrish@gmail.com</span>. Note: Reverse pickups are client-arranged.
+                                Return damaged or defective products within 5 days of delivery. Reach out via email to <span className="font-semibold text-stone-800 hover:underline">vivahstore.india@gmail.com</span>. Note: Reverse pickups are client-arranged.
                             </p>
                         </div>
                     </div>
@@ -261,8 +261,8 @@ const Faqs: React.FC = () => {
                         key={tab.id}
                         onClick={() => setActiveCategory(tab.id as any)}
                         className={`px-5 py-2.5 rounded-full text-xs md:text-sm font-semibold border transition-all duration-300 cursor-pointer ${activeCategory === tab.id
-                                ? 'bg-[#E41F66] border-[#E41F66] text-white shadow-md shadow-[#E41F66]/20 hover:bg-[#c60b4d]'
-                                : 'bg-white border-stone-200/80 text-stone-600 hover:bg-stone-50 hover:text-stone-800'
+                            ? 'bg-[#E41F66] border-[#E41F66] text-white shadow-md shadow-[#E41F66]/20 hover:bg-[#c60b4d]'
+                            : 'bg-white border-stone-200/80 text-stone-600 hover:bg-stone-50 hover:text-stone-800'
                             }`}
                     >
                         {tab.label}
@@ -352,18 +352,18 @@ const Faqs: React.FC = () => {
 
                     <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
                         <a
-                            href="mailto:bishrish@gmail.com"
+                            href="mailto:vivahstore.india@gmail.com"
                             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#E41F66] hover:bg-[#c60b4d] text-white text-xs md:text-sm font-semibold px-6 py-3.5 rounded-xl shadow-lg transition-colors cursor-pointer"
                         >
                             <Mail className="size-4.5" />
                             Email Support
                         </a>
                         <a
-                            href="tel:+917766888626"
+                            href="tel:+918507756877"
                             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-stone-800 hover:bg-stone-700 text-white text-xs md:text-sm font-semibold px-6 py-3.5 rounded-xl border border-stone-700 transition-colors cursor-pointer"
                         >
                             <Phone className="size-4.5" />
-                            +91 77668 88626
+                            +91 8507756877
                         </a>
                     </div>
                 </div>
