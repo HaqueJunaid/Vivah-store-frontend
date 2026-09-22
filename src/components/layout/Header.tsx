@@ -10,11 +10,12 @@ import { HiLogin } from "react-icons/hi";
 import { FiUserPlus } from "react-icons/fi";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { ShieldCheck } from "lucide-react";
-import { navigationDropdown } from '../../constants/navigation';
+import { useCategoryStore } from '../../store/categoryStore';
 import { useAuthStore } from '../../store/authStore';
 import LogOutButton from '../auth/LogOutButton';
 
 const Header: React.FC = () => {
+  const categories = useCategoryStore((state) => state.categories);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const [isOpen, setIsOpen] = useState(false);
@@ -111,7 +112,7 @@ const Header: React.FC = () => {
 
                 <div className={`grid transition-all duration-300 ease-in-out ${isShopWeddingOpen ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 pointer-events-none'}`}>
                   <div className="overflow-hidden flex flex-col pl-4 gap-1">
-                    {navigationDropdown.map((item) => {
+                    {categories.map((item) => {
                       const hasSubItems = item.baseItems && item.baseItems.length > 0;
                       const isCatOpen = openCategories[item.url] || false;
 

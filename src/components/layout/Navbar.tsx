@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { IoIosArrowDown } from "react-icons/io";
-import { navigationDropdown } from '../../constants/navigation';
+import { useCategoryStore } from '../../store/categoryStore';
 
 const Navbar: React.FC = () => {
-
+    const categories = useCategoryStore((state) => state.categories);
     const [activeDropdownUrl, setActiveDropdownUrl] = useState<string | null>(null)
 
     return (
@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
                     <div className='group relative'>
                         <Link to={"/products"} className='flex justify-center items-center hover:text-[#E41F66] transition-all duration-300 ease-in-out'>Products <IoIosArrowDown className='mt-1 ml-1 size-4' /></Link>
                         <div className='hidden group-hover:block left-0 absolute bg-white shadow-md p-1.5 border border-stone-200 w-fit'>
-                            {navigationDropdown.map((item) => (
+                            {categories.map((item) => (
                                 <div
                                     key={item.url}
                                     className='block relative hover:bg-[#E41F66]/10 mb-1 p-0.5 w-full text-sm text-nowrap'

@@ -7,7 +7,7 @@ import ProductGrid from '../products/ProductGrid.tsx'
 import ProductCard from '../products/ProductCard.tsx'
 import { ProductCardSkeleton } from '../common/Skeletons'
 import { useProductStore } from '../../store/productStore'
-import { navigationDropdown } from '../../constants/navigation'
+import { useCategoryStore } from '../../store/categoryStore'
 import type {LayoutChangerMode as LayoutMode} from '../../types/allTypes'
 
 const ProductLayout: React.FC = () => {
@@ -17,6 +17,7 @@ const ProductLayout: React.FC = () => {
   const [layout, setLayout] = useState<LayoutMode>('grid-3');
   const [page, setPage] = useState(1);
 
+  const categories = useCategoryStore((state) => state.categories);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
   const fetchProductsByCategory = useProductStore((state) => state.fetchProductsByCategory);
   const products = useProductStore((state) => state.products);
@@ -38,7 +39,7 @@ const ProductLayout: React.FC = () => {
 
   const categoryTitle = useMemo(() => {
     if (!categoryId) return '';
-    for (const item of navigationDropdown) {
+    for (const item of categories) {
       if (item.url === categoryId) return item.title;
       if (item.baseItems) {
         const sub = item.baseItems.find((b) => b.url === categoryId);
@@ -46,7 +47,7 @@ const ProductLayout: React.FC = () => {
       }
     }
     return decodeURIComponent(categoryId).replace(/-/g, ' ');
-  }, [categoryId]);
+  }, [categoryId, categories]);
 
   useEffect(() => {
     document.title = searchKeyword 

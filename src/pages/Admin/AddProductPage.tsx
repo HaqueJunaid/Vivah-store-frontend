@@ -17,7 +17,9 @@ import {
   Trash2
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { navigationDropdown } from "../../constants/navigation";
+import { useCategoryStore } from "../../store/categoryStore";
+import AddSubCategoryButton from "../../components/Admin/AddSubCategoryButton";
+import AddSubCategoryModal from "../../components/Admin/AddSubCategoryModal";
 import { useProductStore } from "../../store/productStore";
 import type { ProductFormInputs } from "../../types/allTypes";
 
@@ -86,15 +88,26 @@ const AddProductPage: React.FC = () => {
     document.title = "Admin | Add New Product";
   }, []);
 
+  // Category & Sub-Category
+  const categories = useCategoryStore((state) => state.categories);
+  const [isAddSubCategoryModalOpen, setIsAddSubCategoryModalOpen] = useState(false);
+
   const selectedCategory = watch("category");
   const hasVariants = watch("hasVariants");
   const isCustomizable = watch("isCustomizable");
 
   const selectedCategoryItem = useMemo(
-    () => navigationDropdown.find((item) => item.title === selectedCategory),
-    [selectedCategory]
+    () => categories.find((item) => item.title === selectedCategory),
+    [categories, selectedCategory]
   );
   const subCategoryOptions = selectedCategoryItem?.baseItems ?? [];
+
+  const handleSubCategoryAdded = useCallback(
+    (newSubCategory: { title: string; url: string }) => {
+      setValue("subCategory", newSubCategory.title, { shouldValidate: true });
+    },
+    [setValue]
+  );
 
   useEffect(() => {
     if (selectedCategory) {
@@ -407,7 +420,7 @@ const AddProductPage: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <h2 className="text-base sm:text-lg font-semibold text-stone-900">Basic Information</h2>
-                <p className="text-xs text-stone-500 break-words">Core listing identification, categories, and inventory parameters.</p>
+                <p className="text-xs text-stone-500 wrap-break-word">Core listing identification, categories, and inventory parameters.</p>
               </div>
             </div>
 
@@ -440,23 +453,26 @@ const AddProductPage: React.FC = () => {
                   {...register("category", { required: "Category is required" })}
                   className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition cursor-pointer disabled:opacity-60"
                 >
-                  <option value="Assets">Assets</option>
-                  <option value="Boards & Signage">Boards & Signage</option>
-                  <option value="Room Stationery">Room Stationery</option>
-                  <option value="Utility Stationery">Utility Stationery</option>
-                  <option value="Fun & Entertainment">Fun & Entertainment</option>
-                  <option value="Thermatic Elements">Thermatic Elements</option>
-                  <option value="Favour & Gifts">Favour & Gifts</option>
-                  <option value="Invites & Planner">Invites & Planner</option>
+                  {categories.map((cat) => (
+                    <option key={cat.url} value={cat.title}>
+                      {cat.title}
+                    </option>
+                  ))}
                 </select>
                 {errors.category && <p className="text-xs text-red-500 mt-1.5">{errors.category.message}</p>}
               </div>
 
               {/* Sub-Category */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">
-                  Sub-Category {subCategoryOptions.length > 0 && <span className="text-red-500">*</span>}
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-600">
+                    Sub-Category {subCategoryOptions.length > 0 && <span className="text-red-500">*</span>}
+                  </label>
+                  <AddSubCategoryButton
+                    disabled={isSubmitting || !selectedCategory}
+                    onClick={() => setIsAddSubCategoryModalOpen(true)}
+                  />
+                </div>
                 <select
                   disabled={isSubmitting || subCategoryOptions.length === 0}
                   {...register("subCategory", {
@@ -539,7 +555,7 @@ const AddProductPage: React.FC = () => {
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-base sm:text-lg font-semibold text-stone-900">Product Information & Story</h2>
-                  <p className="text-xs text-stone-500 break-words">Provide an overview, craftsmanship story, and vital notes for buyers.</p>
+                  <p className="text-xs text-stone-500 wrap-break-word">Provide an overview, craftsmanship story, and vital notes for buyers.</p>
                 </div>
               </div>
               <span className="text-xs font-medium text-stone-500 bg-stone-100 px-3 py-1 rounded-full w-fit">
@@ -619,7 +635,7 @@ const AddProductPage: React.FC = () => {
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-base sm:text-lg font-semibold text-stone-900">Product Gallery</h2>
-                  <p className="text-xs text-stone-500 break-words">Upload high-resolution photography.</p>
+                  <p className="text-xs text-stone-500 wrap-break-word">Upload high-resolution photography.</p>
                 </div>
               </div>
               <span className="text-xs font-bold text-stone-600 bg-stone-100 px-3 py-1 rounded-full shrink-0">
@@ -925,7 +941,7 @@ const AddProductPage: React.FC = () => {
                 </div>
                 <div className="w-full bg-stone-100 rounded-full h-2.5 overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-[#E41F66] to-stone-900 h-full rounded-full transition-all duration-300 ease-out"
+                    className="bg-linear-to-r from-[#E41F66] to-stone-900 h-full rounded-full transition-all duration-300 ease-out"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
@@ -957,6 +973,13 @@ const AddProductPage: React.FC = () => {
 
         </form>
       </div>
+
+      <AddSubCategoryModal
+        isOpen={isAddSubCategoryModalOpen}
+        onClose={() => setIsAddSubCategoryModalOpen(false)}
+        categoryTitle={selectedCategory}
+        onSubCategoryAdded={handleSubCategoryAdded}
+      />
     </div>
   );
 };

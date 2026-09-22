@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { X } from "lucide-react";
-import { navigationDropdown } from "../../constants/navigation";
+import { useCategoryStore } from "../../store/categoryStore";
+import AddSubCategoryButton from "./AddSubCategoryButton";
+import AddSubCategoryModal from "./AddSubCategoryModal";
 import toast from 'react-hot-toast';
 import type { ProductFormInputs as Product, ProductEditFormProps } from "../../types/allTypes";
 
@@ -50,14 +52,24 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
     }
   }, []);
 
+  const categories = useCategoryStore((state) => state.categories);
+  const [isAddSubCategoryModalOpen, setIsAddSubCategoryModalOpen] = useState(false);
+
   const selectedCategory = watch("category");
   const hasVariants = watch("hasVariants");
   const isCustomizable = watch("isCustomizable");
   const selectedCategoryItem = React.useMemo(() => 
-    navigationDropdown.find((item) => item.title === selectedCategory),
-    [selectedCategory]
+    categories.find((item) => item.title === selectedCategory),
+    [categories, selectedCategory]
   );
   const subCategoryOptions = selectedCategoryItem?.baseItems ?? [];
+
+  const handleSubCategoryAdded = React.useCallback(
+    (newSubCategory: { title: string; url: string }) => {
+      setValue("subCategory", newSubCategory.title, { shouldValidate: true });
+    },
+    [setValue]
+  );
 
   const clearImagePreviews = React.useCallback(() => {
     setObjectUrls((prevUrls) => {
@@ -133,10 +145,11 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
 
   useEffect(() => {
     if (isOpen && productToEdit) {
-      const matchedCategory = navigationDropdown.find(
+      const allCategories = useCategoryStore.getState().categories;
+      const matchedCategory = allCategories.find(
         (item) => item.title.toLowerCase() === productToEdit.category?.toLowerCase()
       )?.title || "Assets";
-      const categoryItem = navigationDropdown.find(
+      const categoryItem = allCategories.find(
         (item) => item.title.toLowerCase() === matchedCategory.toLowerCase()
       );
       const matchedSubCategory = categoryItem?.baseItems?.find(
@@ -303,23 +316,27 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
               defaultValue="Assets"
               className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm text-stone-700 outline-none focus:border-stone-900 focus:bg-white transition-all disabled:opacity-60"
             >
-              <option value="Assets">Assets</option>
-              <option value="Boards & Signage">Boards & Signage</option>
-              <option value="Room Stationery">Room Stationery</option>
-              <option value="Utility Stationery">Utility Stationery</option>
-              <option value="Fun & Entertainment">Fun & Entertainment</option>
-              <option value="Thermatic Elements">Thermatic Elements</option>
-              <option value="Favour & Gifts">Favour & Gifts</option>
-              <option value="Invites & Planner">Invites & Planner</option>
+              {categories.map((cat) => (
+                <option key={cat.url} value={cat.title}>
+                  {cat.title}
+                </option>
+              ))}
             </select>
             {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category.message}</p>}
           </div>
 
-          {subCategoryOptions.length > 0 && (
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">Sub Category</label>
-              <select
-                disabled={isUploading}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500">
+                Sub Category {subCategoryOptions.length > 0 && <span className="text-red-500">*</span>}
+              </label>
+              <AddSubCategoryButton
+                disabled={isUploading || !selectedCategory}
+                onClick={() => setIsAddSubCategoryModalOpen(true)}
+              />
+            </div>
+            <select
+              disabled={isUploading || subCategoryOptions.length === 0}
                 {...register("subCategory", {
                   validate: (value) =>
                     subCategoryOptions.length === 0 || value
@@ -339,7 +356,6 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
                 <p className="text-red-500 text-xs mt-1">{errors.subCategory.message}</p>
               )}
             </div>
-          )}
 
           <div className="flex items-center gap-2">
             <input
@@ -635,6 +651,13 @@ const ProductEditForm: React.FC<ProductEditFormProps> = ({
           </div>
         </form>
       </div>
+
+      <AddSubCategoryModal
+        isOpen={isAddSubCategoryModalOpen}
+        onClose={() => setIsAddSubCategoryModalOpen(false)}
+        categoryTitle={selectedCategory}
+        onSubCategoryAdded={handleSubCategoryAdded}
+      />
     </div>
   );
 };

@@ -9,6 +9,7 @@ import RequireAdmin from './components/auth/RequireAdmin';
 import { useAuthStore } from './store/authStore';
 import { setAuthToken } from './services/api';
 import { useCartStore } from './store/cartStore';
+import { useCategoryStore } from './store/categoryStore';
 
 // Helper to lazy-load and memoize components for optimal performance & prevent redundant re-renders
 const lazyWithMemo = <P extends object>(
@@ -52,6 +53,11 @@ const App = () => {
   const token = useAuthStore((state) => state.token);
   const isHydrated = useCartStore((state) => state.isHydrated);
   const syncWithBackend = useCartStore((state) => state.syncWithBackend);
+  const fetchCategories = useCategoryStore((state) => state.fetchCategories);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   useEffect(() => {
     setAuthToken(token ?? undefined);
