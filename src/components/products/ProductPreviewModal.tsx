@@ -161,6 +161,7 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
     })(),
     isCustomizable: dbProduct.isCustomizable ?? false,
     customizations: dbProduct.customizations || [],
+    hasFixedQuantities: dbProduct.hasFixedQuantities ?? false,
   } : null
 
   const currentVariant = product?.variants[selectedVariant]
@@ -177,7 +178,7 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
   const normalizedPrice = product ? String(Number(String(product.price).replace(/[^0-9.-]/g, '')) || 0) : '0'
 
   return createPortal(
-    <div className='fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 md:p-10'>
+    <div className='fixed inset-0 z-9999 flex items-center justify-center p-4 sm:p-6 md:p-10'>
       {/* Backdrop */}
       <div 
         className='absolute inset-0 bg-stone-900/60 backdrop-blur-xs transition-opacity duration-300' 
@@ -201,7 +202,7 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
         {loading ? (
           <div className='p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-start'>
             <div className="w-full space-y-4">
-              <Skeleton className="w-full aspect-[4/5] md:aspect-square rounded-2xl" />
+              <Skeleton className="w-full aspect-4/5 md:aspect-square rounded-2xl" />
               <div className="flex gap-2.5">
                 <Skeleton className="w-16 h-20 rounded-xl" />
                 <Skeleton className="w-16 h-20 rounded-xl" />
@@ -216,7 +217,7 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
             </div>
           </div>
         ) : error || !product ? (
-          <div className='p-12 text-center text-red-650 flex flex-col items-center justify-center gap-3 min-h-[300px]'>
+          <div className='p-12 text-center text-red-650 flex flex-col items-center justify-center gap-3 min-h-75'>
             <p className='text-xl font-medium tracking-wide'>Error Loading Product</p>
             <p className='text-sm text-stone-500 max-w-md'>{error || "Product not found."}</p>
             <button 
@@ -253,6 +254,7 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
                 variants={product.variants} 
                 isCustomizable={product.isCustomizable} 
                 customizations={product.customizations} 
+                hasFixedQuantities={product.hasFixedQuantities}
               />
             </div>
           </div>

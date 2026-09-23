@@ -85,6 +85,70 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
     }
 
     if (isInCart) {
+        if (product.hasFixedQuantities) {
+            const hasDifferentQty = product.quantity && product.quantity > 0 && product.quantity !== quantityInCart;
+            
+            if (hasDifferentQty) {
+                return (
+                    <div className="flex items-center gap-1.5 w-full select-none">
+                        <button
+                            type="button"
+                            onClick={() => handleUpdateQty(product.quantity!)}
+                            className="flex-grow flex items-center justify-center gap-1.5 cursor-pointer text-[11px] sm:text-xs font-bold tracking-wide uppercase py-2 sm:py-2.5 px-3 bg-[#E41F66] hover:bg-[#c21553] text-white rounded-lg sm:rounded-xl shadow-xs hover:shadow-md transition-all duration-300 active:scale-[0.98]"
+                        >
+                            Update Cart to {product.quantity} pcs
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleRemove}
+                            className="flex items-center justify-center border border-rose-200 bg-rose-50 hover:bg-rose-100 text-[#E41F66] rounded-lg sm:rounded-xl size-8 sm:size-9 cursor-pointer transition-colors active:scale-95 shrink-0"
+                            aria-label="Remove product from cart"
+                            title="Remove from cart"
+                        >
+                            <Trash2 className="size-3.5 sm:size-4" />
+                        </button>
+                    </div>
+                );
+            }
+
+            if (variant === 'luxury') {
+                return (
+                    <div className="flex items-center gap-1.5 w-full select-none">
+                        <div className="flex-grow flex items-center justify-between bg-stone-50 border border-stone-200/80 rounded-lg sm:rounded-xl px-3 py-1.5 h-8 sm:h-9 w-full">
+                            <span className="text-stone-500 font-semibold text-[10px] sm:text-xs uppercase tracking-wider">In Cart:</span>
+                            <span className="text-[#E41F66] font-bold text-xs sm:text-sm">{quantityInCart} pcs</span>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleRemove}
+                            className="flex items-center justify-center border border-rose-200 bg-rose-50 hover:bg-rose-100 text-[#E41F66] rounded-lg sm:rounded-xl size-8 sm:size-9 cursor-pointer transition-colors active:scale-95 shrink-0"
+                            aria-label="Remove product from cart"
+                            title="Remove from cart"
+                        >
+                            <Trash2 className="size-3.5 sm:size-4" />
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="flex items-center gap-1.5 w-full">
+                    <div className="flex-grow flex items-center justify-between border border-stone-300 bg-stone-50 px-3 py-1.5 rounded-lg text-xs font-semibold h-9">
+                        <span className="text-stone-500 text-[10px] uppercase tracking-wider">In Cart:</span>
+                        <span className="text-[#E41F66] font-bold text-xs">{quantityInCart} pcs</span>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleRemove}
+                        className="flex items-center justify-center border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 size-9 rounded-lg text-xs font-medium transition cursor-pointer active:scale-95 shrink-0"
+                        aria-label="Remove product from cart"
+                    >
+                        <Trash2 className="size-4" />
+                    </button>
+                </div>
+            );
+        }
+
         if (variant === 'luxury') {
             return (
                 <div className="flex items-center gap-1.5 w-full select-none">
@@ -232,8 +296,10 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
         p1.id === p2.id &&
         p1.title === p2.title &&
         p1.price === p2.price &&
+        p1.quantity === p2.quantity &&
         p1.imageUrl === p2.imageUrl &&
         p1.inStock === p2.inStock &&
+        p1.hasFixedQuantities === p2.hasFixedQuantities &&
         JSON.stringify(p1.customizations || {}) === JSON.stringify(p2.customizations || {}) &&
         JSON.stringify(p1.selectedVariant || null) === JSON.stringify(p2.selectedVariant || null)
     );

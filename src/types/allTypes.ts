@@ -46,6 +46,7 @@ export interface ProductContentProps {
     customizable?: any;
     isCustomizable?: boolean;
     customizations?: string[];
+    hasFixedQuantities?: boolean;
     handleVariantChange: (index: number) => void
 }
 
@@ -122,6 +123,7 @@ export interface Product {
   variants?: ProductVariant[];
   isCustomizable?: boolean;
   customizations?: string[];
+  hasFixedQuantities?: boolean;
   createdAt?: string;
 }
 
@@ -433,6 +435,7 @@ export interface AddToCartProduct {
     uploadedImage?: string;
     customizations?: Record<string, string>;
     inStock?: boolean;
+    hasFixedQuantities?: boolean;
 }
 
 // Auth Wrapper Props Types
@@ -464,6 +467,7 @@ export interface ProductFormInputs {
   variantImages?: string;
   isCustomizable?: boolean;
   customizations?: string[];
+  hasFixedQuantities?: boolean;
 }
 
 export interface ProductAddFormProps {

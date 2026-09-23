@@ -177,6 +177,7 @@ const DetailProduct: React.FC = () => {
         })(),
         isCustomizable: dbProduct.isCustomizable ?? false,
         customizations: dbProduct.customizations || [],
+        hasFixedQuantities: dbProduct.hasFixedQuantities ?? false,
     } : null;
 
     if (loading) {
@@ -184,7 +185,7 @@ const DetailProduct: React.FC = () => {
             <div className='relative bg-stone-50 w-full min-h-screen py-10 sm:py-16'>
                 <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start'>
                     <div className="w-full space-y-4">
-                        <Skeleton className="w-full aspect-[4/5] md:aspect-square rounded-2xl" />
+                        <Skeleton className="w-full aspect-4/5 md:aspect-square rounded-2xl" />
                         <div className="flex gap-2.5">
                             <Skeleton className="w-20 h-24 rounded-xl" />
                             <Skeleton className="w-20 h-24 rounded-xl" />
@@ -251,6 +252,7 @@ const DetailProduct: React.FC = () => {
                     variants={product.variants} 
                     isCustomizable={product.isCustomizable} 
                     customizations={product.customizations} 
+                    hasFixedQuantities={product.hasFixedQuantities}
                 />
             </div>
 

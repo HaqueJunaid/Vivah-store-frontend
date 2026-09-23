@@ -3,6 +3,7 @@ import type { ProductContentProps } from "../../types/allTypes";
 import AddToCartButton from '../cart/AddToCartButton';
 import AddToWishListButton from '../wishlist/AddToWishListButton';
 import { uploadCustomizationImage } from '../../services/productService';
+import { useCartStore } from '../../store/cartStore';
 import toast from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 
@@ -11,6 +12,8 @@ const FIELD_CONFIG: Record<string, { label: string; placeholder: string; type: s
     customDescription: { label: "Custom Description", placeholder: "Enter custom description", type: "text" },
     customTags: { label: "Custom Tags", placeholder: "Enter custom tags", type: "text" },
 };
+
+const FIXED_QUANTITIES = [25, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000];
 
 const ProductContent: React.FC<ProductContentProps> = ({ 
     id, 
@@ -23,14 +26,50 @@ const ProductContent: React.FC<ProductContentProps> = ({
     variants, 
     isCustomizable,
     customizations: activeCustomizationKeys,
+    hasFixedQuantities,
     handleVariantChange 
 }) => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null)
     const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
-    const [quantity, setQuantity] = useState(1)
+    const [quantity, setQuantity] = useState(hasFixedQuantities ? 25 : 1)
     const [activeVariant, setActiveVariant] = useState(0)
     const [customizations, setCustomizations] = useState<Record<string, string>>({})
+
+    const cartItems = useCartStore((state: any) => state.cartItems);
+    const updateCartItemQuantity = useCartStore((state: any) => state.updateCartItemQuantity);
+
+    const currentVariantObj = variants?.[activeVariant] || null;
+
+    // Check if this item (with exact variant & customizations) is in cart
+    const itemInCart = cartItems.find((item: any) => {
+        if (item.productId !== id) return false;
+        const variantA = JSON.stringify(item.selectedVariant || null);
+        const variantB = JSON.stringify(currentVariantObj || null);
+        if (variantA !== variantB) return false;
+        const customA = JSON.stringify(item.customizations || {});
+        const customB = JSON.stringify(customizations || {});
+        return customA === customB;
+    });
+
+    const quantityInCart = itemInCart ? itemInCart.productQuantity : 0;
+
+    // Sync quantity from cart if already present
+    React.useEffect(() => {
+        if (quantityInCart > 0) {
+            setQuantity(quantityInCart);
+        } else if (hasFixedQuantities) {
+            setQuantity(prev => (FIXED_QUANTITIES.includes(prev) ? prev : 25));
+        }
+    }, [id, activeVariant, quantityInCart, hasFixedQuantities]);
+
+    const handleSelectTier = (tier: number) => {
+        setQuantity(tier);
+        if (hasFixedQuantities && quantityInCart > 0 && quantityInCart !== tier) {
+            updateCartItemQuantity(id, tier, customizations, currentVariantObj);
+            toast.success(`Cart updated to ${tier} pcs`);
+        }
+    };
 
     const handleCustomizationChange = (key: string, value: string) => {
         setCustomizations(prev => ({ ...prev, [key]: value }));
@@ -117,42 +156,72 @@ const ProductContent: React.FC<ProductContentProps> = ({
             </div>
 
             {/* Quantity selection */}
-            <div className='flex flex-col gap-3 pb-6 border-b border-stone-200/80'>
-                <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Quantity</span>
-                <div className='flex items-center border border-stone-300 w-fit rounded-xl bg-white overflow-hidden shadow-2xs'>
-                    <button 
-                        type="button" 
-                        onClick={() => handleQunatityChange('dec')} 
-                        disabled={quantity <= 1}
-                        className='px-4 py-2.5 hover:bg-stone-50 disabled:opacity-40 disabled:hover:bg-transparent text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-r border-stone-300'
-                        aria-label="Decrease quantity"
-                    >
-                        -
-                    </button>
-                    <input 
-                        type="number"
-                        min="1"
-                        value={quantity}
-                        onChange={handleQuantityInput}
-                        onBlur={(e) => {
-                            const val = parseInt(e.target.value, 10);
-                            if (isNaN(val) || val < 1) {
-                                setQuantity(1);
-                            }
-                        }}
-                        className='w-16 px-2 py-2 text-stone-900 font-semibold text-center text-sm outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
-                        aria-label="Product quantity"
-                    />
-                    <button 
-                        type="button" 
-                        onClick={() => handleQunatityChange('inc')} 
-                        className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-l border-stone-300'
-                        aria-label="Increase quantity"
-                    >
-                        +
-                    </button>
+            {hasFixedQuantities ? (
+                <div className='flex flex-col gap-3 pb-6 border-b border-stone-200/80'>
+                    <div className='flex items-center justify-between'>
+                        <span className='text-xs uppercase tracking-wider text-stone-700 font-bold'>
+                            NO. OF PIECES: <span className='text-[#E41F66] font-extrabold text-sm font-mono'>{quantity}</span>
+                        </span>
+                        <span className='text-[11px] font-medium text-stone-400'>Select quantity</span>
+                    </div>
+                    <div className='flex flex-wrap gap-2 pt-1'>
+                        {FIXED_QUANTITIES.map((tier) => {
+                            const isSelected = quantity === tier;
+                            return (
+                                <button
+                                    key={tier}
+                                    type="button"
+                                    onClick={() => handleSelectTier(tier)}
+                                    className={`min-w-13 sm:min-w-15 px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold tracking-wide transition-all duration-200 cursor-pointer text-center select-none flex items-center justify-center ${
+                                        isSelected
+                                            ? 'bg-stone-900 text-white shadow-sm ring-2 ring-stone-900 font-bold scale-[1.02]'
+                                            : 'bg-white text-stone-700 border border-stone-300 hover:border-stone-900 hover:bg-stone-50 active:scale-95'
+                                    }`}
+                                >
+                                    {tier}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div className='flex flex-col gap-3 pb-6 border-b border-stone-200/80'>
+                    <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Quantity</span>
+                    <div className='flex items-center border border-stone-300 w-fit rounded-xl bg-white overflow-hidden shadow-2xs'>
+                        <button 
+                            type="button" 
+                            onClick={() => handleQunatityChange('dec')} 
+                            disabled={quantity <= 1}
+                            className='px-4 py-2.5 hover:bg-stone-50 disabled:opacity-40 disabled:hover:bg-transparent text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-r border-stone-300'
+                            aria-label="Decrease quantity"
+                        >
+                            -
+                        </button>
+                        <input 
+                            type="number"
+                            min="1"
+                            value={quantity}
+                            onChange={handleQuantityInput}
+                            onBlur={(e) => {
+                                const val = parseInt(e.target.value, 10);
+                                if (isNaN(val) || val < 1) {
+                                    setQuantity(1);
+                                }
+                            }}
+                            className='w-16 px-2 py-2 text-stone-900 font-semibold text-center text-sm outline-none bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                            aria-label="Product quantity"
+                        />
+                        <button 
+                            type="button" 
+                            onClick={() => handleQunatityChange('inc')} 
+                            className='px-4 py-2.5 hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer select-none text-base font-medium border-l border-stone-300'
+                            aria-label="Increase quantity"
+                        >
+                            +
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Custom Image Uploader */}
             {canUploadImage && (
@@ -263,6 +332,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
                             selectedVariant: variants?.[activeVariant],
                             uploadedImage: uploadedImage || undefined,
                             customizations,
+                            hasFixedQuantities,
                             inStock: variants && variants.length > 0 ? (variants[activeVariant]?.inStock ?? true) : inStock
                         }} 
                         variant="luxury"

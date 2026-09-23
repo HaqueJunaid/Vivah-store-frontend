@@ -162,6 +162,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
         hasVariants: false,
         variantTitle: "",
         isCustomizable: false,
+        hasFixedQuantities: false,
       });
       setCustomizationSlots([]);
       setCustomizationError(null);
@@ -212,6 +213,8 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
       }
       formData.append("customizations", JSON.stringify(activeSlots));
     }
+
+    formData.append("hasFixedQuantities", String(data.hasFixedQuantities || false));
 
     selectedFiles.forEach((file) => {
       formData.append("ImageUrls", file);
@@ -467,6 +470,19 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
               )}
             </div>
           )}
+
+          <div className="flex items-center gap-2 pt-2">
+            <input
+              type="checkbox"
+              id="hasFixedQuantities"
+              disabled={isUploading}
+              {...register("hasFixedQuantities")}
+              className="h-4 w-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900 disabled:opacity-60"
+            />
+            <label htmlFor="hasFixedQuantities" className="text-sm text-stone-700 font-medium cursor-pointer">
+              Sell in preset batch quantities only (25, 50, 75, 100... 1000 pcs)
+            </label>
+          </div>
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">Product Name</label>
