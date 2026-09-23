@@ -178,6 +178,8 @@ const DetailProduct: React.FC = () => {
         isCustomizable: dbProduct.isCustomizable ?? false,
         customizations: dbProduct.customizations || [],
         hasFixedQuantities: dbProduct.hasFixedQuantities ?? false,
+        hasDimensions: dbProduct.hasDimensions ?? false,
+        dimensions: dbProduct.dimensions || [],
     } : null;
 
     if (loading) {
@@ -253,6 +255,8 @@ const DetailProduct: React.FC = () => {
                     isCustomizable={product.isCustomizable} 
                     customizations={product.customizations} 
                     hasFixedQuantities={product.hasFixedQuantities}
+                    hasDimensions={product.hasDimensions}
+                    dimensions={product.dimensions}
                 />
             </div>
 
@@ -282,7 +286,7 @@ const DetailProduct: React.FC = () => {
                                         <div className='size-8 rounded-xl bg-stone-100 flex items-center justify-center text-stone-700'>
                                             <FileText size={16} />
                                         </div>
-                                        <span className='text-sm sm:text-base font-semibold text-stone-900 uppercase tracking-wider text-xs'>
+                                        <span className='text-sm sm:text-base font-semibold text-stone-900 uppercase tracking-wider'>
                                             Description
                                         </span>
                                     </div>
@@ -311,7 +315,7 @@ const DetailProduct: React.FC = () => {
                                         <div className='size-8 rounded-xl bg-[#E41F66]/10 text-[#E41F66] flex items-center justify-center'>
                                             <Sparkles size={16} />
                                         </div>
-                                        <span className='text-sm sm:text-base font-semibold text-stone-900 uppercase tracking-wider text-xs'>
+                                        <span className='text-sm sm:text-base font-semibold text-stone-900 uppercase tracking-wider'>
                                             About This Product & Craftsmanship
                                         </span>
                                     </div>
@@ -340,7 +344,7 @@ const DetailProduct: React.FC = () => {
                                         <div className='size-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center'>
                                             <AlertCircle size={16} />
                                         </div>
-                                        <span className='text-sm sm:text-base font-semibold text-amber-950 uppercase tracking-wider text-xs'>
+                                        <span className='text-sm sm:text-base font-semibold text-amber-950 uppercase tracking-wider'>
                                             Important Note / Guidelines
                                         </span>
                                     </div>
@@ -369,7 +373,7 @@ const DetailProduct: React.FC = () => {
                                         <HelpCircle size={16} />
                                     </div>
                                     <div>
-                                        <span className='text-sm sm:text-base font-semibold text-stone-900 uppercase tracking-wider text-xs block'>
+                                        <span className='text-sm sm:text-base font-semibold text-stone-900 uppercase tracking-wider block'>
                                             How to Place an Order
                                         </span>
                                         <span className='text-[11px] text-stone-400 font-normal block sm:inline'>

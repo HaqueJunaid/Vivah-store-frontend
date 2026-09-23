@@ -9,9 +9,8 @@ const Footer = () => {
                     <Link to="/" >
                         <img className='-ml-1 w-30 lg:w-40 mb-5' src="/Assets/Logo.svg" alt="Logo" />
                     </Link>
-                    <p className="text-sm">
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
+                    <p className="text-xs sm:text-sm text-stone-500 leading-relaxed">
+                        Crafting bespoke wedding stationery, personalized badges, luxury invitations, and curated gifts. Translating your love stories into timeless celebration keepsakes.
                     </p>
                 </div>
                 <div className="flex flex-col lg:flex-row flex-1 md:justify-end items-start gap-20">

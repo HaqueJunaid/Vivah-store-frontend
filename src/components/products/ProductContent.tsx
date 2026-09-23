@@ -1,11 +1,12 @@
 import React, { useState, useRef, type ChangeEvent } from 'react'
-import type { ProductContentProps } from "../../types/allTypes";
+import type { ProductContentProps, ProductDimension } from "../../types/allTypes";
 import AddToCartButton from '../cart/AddToCartButton';
 import AddToWishListButton from '../wishlist/AddToWishListButton';
 import { uploadCustomizationImage } from '../../services/productService';
 import { useCartStore } from '../../store/cartStore';
 import toast from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Ruler, Check } from 'lucide-react';
+import { formatDimensionString } from '../Admin/ProductDimensionsModal';
 
 const FIELD_CONFIG: Record<string, { label: string; placeholder: string; type: string }> = {
     coupleName: { label: "Couple Name", placeholder: "Enter couple name", type: "text" },
@@ -27,6 +28,8 @@ const ProductContent: React.FC<ProductContentProps> = ({
     isCustomizable,
     customizations: activeCustomizationKeys,
     hasFixedQuantities,
+    hasDimensions,
+    dimensions = [],
     handleVariantChange 
 }) => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null)
@@ -34,12 +37,24 @@ const ProductContent: React.FC<ProductContentProps> = ({
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [quantity, setQuantity] = useState(hasFixedQuantities ? 25 : 1)
     const [activeVariant, setActiveVariant] = useState(0)
+    const [selectedDimensionIndex, setSelectedDimensionIndex] = useState(0)
     const [customizations, setCustomizations] = useState<Record<string, string>>({})
 
     const cartItems = useCartStore((state: any) => state.cartItems);
     const updateCartItemQuantity = useCartStore((state: any) => state.updateCartItemQuantity);
 
     const currentVariantObj = variants?.[activeVariant] || null;
+    const selectedDimension = dimensions && dimensions.length > 0 ? (dimensions[selectedDimensionIndex] || dimensions[0]) : null;
+
+    // Effective customizations includes chosen size/dimension if product has dimensions
+    const effectiveCustomizations = React.useMemo(() => {
+        const res = { ...customizations };
+        if (selectedDimension) {
+            const dimStr = formatDimensionString(selectedDimension);
+            res["Size"] = selectedDimension.label ? `${selectedDimension.label} (${dimStr})` : dimStr;
+        }
+        return res;
+    }, [customizations, selectedDimension]);
 
     // Check if this item (with exact variant & customizations) is in cart
     const itemInCart = cartItems.find((item: any) => {
@@ -48,7 +63,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
         const variantB = JSON.stringify(currentVariantObj || null);
         if (variantA !== variantB) return false;
         const customA = JSON.stringify(item.customizations || {});
-        const customB = JSON.stringify(customizations || {});
+        const customB = JSON.stringify(effectiveCustomizations || {});
         return customA === customB;
     });
 
@@ -66,7 +81,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
     const handleSelectTier = (tier: number) => {
         setQuantity(tier);
         if (hasFixedQuantities && quantityInCart > 0 && quantityInCart !== tier) {
-            updateCartItemQuantity(id, tier, customizations, currentVariantObj);
+            updateCartItemQuantity(id, tier, effectiveCustomizations, currentVariantObj);
             toast.success(`Cart updated to ${tier} pcs`);
         }
     };
@@ -154,6 +169,57 @@ const ProductContent: React.FC<ProductContentProps> = ({
                 <h1 className='font-sans font-medium text-3xl sm:text-4xl tracking-wide capitalize leading-tight text-stone-900'>{title}</h1>
                 <p className='text-[#E41F66] font-semibold text-2xl tracking-wide mt-1'>₹{price}</p>
             </div>
+
+            {/* Product Dimensions & Size Variations */}
+            {dimensions && dimensions.length > 0 && (
+                <div className='flex flex-col gap-3 pb-6 border-b border-stone-200/80'>
+                    <div className='flex items-center justify-between'>
+                        <div className='flex items-center gap-2'>
+                            <Ruler size={14} className="text-[#E41F66]" />
+                            <span className='text-xs uppercase tracking-wider text-stone-700 font-bold'>
+                                Size / Dimensions
+                            </span>
+                        </div>
+                        {selectedDimension && (
+                            <span className='text-xs font-mono font-bold text-[#E41F66]'>
+                                {selectedDimension.label ? selectedDimension.label : formatDimensionString(selectedDimension)}
+                            </span>
+                        )}
+                    </div>
+                    
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1'>
+                        {dimensions.map((dim, idx) => {
+                            const isSelected = selectedDimensionIndex === idx;
+                            return (
+                                <button
+                                    key={dim._id || dim.id || idx}
+                                    type="button"
+                                    onClick={() => setSelectedDimensionIndex(idx)}
+                                    className={`p-3 rounded-2xl text-left transition-all duration-200 cursor-pointer relative flex flex-col justify-between gap-1.5 ${
+                                        isSelected
+                                            ? 'bg-stone-900 text-white shadow-md ring-2 ring-stone-900'
+                                            : 'bg-white text-stone-800 border border-stone-200/90 hover:border-stone-400 hover:bg-stone-50/80 shadow-2xs'
+                                    }`}
+                                >
+                                    <div className='flex items-center justify-between w-full'>
+                                        <span className={`text-xs font-bold tracking-wide ${isSelected ? 'text-white' : 'text-stone-900'}`}>
+                                            {dim.label || `Option ${idx + 1}`}
+                                        </span>
+                                        {isSelected && (
+                                            <div className='size-4.5 rounded-full bg-[#E41F66] flex items-center justify-center text-white'>
+                                                <Check size={11} strokeWidth={3} />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className={`text-xs font-mono ${isSelected ? 'text-stone-300' : 'text-stone-500'}`}>
+                                        {formatDimensionString(dim)}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* Quantity selection */}
             {hasFixedQuantities ? (
@@ -321,7 +387,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
 
             {/* Actions: Add to Cart and Wishlist */}
             <div className='flex gap-4 pt-6 pb-6 items-stretch w-full'>
-                <div className='flex-grow'>
+                <div className='grow'>
                     <AddToCartButton 
                         product={{ 
                             id, 
@@ -331,8 +397,9 @@ const ProductContent: React.FC<ProductContentProps> = ({
                             quantity,
                             selectedVariant: variants?.[activeVariant],
                             uploadedImage: uploadedImage || undefined,
-                            customizations,
+                            customizations: effectiveCustomizations,
                             hasFixedQuantities,
+                            selectedDimension: selectedDimension,
                             inStock: variants && variants.length > 0 ? (variants[activeVariant]?.inStock ?? true) : inStock
                         }} 
                         variant="luxury"

@@ -162,6 +162,8 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
     isCustomizable: dbProduct.isCustomizable ?? false,
     customizations: dbProduct.customizations || [],
     hasFixedQuantities: dbProduct.hasFixedQuantities ?? false,
+    hasDimensions: dbProduct.hasDimensions ?? false,
+    dimensions: dbProduct.dimensions || [],
   } : null
 
   const currentVariant = product?.variants[selectedVariant]
@@ -255,6 +257,8 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
                 isCustomizable={product.isCustomizable} 
                 customizations={product.customizations} 
                 hasFixedQuantities={product.hasFixedQuantities}
+                hasDimensions={product.hasDimensions}
+                dimensions={product.dimensions}
               />
             </div>
           </div>

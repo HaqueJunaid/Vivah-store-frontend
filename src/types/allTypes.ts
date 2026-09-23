@@ -47,6 +47,8 @@ export interface ProductContentProps {
     isCustomizable?: boolean;
     customizations?: string[];
     hasFixedQuantities?: boolean;
+    hasDimensions?: boolean;
+    dimensions?: ProductDimension[];
     handleVariantChange: (index: number) => void
 }
 
@@ -96,6 +98,16 @@ export interface WishlistStoreInterface {
     isInWishlist: (productId: string) => boolean;
 }
 
+export interface ProductDimension {
+  _id?: string;
+  id?: string;
+  label?: string;
+  width?: string | number;
+  height?: string | number;
+  thickness?: string | number;
+  unit?: string;
+}
+
 export interface ProductVariant {
   _id?: string;
   title: string;
@@ -124,6 +136,8 @@ export interface Product {
   isCustomizable?: boolean;
   customizations?: string[];
   hasFixedQuantities?: boolean;
+  hasDimensions?: boolean;
+  dimensions?: ProductDimension[];
   createdAt?: string;
 }
 
@@ -436,6 +450,7 @@ export interface AddToCartProduct {
     customizations?: Record<string, string>;
     inStock?: boolean;
     hasFixedQuantities?: boolean;
+    selectedDimension?: ProductDimension | null;
 }
 
 // Auth Wrapper Props Types
@@ -468,6 +483,8 @@ export interface ProductFormInputs {
   isCustomizable?: boolean;
   customizations?: string[];
   hasFixedQuantities?: boolean;
+  hasDimensions?: boolean;
+  dimensions?: ProductDimension[];
 }
 
 export interface ProductAddFormProps {

@@ -54,7 +54,7 @@ const ProductFilterSideBar: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setOpen(true)}
-                            className="flex-grow flex items-center justify-center gap-2 border border-stone-200 bg-white hover:bg-stone-50 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-850 shadow-xs transition duration-200 cursor-pointer"
+                            className="grow flex items-center justify-center gap-2 border border-stone-200 bg-white hover:bg-stone-50 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-850 shadow-xs transition duration-200 cursor-pointer"
                         >
                             <CiFilter className="size-4.5 text-stone-800" />
                             <span>Filter</span>
@@ -62,7 +62,7 @@ const ProductFilterSideBar: React.FC = () => {
                         <button
                             type="button"
                             onClick={handleClearFilters}
-                            className="flex-grow flex items-center justify-center gap-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-rose-700 transition duration-200 cursor-pointer"
+                            className="grow flex items-center justify-center gap-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-rose-700 transition duration-200 cursor-pointer"
                         >
                             <X className="size-4 text-rose-700" />
                             <span>Clear Filters</span>
@@ -82,7 +82,7 @@ const ProductFilterSideBar: React.FC = () => {
 
             {/* Mobile/Tablet Slide-over Drawer (Visible below lg) */}
             <div
-                className={`lg:hidden fixed inset-0 z-[100] transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                className={`lg:hidden fixed inset-0 z-100 transition-opacity duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
                     }`}
             >
                 {/* Backdrop Overlay */}

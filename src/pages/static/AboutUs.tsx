@@ -86,22 +86,22 @@ const AboutUs: React.FC = () => {
                     <div className="w-16 h-0.5 bg-[#E41F66] mx-auto mt-3" />
                 </div>
 
-                {/* Section 1: Srishti Bhartia (Founder) */}
+                {/* Section 1: Adarsh Sharma (Founder) */}
                 <section className="flex flex-col lg:flex-row items-center gap-10 md:gap-14 bg-white border border-stone-200/60 rounded-4xl p-6 md:p-8 shadow-xs hover:shadow-md transition-all duration-300">
                     <div className="relative rounded-3xl overflow-hidden shrink-0 w-full md:max-w-md aspect-[4/5] lg:aspect-square bg-stone-100 border border-stone-200/50">
                         <img
                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80"
-                            alt="Miss Srishti Bhartia"
+                            alt="Miss Adarsh Sharma"
                         />
                         <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-xs px-3.5 py-1.5 rounded-full text-xs font-bold text-[#E41F66] shadow-sm uppercase tracking-wider">
                             FOUNDER &amp; CREATIVE HEART
                         </div>
                     </div>
                     <div className="flex-1 text-stone-600 text-sm md:text-base space-y-4">
-                        <h3 className="text-xl md:text-3xl font-extrabold text-stone-900">Srishti Bhartia</h3>
+                        <h3 className="text-xl md:text-3xl font-extrabold text-stone-900">Adarsh Sharma</h3>
                         <p className="leading-relaxed">
-                            Srishbish is a small design studio with big dreams based out of Surat. Being the brainchild of the lovely Miss Srishti Bhartia, we work to deliver the best graphic and branding experiences to our clients and also help to translate emotions through visuals and stationery gifting for our wonderful customers all over the world.
+                            Srishbish is a small design studio with big dreams based out of Surat. Being the brainchild of the lovely Miss Adarsh Sharma, we work to deliver the best graphic and branding experiences to our clients and also help to translate emotions through visuals and stationery gifting for our wonderful customers all over the world.
                         </p>
                         <p className="text-stone-500 italic">
                             "Connecting hearts, one handcrafted wax seal and elegant envelope at a time."

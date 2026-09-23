@@ -21,7 +21,9 @@ import { useCategoryStore } from "../../store/categoryStore";
 import AddSubCategoryButton from "../../components/Admin/AddSubCategoryButton";
 import AddSubCategoryModal from "../../components/Admin/AddSubCategoryModal";
 import { useProductStore } from "../../store/productStore";
-import type { ProductFormInputs } from "../../types/allTypes";
+import ProductDimensionsModal, { formatDimensionString } from "../../components/Admin/ProductDimensionsModal";
+import type { ProductFormInputs, ProductDimension } from "../../types/allTypes";
+import { Ruler } from "lucide-react";
 
 const CUSTOMIZATION_OPTIONS = [
   { label: "Custom Image Uploader", value: "customImage" },
@@ -84,6 +86,10 @@ const AddProductPage: React.FC = () => {
   // Customizations
   const [customizationSlots, setCustomizationSlots] = useState<string[]>([]);
   const [customizationError, setCustomizationError] = useState<string | null>(null);
+
+  // Dimensions & Size Variations
+  const [dimensions, setDimensions] = useState<ProductDimension[]>([]);
+  const [isDimensionsModalOpen, setIsDimensionsModalOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Admin | Add New Product";
@@ -331,6 +337,10 @@ const AddProductPage: React.FC = () => {
     }
 
     formData.append("hasFixedQuantities", String(data.hasFixedQuantities || false));
+
+    // Dimensions
+    formData.append("hasDimensions", String(dimensions.length > 0));
+    formData.append("dimensions", JSON.stringify(dimensions));
 
     // Main Images
     selectedFiles.forEach((file) => {
@@ -959,6 +969,69 @@ const AddProductPage: React.FC = () => {
             )}
           </div>
 
+          {/* Card 6: Product Dimensions & Size Variations (Optional) */}
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-stone-100 gap-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
+                  <Ruler size={20} />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Dimensions & Size Variations</h2>
+                  <p className="text-xs text-stone-500">Optional: Add measurements (width, height, thickness) and multiple size options.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDimensionsModalOpen(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900 hover:bg-[#E41F66] text-white text-xs font-bold transition shadow-xs cursor-pointer shrink-0 self-start md:self-auto"
+              >
+                <Plus size={14} />
+                <span>{dimensions.length > 0 ? "Manage Dimensions" : "Add Dimensions"}</span>
+              </button>
+            </div>
+
+            {dimensions.length === 0 ? (
+              <div className="text-center py-6 px-4 bg-stone-50/70 rounded-2xl border border-dashed border-stone-200">
+                <Ruler className="mx-auto size-8 text-stone-300 mb-2" />
+                <p className="text-xs font-semibold text-stone-600">No dimensions configured</p>
+                <p className="text-[11px] text-stone-400 mt-0.5">Click "Add Dimensions" to specify width, height, thickness, or size presets.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs text-stone-500 font-semibold">
+                  <span>Configured Sizes / Dimensions ({dimensions.length})</span>
+                  <span className="text-[11px] text-[#E41F66]">Customers can choose from these options</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  {dimensions.map((dim, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-3 rounded-xl bg-stone-50 border border-stone-200 hover:border-stone-300 transition group"
+                    >
+                      <div className="min-w-0 pr-2">
+                        {dim.label && (
+                          <div className="text-xs font-bold text-stone-900 truncate">{dim.label}</div>
+                        )}
+                        <div className="text-xs text-stone-600 font-mono font-medium">
+                          {formatDimensionString(dim)}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setDimensions((prev) => prev.filter((_, i) => i !== idx))}
+                        className="text-stone-400 hover:text-red-500 p-1 rounded-lg opacity-80 group-hover:opacity-100 transition cursor-pointer"
+                        title="Remove dimension"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Sticky/Bottom Actions */}
           <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-stone-200 shadow-sm space-y-4">
             {isSubmitting ? (
@@ -1007,6 +1080,13 @@ const AddProductPage: React.FC = () => {
         onClose={() => setIsAddSubCategoryModalOpen(false)}
         categoryTitle={selectedCategory}
         onSubCategoryAdded={handleSubCategoryAdded}
+      />
+
+      <ProductDimensionsModal
+        isOpen={isDimensionsModalOpen}
+        onClose={() => setIsDimensionsModalOpen(false)}
+        initialDimensions={dimensions}
+        onSave={(updated) => setDimensions(updated)}
       />
     </div>
   );

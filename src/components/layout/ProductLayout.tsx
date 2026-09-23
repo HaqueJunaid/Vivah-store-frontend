@@ -221,7 +221,7 @@ const ProductLayout: React.FC = () => {
                   <button
                     onClick={loadMore}
                     disabled={loading}
-                    className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#E41F66] to-pink-600 hover:from-pink-600 hover:to-[#E41F66] text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-xl hover:shadow-pink-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0 cursor-pointer min-w-[200px]"
+                    className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-linear-to-r from-[#E41F66] to-pink-600 hover:from-pink-600 hover:to-[#E41F66] text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-xl hover:shadow-pink-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0 cursor-pointer min-w-50"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">

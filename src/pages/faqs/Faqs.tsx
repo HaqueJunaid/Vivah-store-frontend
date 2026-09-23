@@ -116,7 +116,7 @@ const Faqs: React.FC = () => {
         {
             category: 'returns',
             question: "Where do I Ship the Returns?",
-            answer: "Please mail the item(s) to the address below. Do remember to mention your Order ID and Contact Number. Srishti Bhartia. 414-15, A, Villa, New City light, Althan, Sonari, Jamshedpur, Jharkhand, Contact Number - +91 8507756877.",
+            answer: "Please mail the item(s) to the address below. Do remember to mention your Order ID and Contact Number. Adarsh Sharma. Auto Stand, in front of ICICI Bank, near Kagal Nagar, Sonari East, Kagal Nagar, Sonari, Jamshedpur, Jharkhand - 831011, Contact Number: +91 8507756877.",
             icon: <Package className="size-5 text-[#E41F66]" />
         },
         {
@@ -338,7 +338,7 @@ const Faqs: React.FC = () => {
 
             {/* Still Need Help Concierge Card */}
             <div className="max-w-3xl mx-auto px-6 mt-16 text-center">
-                <div className="bg-gradient-to-br from-stone-900 to-stone-950 text-white rounded-3xl p-8 md:p-10 shadow-xl relative overflow-hidden">
+                <div className="bg-linear-to-br from-stone-900 to-stone-950 text-white rounded-3xl p-8 md:p-10 shadow-xl relative overflow-hidden">
                     {/* Decorative Ambient Glow shapes */}
                     <div className="absolute -right-16 -bottom-16 size-48 bg-[#E41F66]/15 rounded-full blur-2xl pointer-events-none" />
                     <div className="absolute -left-16 -top-16 size-36 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
