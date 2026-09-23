@@ -101,8 +101,10 @@ export const generateInvoicePDF = async (order: any) => {
     if (item.selectedVariant) {
       const variantName = typeof item.selectedVariant === 'string' 
         ? item.selectedVariant 
-        : (item.selectedVariant.name || item.selectedVariant.title || 'Default');
-      description += `\nVariant: ${variantName}`;
+        : (item.selectedVariant.name || item.selectedVariant.title || '');
+      if (variantName && variantName.toLowerCase() !== 'default') {
+        description += `\nVariant: ${variantName}`;
+      }
     }
 
     if (item.customizations) {

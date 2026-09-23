@@ -37,7 +37,7 @@ const Cartitem = React.memo(({ cartItems, updateQuantity, setQuantity }: CartIte
                 const parsedPrice = typeof item.productPrice === 'string' ? parseFloat(item.productPrice) : item.productPrice;
                 const unitPrice = Number.isFinite(parsedPrice) ? parsedPrice : 0;
                 const totalPrice = unitPrice * item.productQuantity;
-                const mainImage = (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) || item.productImage || 'https://picsum.photos/600/500';
+                const mainImage = item.productImage || (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) || 'https://picsum.photos/600/500';
 
                 return (
                     <div 
@@ -72,7 +72,8 @@ const Cartitem = React.memo(({ cartItems, updateQuantity, setQuantity }: CartIte
                                 {/* Variant Badge */}
                                 {item.selectedVariant && (() => {
                                     const variant = item.selectedVariant;
-                                    const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
+                                    const name = typeof variant === 'string' ? variant : (variant.name || variant.title || '');
+                                    if (!name || name.toLowerCase() === 'default') return null;
                                     const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
                                     return (
                                         <div className="mt-1.5 flex items-center gap-1.5 text-stone-500 text-xs font-semibold">

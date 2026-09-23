@@ -49,6 +49,10 @@ export interface ProductContentProps {
     hasFixedQuantities?: boolean;
     hasDimensions?: boolean;
     dimensions?: ProductDimension[];
+    selectedImage?: number;
+    selectedVariantIndex?: number;
+    selectedImageUrl?: string;
+    hasVariants?: boolean;
     handleVariantChange: (index: number) => void
 }
 

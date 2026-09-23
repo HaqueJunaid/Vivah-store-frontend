@@ -146,8 +146,8 @@ const OrderDetail = () => {
               <div className='space-y-6'>
                 {order.items?.map((item: any, index: number) => {
                   const itemMainImage = 
-                    (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) ||
                     item.productImage || 
+                    (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) ||
                     (item.product?.imageUrls && item.product.imageUrls[0]) || 
                     'https://picsum.photos/600/500';
 
@@ -162,7 +162,8 @@ const OrderDetail = () => {
                           <span className="bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md text-stone-700 font-medium">Qty: {item.quantity}</span>
                           {item.selectedVariant && (() => {
                             const variant = item.selectedVariant;
-                            const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
+                            const name = typeof variant === 'string' ? variant : (variant.name || variant.title || '');
+                            if (!name || name.toLowerCase() === 'default') return null;
                             const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
                             return (
                               <span className="inline-flex items-center gap-1 bg-stone-100 border border-stone-200 px-2.5 py-0.5 rounded-md text-stone-700 font-medium capitalize">

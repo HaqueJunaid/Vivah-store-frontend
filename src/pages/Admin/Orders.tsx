@@ -409,8 +409,8 @@ const Orders = () => {
                 <div className="space-y-4">
                   {selectedOrder.items?.map((item: any, index: number) => {
                     const itemMainImage = 
-                      (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) ||
                       item.productImage || 
+                      (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) ||
                       (item.product?.imageUrls && item.product.imageUrls[0]) || 
                       'https://picsum.photos/600/500';
 
@@ -431,7 +431,8 @@ const Orders = () => {
                           <p className="mt-1 text-xs text-stone-500">Qty: {item.quantity}</p>
                           {item.selectedVariant && (() => {
                             const variant = item.selectedVariant;
-                            const name = typeof variant === 'string' ? variant : (variant.name || variant.title || 'Default');
+                            const name = typeof variant === 'string' ? variant : (variant.name || variant.title || '');
+                            if (!name || name.toLowerCase() === 'default') return null;
                             const imageUrl = typeof variant === 'object' && variant.images && variant.images.length > 0 ? variant.images[0] : null;
                             return (
                               <p className="text-xs mt-1">

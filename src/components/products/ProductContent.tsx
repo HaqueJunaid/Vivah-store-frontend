@@ -1,4 +1,4 @@
-import React, { useState, useRef, type ChangeEvent } from 'react'
+import React, { useState, useEffect, useRef, type ChangeEvent } from 'react'
 import type { ProductContentProps, ProductDimension } from "../../types/allTypes";
 import AddToCartButton from '../cart/AddToCartButton';
 import AddToWishListButton from '../wishlist/AddToWishListButton';
@@ -30,20 +30,38 @@ const ProductContent: React.FC<ProductContentProps> = ({
     hasFixedQuantities,
     hasDimensions,
     dimensions = [],
+    selectedImage,
+    selectedVariantIndex,
+    selectedImageUrl,
+    hasVariants,
     handleVariantChange 
 }) => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null)
     const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [quantity, setQuantity] = useState(hasFixedQuantities ? 25 : 1)
-    const [activeVariant, setActiveVariant] = useState(0)
+    const [activeVariant, setActiveVariant] = useState(selectedVariantIndex ?? 0)
     const [selectedDimensionIndex, setSelectedDimensionIndex] = useState(0)
     const [customizations, setCustomizations] = useState<Record<string, string>>({})
+
+    useEffect(() => {
+        if (selectedVariantIndex !== undefined) {
+            setActiveVariant(selectedVariantIndex);
+        }
+    }, [selectedVariantIndex]);
 
     const cartItems = useCartStore((state: any) => state.cartItems);
     const updateCartItemQuantity = useCartStore((state: any) => state.updateCartItemQuantity);
 
     const currentVariantObj = variants?.[activeVariant] || null;
+    const isRealVariant = !!hasVariants || (variants && variants.length > 1 && variants.some(v => v.name.toLowerCase() !== 'default'));
+    const effectiveVariant = isRealVariant ? currentVariantObj : undefined;
+
+    const effectiveImageUrl = selectedImageUrl 
+        || (currentVariantObj?.images?.[selectedImage ?? 0]) 
+        || currentVariantObj?.images?.[0] 
+        || '';
+
     const selectedDimension = dimensions && dimensions.length > 0 ? (dimensions[selectedDimensionIndex] || dimensions[0]) : null;
 
     // Effective customizations includes chosen size/dimension if product has dimensions
@@ -60,7 +78,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
     const itemInCart = cartItems.find((item: any) => {
         if (item.productId !== id) return false;
         const variantA = JSON.stringify(item.selectedVariant || null);
-        const variantB = JSON.stringify(currentVariantObj || null);
+        const variantB = JSON.stringify(effectiveVariant || null);
         if (variantA !== variantB) return false;
         const customA = JSON.stringify(item.customizations || {});
         const customB = JSON.stringify(effectiveCustomizations || {});
@@ -81,7 +99,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
     const handleSelectTier = (tier: number) => {
         setQuantity(tier);
         if (hasFixedQuantities && quantityInCart > 0 && quantityInCart !== tier) {
-            updateCartItemQuantity(id, tier, effectiveCustomizations, currentVariantObj);
+            updateCartItemQuantity(id, tier, effectiveCustomizations, effectiveVariant);
             toast.success(`Cart updated to ${tier} pcs`);
         }
     };
@@ -393,9 +411,9 @@ const ProductContent: React.FC<ProductContentProps> = ({
                             id, 
                             title, 
                             price: String(normalizedActionPrice), 
-                            imageUrl: variants?.[activeVariant]?.images?.[0],
+                            imageUrl: effectiveImageUrl,
                             quantity,
-                            selectedVariant: variants?.[activeVariant],
+                            selectedVariant: effectiveVariant,
                             uploadedImage: uploadedImage || undefined,
                             customizations: effectiveCustomizations,
                             hasFixedQuantities,
@@ -409,7 +427,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
                     id={id} 
                     title={title} 
                     price={normalizedActionPrice} 
-                    imageUrl={variants?.[activeVariant]?.images?.[0]} 
+                    imageUrl={effectiveImageUrl} 
                     variant="detail"
                 />
             </div>

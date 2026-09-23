@@ -177,6 +177,7 @@ const DetailProduct: React.FC = () => {
         })(),
         isCustomizable: dbProduct.isCustomizable ?? false,
         customizations: dbProduct.customizations || [],
+        hasVariants: !!dbProduct.hasVariants,
         hasFixedQuantities: dbProduct.hasFixedQuantities ?? false,
         hasDimensions: dbProduct.hasDimensions ?? false,
         dimensions: dbProduct.dimensions || [],
@@ -257,6 +258,10 @@ const DetailProduct: React.FC = () => {
                     hasFixedQuantities={product.hasFixedQuantities}
                     hasDimensions={product.hasDimensions}
                     dimensions={product.dimensions}
+                    selectedImage={selectedImage}
+                    selectedVariantIndex={selectedVariant}
+                    selectedImageUrl={currentVariant.images[selectedImage] || currentVariant.images[0]}
+                    hasVariants={product.hasVariants}
                 />
             </div>
 
