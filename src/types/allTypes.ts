@@ -321,7 +321,7 @@ export interface BaseItem {
 }
 
 export interface DropdownItem {
-  _id: Key | null | undefined;
+  _id?: string | React.Key | null;
   title: string;
   url: string;
   baseItems?: BaseItem[];

@@ -49,7 +49,7 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({ query, debounced
     if (!query.trim()) return null;
 
     return (
-        <div className="absolute top-full left-0 right-0 z-50 bg-white shadow-2xl rounded-b-xl border border-stone-200 mt-2 max-h-[60vh] md:max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 z-50 bg-white shadow-xl shadow-stone-900/10 rounded-2xl border border-stone-200/90 mt-2 max-h-[60vh] md:max-h-96 overflow-hidden">
             {loading ? (
                 <div className="p-4 space-y-3">
                     <div className="flex items-center gap-3 animate-pulse">
