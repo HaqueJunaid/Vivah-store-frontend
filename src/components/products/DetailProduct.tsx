@@ -179,6 +179,7 @@ const DetailProduct: React.FC = () => {
         customizations: dbProduct.customizations || [],
         hasVariants: !!dbProduct.hasVariants,
         hasFixedQuantities: dbProduct.hasFixedQuantities ?? false,
+        batchQuantities: dbProduct.batchQuantities || [],
         hasDimensions: dbProduct.hasDimensions ?? false,
         dimensions: dbProduct.dimensions || [],
     } : null;
@@ -256,6 +257,7 @@ const DetailProduct: React.FC = () => {
                     isCustomizable={product.isCustomizable} 
                     customizations={product.customizations} 
                     hasFixedQuantities={product.hasFixedQuantities}
+                    batchQuantities={product.batchQuantities}
                     hasDimensions={product.hasDimensions}
                     dimensions={product.dimensions}
                     selectedImage={selectedImage}

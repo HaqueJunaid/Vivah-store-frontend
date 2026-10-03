@@ -47,6 +47,7 @@ export interface ProductContentProps {
     isCustomizable?: boolean;
     customizations?: string[];
     hasFixedQuantities?: boolean;
+    batchQuantities?: number[];
     hasDimensions?: boolean;
     dimensions?: ProductDimension[];
     selectedImage?: number;
@@ -140,6 +141,7 @@ export interface Product {
   isCustomizable?: boolean;
   customizations?: string[];
   hasFixedQuantities?: boolean;
+  batchQuantities?: number[];
   hasDimensions?: boolean;
   dimensions?: ProductDimension[];
   createdAt?: string;
@@ -319,6 +321,7 @@ export interface BaseItem {
 }
 
 export interface DropdownItem {
+  _id: Key | null | undefined;
   title: string;
   url: string;
   baseItems?: BaseItem[];
@@ -454,6 +457,7 @@ export interface AddToCartProduct {
     customizations?: Record<string, string>;
     inStock?: boolean;
     hasFixedQuantities?: boolean;
+    batchQuantities?: number[];
     selectedDimension?: ProductDimension | null;
 }
 
@@ -487,6 +491,7 @@ export interface ProductFormInputs {
   isCustomizable?: boolean;
   customizations?: string[];
   hasFixedQuantities?: boolean;
+  batchQuantities?: number[];
   hasDimensions?: boolean;
   dimensions?: ProductDimension[];
 }
@@ -512,4 +517,4 @@ export interface ProductEditFormProps {
   ) => Promise<void>;
   existingIds: string[];
   productToEdit: ProductFormInputs;
-}
+}

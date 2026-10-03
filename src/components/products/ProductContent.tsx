@@ -28,6 +28,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
     isCustomizable,
     customizations: activeCustomizationKeys,
     hasFixedQuantities,
+    batchQuantities,
     hasDimensions,
     dimensions = [],
     selectedImage,
@@ -36,10 +37,14 @@ const ProductContent: React.FC<ProductContentProps> = ({
     hasVariants,
     handleVariantChange 
 }) => {
+    const effectiveBatchQuantities = (batchQuantities && batchQuantities.length > 0) 
+        ? [...batchQuantities].sort((a, b) => a - b) 
+        : FIXED_QUANTITIES;
+
     const [uploadedImage, setUploadedImage] = useState<string | null>(null)
     const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
-    const [quantity, setQuantity] = useState(hasFixedQuantities ? 25 : 1)
+    const [quantity, setQuantity] = useState(hasFixedQuantities ? (effectiveBatchQuantities[0] || 25) : 1)
     const [activeVariant, setActiveVariant] = useState(selectedVariantIndex ?? 0)
     const [selectedDimensionIndex, setSelectedDimensionIndex] = useState(0)
     const [customizations, setCustomizations] = useState<Record<string, string>>({})
@@ -92,9 +97,9 @@ const ProductContent: React.FC<ProductContentProps> = ({
         if (quantityInCart > 0) {
             setQuantity(quantityInCart);
         } else if (hasFixedQuantities) {
-            setQuantity(prev => (FIXED_QUANTITIES.includes(prev) ? prev : 25));
+            setQuantity(prev => (effectiveBatchQuantities.includes(prev) ? prev : (effectiveBatchQuantities[0] || 25)));
         }
-    }, [id, activeVariant, quantityInCart, hasFixedQuantities]);
+    }, [id, activeVariant, quantityInCart, hasFixedQuantities, effectiveBatchQuantities]);
 
     const handleSelectTier = (tier: number) => {
         setQuantity(tier);
@@ -249,7 +254,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
                         <span className='text-[11px] font-medium text-stone-400'>Select quantity</span>
                     </div>
                     <div className='flex flex-wrap gap-2 pt-1'>
-                        {FIXED_QUANTITIES.map((tier) => {
+                        {effectiveBatchQuantities.map((tier) => {
                             const isSelected = quantity === tier;
                             return (
                                 <button

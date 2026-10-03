@@ -14,7 +14,19 @@ import {
   Loader2,
   FileText,
   Plus,
-  Trash2
+  Trash2,
+  Image as ImageIcon,
+  DollarSign,
+  Tag,
+  Check,
+  Eye,
+  Settings2,
+  Info,
+  Palette,
+  Ruler,
+  Boxes,
+  HelpCircle,
+  ShoppingBag
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCategoryStore } from "../../store/categoryStore";
@@ -22,8 +34,8 @@ import AddSubCategoryButton from "../../components/Admin/AddSubCategoryButton";
 import AddSubCategoryModal from "../../components/Admin/AddSubCategoryModal";
 import { useProductStore } from "../../store/productStore";
 import ProductDimensionsModal, { formatDimensionString } from "../../components/Admin/ProductDimensionsModal";
+import ProductBatchQuantitiesModal, { DEFAULT_BATCH_QUANTITIES } from "../../components/Admin/ProductBatchQuantitiesModal";
 import type { ProductFormInputs, ProductDimension } from "../../types/allTypes";
-import { Ruler } from "lucide-react";
 
 const CUSTOMIZATION_OPTIONS = [
   { label: "Custom Image Uploader", value: "customImage" },
@@ -72,6 +84,7 @@ const AddProductPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
+
   // Multi-variant state
   const [variantsList, setVariantsList] = useState<FormVariantItem[]>([
     {
@@ -91,6 +104,10 @@ const AddProductPage: React.FC = () => {
   const [dimensions, setDimensions] = useState<ProductDimension[]>([]);
   const [isDimensionsModalOpen, setIsDimensionsModalOpen] = useState(false);
 
+  // Predefined Batch Quantities
+  const [batchQuantities, setBatchQuantities] = useState<number[]>(DEFAULT_BATCH_QUANTITIES);
+  const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
+
   useEffect(() => {
     document.title = "Admin | Add New Product";
   }, []);
@@ -99,9 +116,17 @@ const AddProductPage: React.FC = () => {
   const categories = useCategoryStore((state) => state.categories);
   const [isAddSubCategoryModalOpen, setIsAddSubCategoryModalOpen] = useState(false);
 
+  const watchedTitle = watch("title") || "";
+  const watchedPrice = watch("price") || 0;
+  const watchedInStock = watch("inStock");
   const selectedCategory = watch("category");
+  const selectedSubCategory = watch("subCategory");
   const hasVariants = watch("hasVariants");
   const isCustomizable = watch("isCustomizable");
+  const hasFixedQuantities = watch("hasFixedQuantities");
+  const watchedDescription = watch("description") || "";
+  const watchedAbout = watch("about") || "";
+  const watchedNote = watch("note") || "";
 
   const selectedCategoryItem = useMemo(
     () => categories.find((item) => item.title === selectedCategory),
@@ -255,6 +280,7 @@ const AddProductPage: React.FC = () => {
     );
   };
 
+
   const onSubmit: SubmitHandler<ProductFormInputs> = async (data) => {
     if (selectedFiles.length === 0) {
       toast.error("Please upload at least one main product image.");
@@ -298,7 +324,7 @@ const AddProductPage: React.FC = () => {
       formData.append("subCategory", data.subCategory);
     }
 
-    // Structured productInfo object and direct fields for backwards compatibility
+    // Structured productInfo object
     const productInfoObj = {
       description: data.description?.trim() || "",
       about: data.about?.trim() || "",
@@ -318,7 +344,7 @@ const AddProductPage: React.FC = () => {
       }));
       formData.append("variants", JSON.stringify(variantsMeta));
 
-      // Append files for each variant using variantImages_INDEX
+      // Append files for each variant
       variantsList.forEach((v, index) => {
         v.selectedFiles.forEach((file) => {
           formData.append(`variantImages_${index}`, file);
@@ -337,6 +363,9 @@ const AddProductPage: React.FC = () => {
     }
 
     formData.append("hasFixedQuantities", String(data.hasFixedQuantities || false));
+    if (data.hasFixedQuantities) {
+      formData.append("batchQuantities", JSON.stringify(batchQuantities));
+    }
 
     // Dimensions
     formData.append("hasDimensions", String(dimensions.length > 0));
@@ -369,52 +398,57 @@ const AddProductPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50/70 p-3.5 sm:p-6 lg:p-10">
-      <div className="max-w-5xl w-full mx-auto space-y-6 sm:space-y-8">
-        
-        {/* Top Header Navigation */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200 pb-5">
-          <div className="space-y-1.5 min-w-0">
+    <div className="min-h-screen bg-stone-50/60 pb-20">
+      {/* Top Sticky Header */}
+      <div className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-stone-200/80 px-4 sm:px-6 lg:px-8 py-3.5 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
             <Link
               to="/admin/products"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-stone-900 transition-colors mb-0.5"
+              className="p-2 rounded-xl border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer shrink-0"
+              title="Back to products"
             >
-              <ChevronLeft size={16} /> Back to Products
+              <ChevronLeft size={18} />
             </Link>
-            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-stone-900 tracking-tight">Add New Product</h1>
-              <span className="text-xs font-semibold bg-[#E41F66]/10 text-[#E41F66] px-2.5 py-0.5 rounded-full border border-[#E41F66]/20 shrink-0">
-                Catalog Item
-              </span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
+                  Products Studio
+                </span>
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  New Draft
+                </span>
+              </div>
+              <h1 className="text-base sm:text-lg font-bold text-stone-900 truncate">
+                {watchedTitle.trim() || "Untitled New Product"}
+              </h1>
             </div>
-            <p className="text-xs sm:text-sm text-stone-500 max-w-2xl wrap-break-word leading-relaxed">
-              Create a new product listing with rich specifications, overview, detailed about information, and customer guidance.
-            </p>
           </div>
 
-          <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               type="button"
               onClick={() => navigate("/admin/products")}
               disabled={isSubmitting}
-              className="flex-1 sm:flex-none px-4 py-2.5 text-xs sm:text-sm font-medium text-stone-700 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 transition cursor-pointer disabled:opacity-50 text-center"
+              className="px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition cursor-pointer disabled:opacity-50"
             >
-              Cancel
+              Discard
             </button>
             <button
               type="button"
               onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white bg-stone-900 hover:bg-[#E41F66] rounded-xl shadow-sm transition-all duration-300 cursor-pointer disabled:opacity-60 text-center whitespace-nowrap"
+              className="flex items-center justify-center gap-2 px-4.5 sm:px-5 py-2 text-xs sm:text-sm font-bold text-white bg-stone-950 hover:bg-[#E41F66] rounded-xl shadow-sm transition-all duration-300 cursor-pointer disabled:opacity-60"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Publishing...</span>
+                  <Loader2 size={15} className="animate-spin" />
+                  <span>Publishing ({uploadProgress}%)...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 size={16} />
+                  <CheckCircle2 size={15} />
                   <span>Publish Product</span>
                 </>
               )}
@@ -422,145 +456,192 @@ const AddProductPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Form Container */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
-          
-          {/* Card 1: Basic Information */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
-            <div className="flex items-center gap-3 pb-4 border-b border-stone-100">
-              <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
-                <Package size={20} />
+        {/* Upload Progress Bar */}
+        {isSubmitting && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-stone-100 overflow-hidden">
+            <div
+              className="h-full bg-[#E41F66] transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Main Studio Content Area */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-16">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            
+            {/* Card 1: Core Essentials */}
+            <div className="bg-white rounded-3xl p-5 sm:p-7 border border-stone-200/80 shadow-xs space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-stone-100 text-stone-800 rounded-2xl">
+                    <Package size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-stone-900">Essentials &amp; Catalog Info</h2>
+                    <p className="text-xs text-stone-500">Define the core title, categorization, and pricing structure.</p>
+                  </div>
+                </div>
+                <span className="text-[11px] font-semibold text-stone-400 bg-stone-50 px-2.5 py-1 rounded-full border border-stone-200/60 hidden sm:inline-block">
+                  Required Fields
+                </span>
               </div>
-              <div className="min-w-0">
-                <h2 className="text-base sm:text-lg font-semibold text-stone-900">Basic Information</h2>
-                <p className="text-xs text-stone-500 wrap-break-word">Core listing identification, categories, and inventory parameters.</p>
+
+              <div className="space-y-5">
+                {/* Title */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-stone-700 flex items-center gap-1">
+                      Product Name / Title <span className="text-red-500">*</span>
+                    </label>
+                    <span className="text-[11px] text-stone-400 font-mono">
+                      {watchedTitle.length}/100
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    disabled={isSubmitting}
+                    maxLength={100}
+                    {...register("title", { required: "Product Name is required" })}
+                    placeholder="e.g. Custom Premium Acrylic Wedding Invitation Suite"
+                    className="w-full rounded-2xl border border-stone-200 bg-stone-50/40 px-4 py-3 text-sm text-stone-900 font-medium outline-none focus:border-[#E41F66] focus:bg-white transition-all disabled:opacity-60 placeholder:text-stone-400"
+                  />
+                  {errors.title && <p className="text-xs text-red-500 mt-1 font-medium">{errors.title.message}</p>}
+                </div>
+
+                {/* Category & SubCategory Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Category */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                      Category <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      disabled={isSubmitting}
+                      {...register("category", { required: "Category is required" })}
+                      className="w-full rounded-2xl border border-stone-200 bg-stone-50/40 px-4 py-3 text-sm text-stone-900 font-medium outline-none focus:border-[#E41F66] focus:bg-white transition-all cursor-pointer disabled:opacity-60"
+                    >
+                      {categories.map((cat) => (
+                        <option key={cat._id} value={cat.title}>
+                          {cat.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* SubCategory */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-xs font-bold uppercase tracking-wider text-stone-700">
+                        Subcategory
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddSubCategoryModalOpen(true)}
+                        className="text-[11px] font-bold text-[#E41F66] hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <Plus size={12} /> Add New
+                      </button>
+                    </div>
+                    <select
+                      disabled={isSubmitting}
+                      {...register("subCategory")}
+                      className="w-full rounded-2xl border border-stone-200 bg-stone-50/40 px-4 py-3 text-sm text-stone-900 font-medium outline-none focus:border-[#E41F66] focus:bg-white transition-all cursor-pointer disabled:opacity-60"
+                    >
+                      <option value="">-- None / General --</option>
+                      {subCategoryOptions.map((sub, idx) => (
+                        <option key={idx} value={sub.title}>
+                          {sub.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Pricing & In Stock Status */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  {/* Base Price */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                      Base Price (USD) <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400 font-bold">
+                        $
+                      </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        disabled={isSubmitting}
+                        {...register("price", {
+                          required: "Price is required",
+                          min: { value: 0.01, message: "Price must be greater than 0" },
+                        })}
+                        placeholder="29.99"
+                        className="w-full rounded-2xl border border-stone-200 bg-stone-50/40 pl-8 pr-4 py-3 text-sm text-stone-900 font-mono font-bold outline-none focus:border-[#E41F66] focus:bg-white transition-all disabled:opacity-60"
+                      />
+                    </div>
+                    {errors.price && <p className="text-xs text-red-500 mt-1 font-medium">{errors.price.message}</p>}
+                  </div>
+
+                  {/* In Stock Toggle Box */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                      Inventory Status
+                    </label>
+                    <label className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl border border-stone-200 bg-stone-50/40 hover:bg-stone-50 transition cursor-pointer select-none">
+                      <div className="flex items-center gap-2.5">
+                        <input
+                          type="checkbox"
+                          disabled={isSubmitting}
+                          {...register("inStock")}
+                          className="size-4.5 text-[#E41F66] rounded-md border-stone-300 focus:ring-[#E41F66] accent-[#E41F66] cursor-pointer"
+                        />
+                        <span className="text-xs font-bold text-stone-800">
+                          {watch("inStock") ? "In Stock & Available" : "Out of Stock"}
+                        </span>
+                      </div>
+                      <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${watch("inStock") ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-700"}`}>
+                        {watch("inStock") ? "Active" : "Hidden"}
+                      </span>
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              {/* Product Title */}
-              <div className="md:col-span-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">
-                  Product Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  disabled={isSubmitting}
-                  {...register("title", { 
-                    required: "Product Title is required",
-                    minLength: { value: 3, message: "Title must be at least 3 characters" }
-                  })}
-                  placeholder="e.g. Royal Golden Laser-Cut Wedding Invitation Suite"
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-3.5 sm:px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition disabled:opacity-60"
-                />
-                {errors.title && <p className="text-xs text-red-500 mt-1.5">{errors.title.message}</p>}
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">
-                  Category <span className="text-red-500">*</span>
-                </label>
-                <select
-                  disabled={isSubmitting}
-                  {...register("category", { required: "Category is required" })}
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition cursor-pointer disabled:opacity-60"
-                >
-                  {categories.map((cat) => (
-                    <option key={cat.url} value={cat.title}>
-                      {cat.title}
-                    </option>
-                  ))}
-                </select>
-                {errors.category && <p className="text-xs text-red-500 mt-1.5">{errors.category.message}</p>}
-              </div>
-
-              {/* Sub-Category */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-600">
-                    Sub-Category {subCategoryOptions.length > 0 && <span className="text-red-500">*</span>}
-                  </label>
-                  <AddSubCategoryButton
-                    disabled={isSubmitting || !selectedCategory}
-                    onClick={() => setIsAddSubCategoryModalOpen(true)}
-                  />
-                </div>
-                <select
-                  disabled={isSubmitting || subCategoryOptions.length === 0}
-                  {...register("subCategory", {
-                    validate: (value) =>
-                      subCategoryOptions.length === 0 || value ? true : "Sub Category is required",
-                  })}
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition cursor-pointer disabled:opacity-60"
-                >
-                  <option value="">
-                    {subCategoryOptions.length === 0 ? "No sub-categories available" : "Select sub-category"}
-                  </option>
-                  {subCategoryOptions.map((item) => (
-                    <option key={item.url} value={item.title}>
-                      {item.title}
-                    </option>
-                  ))}
-                </select>
-                {errors.subCategory && <p className="text-xs text-red-500 mt-1.5">{errors.subCategory.message}</p>}
-              </div>
-
-              {/* Price */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">
-                  Price (₹ INR) <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-3 text-stone-400 font-semibold text-sm">₹</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    disabled={isSubmitting}
-                    {...register("price", {
-                      required: "Price is required",
-                      valueAsNumber: true,
-                      min: { value: 0.5, message: "Price must be at least ₹0.50" },
-                    })}
-                    placeholder="e.g. 1499"
-                    className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 pl-8 pr-4 py-3 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition disabled:opacity-60 font-mono"
-                  />
-                </div>
-                {errors.price && <p className="text-xs text-red-500 mt-1.5">{errors.price.message}</p>}
-              </div>
-
-              {/* Stock Status Checkbox */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">
-                  Availability / Stock Status
-                </label>
-                <label className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-stone-200 bg-stone-50/50 hover:bg-stone-50 transition-colors cursor-pointer select-none">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      disabled={isSubmitting}
-                      {...register("inStock")}
-                      className="size-5 text-[#E41F66] rounded-md border-stone-300 focus:ring-[#E41F66] accent-[#E41F66] cursor-pointer"
-                    />
-                    <div>
-                      <span className="text-sm font-semibold text-stone-900 block">
-                        In Stock
-                      </span>
-                      <span className="text-xs text-stone-500">
-                        {watch("inStock") ? "Available for ordering" : "Marked as out of stock"}
-                      </span>
-                    </div>
+            {/* Card 2: Predefined Batch Quantities (FEATURED) */}
+            <div className="bg-white rounded-3xl p-5 sm:p-7 border border-stone-200/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-[#E41F66]/10 text-[#E41F66] rounded-2xl">
+                    <Boxes size={20} />
                   </div>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${watch("inStock") ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
-                    {watch("inStock") ? "In Stock" : "Out of Stock"}
-                  </span>
-                </label>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-stone-900">Predefined Batch Quantities</h2>
+                    <p className="text-xs text-stone-500">Allow buyers to select from fixed bundle tiers (e.g. 25, 50, 100 pcs).</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!hasFixedQuantities) {
+                      setValue("hasFixedQuantities", true);
+                    }
+                    setIsBatchModalOpen(true);
+                  }}
+                  className="px-3.5 py-1.5 bg-stone-900 hover:bg-[#E41F66] text-white text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs shrink-0"
+                >
+                  <Settings2 size={13} />
+                  <span>Configure Batches</span>
+                </button>
               </div>
 
-              {/* Fixed Quantity Tier Checkbox */}
-              <div className="md:col-span-2">
-                <label className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-stone-200 bg-stone-50/50 hover:bg-stone-50 transition-colors cursor-pointer select-none">
-                  <div className="flex items-center gap-3">
+              <div className="rounded-2xl border border-stone-200 bg-stone-50/40 p-4 space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-3 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       disabled={isSubmitting}
@@ -568,513 +649,458 @@ const AddProductPage: React.FC = () => {
                       className="size-5 text-[#E41F66] rounded-md border-stone-300 focus:ring-[#E41F66] accent-[#E41F66] cursor-pointer"
                     />
                     <div>
-                      <span className="text-sm font-semibold text-stone-900 block">
-                        Sell in Predefined Batch Quantities Only
+                      <span className="text-sm font-bold text-stone-900 block">
+                        Sell in Fixed Batch Quantities Only
                       </span>
                       <span className="text-xs text-stone-500">
-                        When enabled, buyers select from fixed quantities (25, 50, 75, 100... 1000 pcs) instead of standard 1-by-1 increments.
+                        When enabled, customers must select from configured quantity packs instead of typing arbitrary units.
                       </span>
                     </div>
-                  </div>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${watch("hasFixedQuantities") ? "bg-[#E41F66]/10 text-[#E41F66]" : "bg-stone-200 text-stone-600"}`}>
-                    {watch("hasFixedQuantities") ? "Enabled" : "Disabled"}
+                  </label>
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full shrink-0 ${hasFixedQuantities ? "bg-[#E41F66]/10 text-[#E41F66]" : "bg-stone-200 text-stone-600"}`}>
+                    {hasFixedQuantities ? "Enabled" : "Disabled"}
                   </span>
-                </label>
+                </div>
+
+                {hasFixedQuantities && (
+                  <div className="pt-3 border-t border-stone-200/80 space-y-2.5 animate-in fade-in duration-200">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-stone-600 flex items-center gap-1.5">
+                        <Layers size={13} className="text-[#E41F66]" />
+                        Active Batch Tiers ({batchQuantities.length} tiers)
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsBatchModalOpen(true)}
+                        className="text-xs font-bold text-[#E41F66] hover:underline cursor-pointer"
+                      >
+                        + Add / Edit Tiers
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
+                      {batchQuantities.map((qty) => (
+                        <span
+                          key={qty}
+                          className="px-2.5 py-1 rounded-xl bg-white border border-stone-200 text-stone-800 text-xs font-semibold font-mono shadow-2xs flex items-center gap-1"
+                        >
+                          <span>{qty}</span>
+                          <span className="text-[10px] font-normal text-stone-400">pcs</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Card 2: Structured Product Information (productInfo) */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-stone-100 gap-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#E41F66]/10 text-[#E41F66] rounded-xl shrink-0">
-                  <FileText size={20} />
+            {/* Card 3: Media Gallery Studio */}
+            <div className="bg-white rounded-3xl p-5 sm:p-7 border border-stone-200/80 shadow-xs space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-stone-100 text-stone-800 rounded-2xl">
+                    <ImageIcon size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-stone-900">Product Media &amp; Gallery</h2>
+                    <p className="text-xs text-stone-500">Upload high resolution photography. First image becomes the primary cover.</p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Product Information & Story</h2>
-                  <p className="text-xs text-stone-500 wrap-break-word">Provide an overview, craftsmanship story, and vital notes for buyers.</p>
-                </div>
-              </div>
-              <span className="text-xs font-medium text-stone-500 bg-stone-100 px-3 py-1 rounded-full w-fit">
-                Structured Info Schema
-              </span>
-            </div>
-
-            <div className="space-y-5 sm:space-y-6">
-              {/* Field 1: Description */}
-              <div className="space-y-2">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-                    Product Description <span className="text-red-500">*</span>
-                  </label>
-                  <span className="text-[11px] text-stone-400">Main overview summary</span>
-                </div>
-                <textarea
-                  rows={3}
-                  disabled={isSubmitting}
-                  {...register("description", { required: "Product description is required" })}
-                  placeholder="Description here..."
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 p-3.5 sm:p-4 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition resize-none disabled:opacity-60 leading-relaxed"
-                />
-                {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-stone-100 text-stone-600">
+                  {imagePreviews.length} {imagePreviews.length === 1 ? "Image" : "Images"}
+                </span>
               </div>
 
-              {/* Field 2: About Product */}
-              <div className="space-y-2">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
-                  <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-stone-700">
-                    <Sparkles size={14} className="text-[#E41F66]" />
-                    About This Product
-                  </label>
-                  <span className="text-[11px] text-stone-400">Craftsmanship & specs</span>
-                </div>
-                <textarea
-                  rows={4}
-                  disabled={isSubmitting}
-                  {...register("about")}
-                  placeholder="About here..."
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/50 p-3.5 sm:p-4 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition resize-none disabled:opacity-60 leading-relaxed"
-                />
-                <p className="text-[11px] text-stone-400">
-                  This detailed info will be displayed in an elegant dedicated section on the product page.
-                </p>
-              </div>
-
-              {/* Field 3: Important Note */}
-              <div className="space-y-2">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
-                  <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700">
-                    <AlertCircle size={14} className="text-amber-600" />
-                    Important Note / Guidelines
-                  </label>
-                  <span className="text-[11px] text-stone-400">Key customer alerts</span>
-                </div>
-                <textarea
-                  rows={2}
-                  disabled={isSubmitting}
-                  {...register("note")}
-                  placeholder="Important note here..."
-                  className="w-full rounded-2xl border border-amber-200/80 bg-amber-50/30 p-3.5 sm:p-4 text-sm text-stone-900 outline-none focus:border-amber-500 focus:bg-white transition resize-none disabled:opacity-60 leading-relaxed"
-                />
-                <p className="text-[11px] text-stone-400">
-                  Renders as a luxury highlighted callout banner to make essential instructions effortlessly visible.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3: Media & Gallery */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
-            <div className="flex items-center justify-between pb-4 border-b border-stone-100 gap-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
-                  <Upload size={20} />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Product Gallery</h2>
-                  <p className="text-xs text-stone-500 wrap-break-word">Upload high-resolution photography.</p>
-                </div>
-              </div>
-              <span className="text-xs font-bold text-stone-600 bg-stone-100 px-3 py-1 rounded-full shrink-0">
-                {imagePreviews.length} {imagePreviews.length === 1 ? "Image" : "Images"}
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              <label 
-                htmlFor="mainImageInput"
-                className="flex flex-col items-center justify-center p-6 sm:p-8 border-2 border-stone-200 border-dashed rounded-2xl sm:rounded-3xl hover:border-[#E41F66] transition-colors cursor-pointer bg-stone-50/40 hover:bg-stone-50/80 group text-center"
-              >
-                <div className="size-11 sm:size-12 rounded-full bg-white shadow-xs border border-stone-200 flex items-center justify-center text-stone-400 group-hover:text-[#E41F66] group-hover:scale-110 transition-all mb-2.5">
-                  <Upload size={20} />
-                </div>
-                <p className="text-xs sm:text-sm font-semibold text-stone-800">
-                  Click or drag images to upload
-                </p>
-                <p className="text-[11px] text-stone-400 mt-1">PNG, JPG, WEBP up to 10MB per file</p>
+              {/* Upload Dropzone */}
+              <label className="group relative flex flex-col items-center justify-center p-6 sm:p-8 rounded-3xl border-2 border-dashed border-stone-300 hover:border-[#E41F66] bg-stone-50/40 hover:bg-rose-50/20 transition-all duration-200 cursor-pointer text-center">
                 <input
-                  id="mainImageInput"
                   type="file"
-                  accept="image/*"
                   multiple
+                  accept="image/*"
                   disabled={isSubmitting}
                   onChange={handleImageChange}
                   className="hidden"
                 />
+                <div className="p-3.5 bg-white group-hover:bg-[#E41F66]/10 text-stone-600 group-hover:text-[#E41F66] rounded-2xl shadow-xs border border-stone-200 group-hover:border-[#E41F66]/30 transition-all duration-200 mb-3">
+                  <Upload size={22} />
+                </div>
+                <p className="text-sm font-bold text-stone-900">
+                  Click to upload or drag &amp; drop photos
+                </p>
+                <p className="text-xs text-stone-400 mt-1">
+                  High-res PNG, JPG, or WEBP (up to 10MB each)
+                </p>
               </label>
 
+              {/* Image Previews Grid */}
               {imagePreviews.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5 sm:gap-3 pt-2">
-                  {imagePreviews.map((src, idx) => (
-                    <div key={`${src}-${idx}`} className="group relative aspect-square rounded-2xl overflow-hidden border border-stone-200 bg-stone-100 shadow-2xs">
-                      <img src={src} alt={`Preview ${idx + 1}`} className="h-full w-full object-cover" />
-                      {idx === 0 && (
-                        <span className="absolute bottom-1.5 left-1.5 bg-stone-900/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">
-                          Primary
-                        </span>
-                      )}
+                <div className="space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-stone-600">
+                    Selected Photos ({imagePreviews.length})
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                    {imagePreviews.map((src, idx) => (
+                      <div
+                        key={idx}
+                        className="group relative aspect-square rounded-2xl overflow-hidden border border-stone-200 bg-stone-100 shadow-2xs"
+                      >
+                        <img
+                          src={src}
+                          alt={`Upload preview ${idx + 1}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        {idx === 0 && (
+                          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-bold">
+                            Cover
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(idx)}
+                          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/90 text-stone-700 hover:text-red-600 hover:bg-white shadow-sm transition opacity-0 group-hover:opacity-100 cursor-pointer"
+                          title="Remove image"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Card 4: Product Story & Details */}
+            <div className="bg-white rounded-3xl p-5 sm:p-7 border border-stone-200/80 shadow-xs space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-stone-100 text-stone-800 rounded-2xl">
+                    <FileText size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-stone-900">Product Story &amp; Details</h2>
+                    <p className="text-xs text-stone-500">Provide description, craftsmanship notes, and buyer guidelines.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                {/* Field 1: Description */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase tracking-wider text-stone-700">
+                      Product Description <span className="text-red-500">*</span>
+                    </label>
+                    <span className="text-[11px] text-stone-400">Main overview summary</span>
+                  </div>
+                  <textarea
+                    rows={4}
+                    disabled={isSubmitting}
+                    {...register("description", { required: "Product description is required" })}
+                    placeholder="Describe the product, its key highlights, finish options, and what makes it special..."
+                    className="w-full rounded-2xl border border-stone-200 bg-stone-50/40 p-4 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition leading-relaxed resize-none disabled:opacity-60"
+                  />
+                  {errors.description && <p className="text-xs text-red-500 font-medium">{errors.description.message}</p>}
+                </div>
+
+                {/* Field 2: About & Craftsmanship */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase tracking-wider text-stone-700">
+                      About &amp; Craftsmanship
+                    </label>
+                    <span className="text-[11px] text-stone-400">Optional</span>
+                  </div>
+                  <textarea
+                    rows={3}
+                    disabled={isSubmitting}
+                    {...register("about")}
+                    placeholder="Tell the artisan story, materials used (e.g. 350 GSM archival cotton cardstock), foil stamping technique..."
+                    className="w-full rounded-2xl border border-stone-200 bg-stone-50/40 p-4 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition leading-relaxed resize-none disabled:opacity-60"
+                  />
+                </div>
+
+                {/* Field 3: Buyer Notes */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase tracking-wider text-stone-700">
+                      Buyer Notes
+                    </label>
+                    <span className="text-[11px] text-stone-400">Optional</span>
+                  </div>
+                  <textarea
+                    rows={3}
+                    disabled={isSubmitting}
+                    {...register("note")}
+                    placeholder="Important information for customers: digital proof turnaround in 24 hours, production time 3-5 days..."
+                    className="w-full rounded-2xl border border-stone-200 bg-stone-50/40 p-4 text-sm text-stone-900 outline-none focus:border-[#E41F66] focus:bg-white transition leading-relaxed resize-none disabled:opacity-60"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Card 5: Variants & Finishes (Optional) */}
+            <div className="bg-white rounded-3xl p-5 sm:p-7 border border-stone-200/80 shadow-xs space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-stone-100 text-stone-800 rounded-2xl">
+                    <Palette size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-stone-900">Color &amp; Style Variations</h2>
+                    <p className="text-xs text-stone-500">Add variations like colors, foils, or material finishes with dedicated photos.</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    disabled={isSubmitting}
+                    {...register("hasVariants")}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E41F66]"></div>
+                </label>
+              </div>
+
+              {hasVariants && (
+                <div className="space-y-4 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-stone-600">
+                      Configured Variations ({variantsList.length})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleAddVariant}
+                      className="px-3 py-1.5 bg-stone-900 hover:bg-[#E41F66] text-white text-xs font-bold rounded-xl transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Plus size={13} /> Add Variant
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {variantsList.map((variant, vIdx) => (
+                      <div
+                        key={variant.id}
+                        className="p-4 rounded-2xl border border-stone-200 bg-stone-50/40 space-y-3"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-xs font-extrabold text-stone-400">#{vIdx + 1}</span>
+                          <input
+                            type="text"
+                            value={variant.title}
+                            onChange={(e) => handleVariantTitleChange(variant.id, e.target.value)}
+                            placeholder="Variant title (e.g. Matte Black, Gold Foil, Rose Gold)"
+                            className="flex-1 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-900 outline-none focus:border-[#E41F66]"
+                          />
+                          {variantsList.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveVariant(variant.id)}
+                              className="p-2 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer"
+                              title="Delete variant"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Variant Images */}
+                        <div className="flex items-center gap-2 overflow-x-auto py-1">
+                          <label className="size-16 rounded-xl border-2 border-dashed border-stone-300 hover:border-[#E41F66] bg-white flex flex-col items-center justify-center text-stone-400 hover:text-[#E41F66] transition cursor-pointer shrink-0">
+                            <input
+                              type="file"
+                              multiple
+                              accept="image/*"
+                              onChange={(e) => handleVariantImageChange(variant.id, e)}
+                              className="hidden"
+                            />
+                            <Plus size={16} />
+                            <span className="text-[9px] font-bold mt-0.5">Photo</span>
+                          </label>
+
+                          {variant.imagePreviews.map((vImg, iIdx) => (
+                            <div
+                              key={iIdx}
+                              className="relative size-16 rounded-xl overflow-hidden border border-stone-200 bg-white shrink-0 group"
+                            >
+                              <img src={vImg} alt="Variant preview" className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveVariantImage(variant.id, iIdx)}
+                                className="absolute inset-0 bg-stone-950/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Card 6: Dimensions & Size Presets (Optional) */}
+            <div className="bg-white rounded-3xl p-5 sm:p-7 border border-stone-200/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-stone-100 text-stone-800 rounded-2xl">
+                    <Ruler size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-stone-900">Dimensions &amp; Physical Sizes</h2>
+                    <p className="text-xs text-stone-500">Add measurement options (width, height, thickness) for buyer selection.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsDimensionsModalOpen(true)}
+                  className="px-3.5 py-1.5 bg-stone-900 hover:bg-[#E41F66] text-white text-xs font-bold rounded-xl transition cursor-pointer flex items-center gap-1.5 shadow-2xs shrink-0"
+                >
+                  <Plus size={13} />
+                  <span>{dimensions.length > 0 ? "Manage Sizes" : "Add Dimensions"}</span>
+                </button>
+              </div>
+
+              {dimensions.length === 0 ? (
+                <div className="p-4 rounded-2xl border border-dashed border-stone-200 bg-stone-50/40 text-center">
+                  <p className="text-xs font-semibold text-stone-500">No dimensions configured yet</p>
+                  <p className="text-[11px] text-stone-400 mt-0.5">Click &quot;Add Dimensions&quot; to specify 5x7 in, 4x6 in, or custom sizes.</p>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {dimensions.map((dim, idx) => (
+                    <div
+                      key={idx}
+                      className="px-3 py-1.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs font-semibold text-stone-800 flex items-center gap-2"
+                    >
+                      <span>{dim.label || formatDimensionString(dim)}</span>
                       <button
                         type="button"
-                        disabled={isSubmitting}
-                        onClick={() => handleRemoveImage(idx)}
-                        className="absolute top-1.5 right-1.5 bg-stone-900/80 hover:bg-red-600 text-white rounded-full p-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer"
-                        title="Remove image"
+                        onClick={() => setDimensions((prev) => prev.filter((_, i) => i !== idx))}
+                        className="text-stone-400 hover:text-red-600 transition cursor-pointer"
                       >
-                        <X size={14} />
+                        <X size={12} />
                       </button>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Card 4: Variants Configuration */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
-            <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-stone-100 gap-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
-                  <Layers size={20} />
+            {/* Card 7: Buyer Customizations (Optional) */}
+            <div className="bg-white rounded-3xl p-5 sm:p-7 border border-stone-200/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-stone-100 text-stone-800 rounded-2xl">
+                    <Sliders size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-stone-900">Buyer Customization Slots</h2>
+                    <p className="text-xs text-stone-500">Enable fields for buyers to input names, dates, or upload artwork.</p>
+                  </div>
                 </div>
-                <div className="min-w-0 flex flex-col md:flex-row">
-                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Product Variants</h2>
-                  <p className="text-xs text-stone-500 wrap-break-word">Enable for multiple designs, colorways, or pack options.</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <input
-                  type="checkbox"
-                  id="hasVariantsToggle"
-                  disabled={isSubmitting}
-                  {...register("hasVariants")}
-                  className="size-5 rounded-md border-stone-300 text-[#E41F66] focus:ring-[#E41F66] cursor-pointer"
-                />
-                <label htmlFor="hasVariantsToggle" className="text-xs sm:text-sm font-semibold text-stone-800 cursor-pointer whitespace-nowrap">
-                  Has Variants
-                </label>
-              </div>
-            </div>
-
-            {hasVariants && (
-              <div className="space-y-5 sm:space-y-6 animate-in fade-in duration-200">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
-                    Product Variants ({variantsList.length})
-                  </span>
-                  <button
-                    type="button"
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
                     disabled={isSubmitting}
-                    onClick={handleAddVariant}
-                    className="inline-flex items-center w-fit gap-1.5 px-3 py-1.5 rounded-xl bg-[#E41F66]/10 hover:bg-[#E41F66]/20 text-[#E41F66] text-xs font-bold transition cursor-pointer shrink-0"
-                  >
-                    <Plus size={14} />
-                    Add Variant
-                  </button>
-                </div>
-
-                <div className="space-y-4 sm:space-y-5">
-                  {variantsList.map((v, index) => (
-                    <div
-                      key={v.id}
-                      className="p-4 sm:p-6 rounded-2xl bg-stone-50 border border-stone-200/90 space-y-4 shadow-2xs relative"
-                    >
-                      <div className="flex items-center justify-between pb-3 border-b border-stone-200/70 gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="size-6 rounded-full bg-stone-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
-                            {index + 1}
-                          </span>
-                          <span className="text-sm font-bold text-stone-900 truncate">
-                            {v.title ? v.title : `Variant #${index + 1}`}
-                          </span>
-                        </div>
-                        {variantsList.length > 1 && (
-                          <button
-                            type="button"
-                            disabled={isSubmitting}
-                            onClick={() => handleRemoveVariant(v.id)}
-                            className="text-stone-400 hover:text-red-600 transition p-1 rounded-lg hover:bg-red-50 cursor-pointer flex items-center gap-1 text-xs font-semibold shrink-0"
-                            title="Remove this variant"
-                          >
-                            <Trash2 size={14} />
-                            Remove
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Variant Title */}
-                      <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">
-                          Variant Title / Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          disabled={isSubmitting}
-                          value={v.title}
-                          onChange={(e) => handleVariantTitleChange(v.id, e.target.value)}
-                          placeholder="e.g. Design 1, Emerald Green, Pack of 50"
-                          className="w-full rounded-xl border border-stone-200 bg-white px-3.5 sm:px-4 py-2.5 text-sm text-stone-900 outline-none focus:border-[#E41F66] transition"
-                        />
-                      </div>
-
-                      {/* Variant Images Upload */}
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="block text-xs font-bold uppercase tracking-wider text-stone-700">
-                            Variant Images <span className="text-red-500">*</span>
-                          </label>
-                          <span className="text-[11px] text-stone-400">
-                            {v.imagePreviews.length} {v.imagePreviews.length === 1 ? "image" : "images"}
-                          </span>
-                        </div>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          disabled={isSubmitting}
-                          onChange={(e) => handleVariantImageChange(v.id, e)}
-                          className="w-full rounded-xl border border-stone-200 bg-white px-3 sm:px-4 py-2 text-xs sm:text-sm text-stone-700 outline-none file:text-xs file:font-semibold file:bg-stone-100 file:border-0 file:rounded-lg file:px-2.5 file:py-1 file:mr-2.5 hover:file:bg-stone-200 cursor-pointer"
-                        />
-                        {v.imagePreviews.length > 0 && (
-                          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 mt-3">
-                            {v.imagePreviews.map((src, idx) => (
-                              <div key={`${src}-${idx}`} className="group relative aspect-square rounded-xl overflow-hidden border border-stone-200 bg-stone-100">
-                                <img src={src} alt={`Variant Preview ${idx + 1}`} className="h-full w-full object-cover" />
-                                <button
-                                  type="button"
-                                  disabled={isSubmitting}
-                                  onClick={() => handleRemoveVariantImage(v.id, idx)}
-                                  className="absolute top-1 right-1 bg-stone-900/80 text-white rounded-full p-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition cursor-pointer hover:bg-red-600"
-                                  title="Remove image"
-                                >
-                                  <X size={12} />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  disabled={isSubmitting}
-                  onClick={handleAddVariant}
-                  className="w-full py-3 border-2 border-dashed border-stone-300 hover:border-[#E41F66] rounded-2xl text-stone-600 hover:text-[#E41F66] text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer bg-stone-50/50 hover:bg-[#E41F66]/5"
-                >
-                  <Plus size={16} />
-                  Add Another Variant
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Card 5: Customization Configuration */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
-            <div className="flex flex-col md-flex-row md:items-center justify-between pb-4 border-b border-stone-100 gap-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
-                  <Sliders size={20} />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Customization & Personalization</h2>
-                  <p className="text-xs text-stone-500 wrap-break-word">Allow customers to input customized text or upload photos.</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <input
-                  type="checkbox"
-                  id="isCustomizableToggle"
-                  disabled={isSubmitting}
-                  {...register("isCustomizable")}
-                  className="size-5 rounded-md border-stone-300 text-[#E41F66] focus:ring-[#E41F66] cursor-pointer"
-                />
-                <label htmlFor="isCustomizableToggle" className="text-xs sm:text-sm font-semibold text-stone-800 cursor-pointer whitespace-nowrap">
-                  Allow Customization
+                    {...register("isCustomizable")}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E41F66]"></div>
                 </label>
               </div>
-            </div>
 
-            {isCustomizable && (
-              <div className="p-4 sm:p-6 rounded-2xl bg-stone-50 border border-stone-200/80 space-y-4 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-stone-700">Customization Fields</span>
-                  {customizationSlots.length < CUSTOMIZATION_OPTIONS.length && (
+              {isCustomizable && (
+                <div className="space-y-3 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-stone-600">
+                      Enabled Input Fields ({customizationSlots.length})
+                    </span>
                     <button
                       type="button"
-                      disabled={isSubmitting}
-                      onClick={() => {
-                        const unused = CUSTOMIZATION_OPTIONS.find((opt) => !customizationSlots.includes(opt.value))?.value || "";
-                        const nextSlots = [...customizationSlots, unused];
-                        setCustomizationSlots(nextSlots);
-                        validateCustomizationSlots(nextSlots);
-                      }}
-                      className="text-xs font-bold text-[#E41F66] hover:text-[#c41554] cursor-pointer shrink-0"
+                      onClick={() => setCustomizationSlots([...customizationSlots, ""])}
+                      className="text-xs font-bold text-[#E41F66] hover:underline cursor-pointer flex items-center gap-1"
                     >
-                      + Add Field
+                      <Plus size={12} /> Add Field Slot
                     </button>
+                  </div>
+
+                  {customizationError && (
+                    <div className="p-2.5 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-medium flex items-center gap-2">
+                      <AlertCircle size={14} />
+                      <span>{customizationError}</span>
+                    </div>
                   )}
-                </div>
 
-                {customizationError && (
-                  <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-medium">
-                    {customizationError}
-                  </div>
-                )}
-
-                {customizationSlots.length === 0 ? (
-                  <p className="text-xs text-stone-400 italic">No customization fields added yet. Click "+ Add Field" above.</p>
-                ) : (
-                  <div className="space-y-2.5">
-                    {customizationSlots.map((slotValue, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <select
-                          disabled={isSubmitting}
-                          value={slotValue}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            const nextSlots = [...customizationSlots];
-                            nextSlots[idx] = val;
-                            setCustomizationSlots(nextSlots);
-                            validateCustomizationSlots(nextSlots);
-                          }}
-                          className="w-full rounded-xl border border-stone-200 bg-white px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm text-stone-800 outline-none focus:border-[#E41F66] transition"
-                        >
-                          <option value="">Select customization field</option>
-                          {CUSTOMIZATION_OPTIONS.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          disabled={isSubmitting}
-                          onClick={() => {
-                            const nextSlots = customizationSlots.filter((_, i) => i !== idx);
-                            setCustomizationSlots(nextSlots);
-                            validateCustomizationSlots(nextSlots);
-                          }}
-                          className="text-stone-400 hover:text-red-500 p-2 rounded-xl transition cursor-pointer hover:bg-red-50 shrink-0"
-                        >
-                          <X size={18} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Card 6: Product Dimensions & Size Variations (Optional) */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-stone-200/80 shadow-xs space-y-5 sm:space-y-6 overflow-hidden">
-            <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-stone-100 gap-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-stone-100 rounded-xl text-stone-800 shrink-0">
-                  <Ruler size={20} />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-base sm:text-lg font-semibold text-stone-900">Dimensions & Size Variations</h2>
-                  <p className="text-xs text-stone-500">Optional: Add measurements (width, height, thickness) and multiple size options.</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsDimensionsModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900 hover:bg-[#E41F66] text-white text-xs font-bold transition shadow-xs cursor-pointer shrink-0 self-start md:self-auto"
-              >
-                <Plus size={14} />
-                <span>{dimensions.length > 0 ? "Manage Dimensions" : "Add Dimensions"}</span>
-              </button>
-            </div>
-
-            {dimensions.length === 0 ? (
-              <div className="text-center py-6 px-4 bg-stone-50/70 rounded-2xl border border-dashed border-stone-200">
-                <Ruler className="mx-auto size-8 text-stone-300 mb-2" />
-                <p className="text-xs font-semibold text-stone-600">No dimensions configured</p>
-                <p className="text-[11px] text-stone-400 mt-0.5">Click "Add Dimensions" to specify width, height, thickness, or size presets.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs text-stone-500 font-semibold">
-                  <span>Configured Sizes / Dimensions ({dimensions.length})</span>
-                  <span className="text-[11px] text-[#E41F66]">Customers can choose from these options</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                  {dimensions.map((dim, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between p-3 rounded-xl bg-stone-50 border border-stone-200 hover:border-stone-300 transition group"
-                    >
-                      <div className="min-w-0 pr-2">
-                        {dim.label && (
-                          <div className="text-xs font-bold text-stone-900 truncate">{dim.label}</div>
-                        )}
-                        <div className="text-xs text-stone-600 font-mono font-medium">
-                          {formatDimensionString(dim)}
-                        </div>
-                      </div>
+                  {customizationSlots.map((slot, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <select
+                        value={slot}
+                        onChange={(e) => {
+                          const updated = [...customizationSlots];
+                          updated[idx] = e.target.value;
+                          setCustomizationSlots(updated);
+                          validateCustomizationSlots(updated);
+                        }}
+                        className="flex-1 rounded-xl border border-stone-200 bg-stone-50/40 px-3.5 py-2.5 text-xs font-semibold text-stone-900 outline-none focus:border-[#E41F66]"
+                      >
+                        <option value="">-- Choose Input Option --</option>
+                        {CUSTOMIZATION_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
                       <button
                         type="button"
-                        onClick={() => setDimensions((prev) => prev.filter((_, i) => i !== idx))}
-                        className="text-stone-400 hover:text-red-500 p-1 rounded-lg opacity-80 group-hover:opacity-100 transition cursor-pointer"
-                        title="Remove dimension"
+                        onClick={() => {
+                          const updated = customizationSlots.filter((_, i) => i !== idx);
+                          setCustomizationSlots(updated);
+                          validateCustomizationSlots(updated);
+                        }}
+                        className="p-2 text-stone-400 hover:text-red-600 rounded-xl hover:bg-red-50 transition cursor-pointer"
                       >
-                        <Trash2 size={13} />
+                        <Trash2 size={15} />
                       </button>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* Sticky/Bottom Actions */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-stone-200 shadow-sm space-y-4">
-            {isSubmitting ? (
-              <div className="w-full space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold uppercase tracking-wider text-stone-600">Uploading Assets to ImageKit...</span>
-                  <span className="text-sm font-bold text-stone-900">{uploadProgress}%</span>
-                </div>
-                <div className="w-full bg-stone-100 rounded-full h-2.5 overflow-hidden">
-                  <div
-                    className="bg-linear-to-r from-[#E41F66] to-stone-900 h-full rounded-full transition-all duration-300 ease-out"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-xs text-stone-500 text-center sm:text-left">
-                  By publishing, this product will instantly become active and available for customers in the catalog.
-                </p>
-                <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => navigate("/admin/products")}
-                    className="flex-1 sm:flex-none px-5 py-3 rounded-2xl border border-stone-200 text-xs sm:text-sm font-semibold text-stone-700 hover:bg-stone-50 transition cursor-pointer text-center"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-2xl bg-stone-900 hover:bg-[#E41F66] text-xs sm:text-sm font-semibold text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg whitespace-nowrap"
-                  >
-                    <CheckCircle2 size={18} />
+              )}
+            </div>
+            {/* Bottom Actions */}
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-200">
+              <button
+                type="button"
+                onClick={() => navigate("/admin/products")}
+                disabled={isSubmitting}
+                className="px-5 py-2.5 text-sm font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl transition cursor-pointer disabled:opacity-50"
+              >
+                Discard
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit(onSubmit)}
+                disabled={isSubmitting}
+                className="flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-stone-950 hover:bg-[#E41F66] rounded-xl shadow-sm transition-all duration-300 cursor-pointer disabled:opacity-60"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Publishing ({uploadProgress}%)...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 size={16} />
                     <span>Publish Product</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
+                  </>
+                )}
+              </button>
+            </div>
         </form>
       </div>
 
+      {/* Modals */}
       <AddSubCategoryModal
         isOpen={isAddSubCategoryModalOpen}
         onClose={() => setIsAddSubCategoryModalOpen(false)}
@@ -1087,6 +1113,16 @@ const AddProductPage: React.FC = () => {
         onClose={() => setIsDimensionsModalOpen(false)}
         initialDimensions={dimensions}
         onSave={(updated) => setDimensions(updated)}
+      />
+
+      <ProductBatchQuantitiesModal
+        isOpen={isBatchModalOpen}
+        onClose={() => setIsBatchModalOpen(false)}
+        initialQuantities={batchQuantities}
+        onSave={(updated) => {
+          setBatchQuantities(updated);
+          setValue("hasFixedQuantities", true);
+        }}
       />
     </div>
   );
