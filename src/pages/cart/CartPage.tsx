@@ -7,11 +7,22 @@ import { useCartStore } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
 import { getAddresses } from '../../services/addressService';
 import { createOrder } from '../../services/orderService';
+import { createCashfreePaymentOrder, verifyPayment } from '../../services/paymentService';
+import { load } from '@cashfreepayments/cashfree-js';
 import toast from 'react-hot-toast';
 import type { AddressItem } from '../../types/allTypes';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+
+// Cache and preload Cashfree SDK instance in memory for instant modal rendering
+let cachedCashfreePromise: Promise<any> | null = null;
+const getPreloadedCashfree = (mode: 'sandbox' | 'production' = 'sandbox') => {
+    if (!cachedCashfreePromise) {
+        cachedCashfreePromise = load({ mode });
+    }
+    return cachedCashfreePromise;
+};
 
 const CartPage = () => {
     const { user } = useAuthStore();
@@ -26,10 +37,13 @@ const CartPage = () => {
     const [showAddForm, setShowAddForm] = useState(false);
     const [loadingAddresses, setLoadingAddresses] = useState(false);
     const [checkingOut, setCheckingOut] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<'cashfree' | 'cod'>('cashfree');
     const [settings, setSettings] = useState<{ gstRate: number, shippingCost: number } | null>(null);
 
     useEffect(() => {
         document.title = "VivahStore | Cart";
+        // Pre-warm the Cashfree SDK script in the background so modal opens without delay
+        getPreloadedCashfree('sandbox').catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -81,7 +95,8 @@ const CartPage = () => {
     const subtotal = useCartStore((state) => state.getCartTotal());
     const selectedAddress = addresses.find((a) => a._id === selectedAddressId) || addresses[0];
 
-    const handleCheckout = async () => {
+    const handleCheckout = async (chosenMethod?: 'cashfree' | 'cod') => {
+        const method = chosenMethod || paymentMethod;
         if (!user) {
             toast.error("Please sign in to complete your checkout.");
             navigate("/login");
@@ -100,21 +115,80 @@ const CartPage = () => {
 
         setCheckingOut(true);
         try {
-            // Synchronize cart with the backend to ensure it is not empty before creating the order
-            await syncWithBackend();
+            // Background sync without blocking user interaction
+            syncWithBackend().catch(() => {});
 
-            const res = await createOrder({
-                addressId: selectedAddressId,
-                paymentMethod: 'mock'
-            });
+            if (method === 'cod') {
+                const res = await createOrder({
+                    addressId: selectedAddressId,
+                    paymentMethod: 'cod'
+                });
 
-            if (res.data.success) {
-                toast.success("Order placed successfully!");
-                clearCart();
-                navigate(`/orders/${res.data.order._id}`);
-            } else {
-                toast.error(res.data.message || "Failed to place order.");
+                if (res.data.success) {
+                    toast.success("Order placed successfully via COD!");
+                    clearCart();
+                    navigate(`/orders/${res.data.order._id}`);
+                } else {
+                    toast.error(res.data.message || "Failed to place COD order.");
+                }
+                return;
             }
+
+            // Cashfree Online Payment Flow
+            const toastId = toast.loading("Opening Cashfree checkout...");
+            const res = await createCashfreePaymentOrder(selectedAddressId);
+
+            if (!res.data.success || !res.data.order) {
+                toast.dismiss(toastId);
+                toast.error(res.data.message || "Failed to initialize payment.");
+                return;
+            }
+
+            const createdOrder = res.data.order;
+            const paymentSessionId = res.data.paymentSessionId;
+            const cfEnv = res.data.mode === 'production' ? 'production' : 'sandbox';
+
+            // Check if mock session (development fallback)
+            if (paymentSessionId && paymentSessionId.startsWith('mock_session_')) {
+                toast.dismiss(toastId);
+                toast.success("Test session initialized. Verifying payment...");
+                await verifyPayment(createdOrder._id);
+                clearCart();
+                navigate(`/orders/${createdOrder._id}`);
+                return;
+            }
+
+            if (!paymentSessionId) {
+                toast.dismiss(toastId);
+                toast.error("Unable to start payment session. Please try again.");
+                return;
+            }
+
+            toast.dismiss(toastId);
+
+            // Use preloaded Cashfree instance - instant modal popup!
+            const cashfree = await getPreloadedCashfree(cfEnv);
+
+            const checkoutOptions = {
+                paymentSessionId: paymentSessionId,
+                redirectTarget: "_modal" as const,
+            };
+
+            await cashfree.checkout(checkoutOptions);
+
+            // When modal completes/returns, verify payment with backend
+            try {
+                const verifyRes = await verifyPayment(createdOrder._id);
+                if (verifyRes.data.success && verifyRes.data.paymentStatus === 'Completed') {
+                    toast.success("Payment completed successfully!");
+                }
+            } catch (vErr) {
+                console.warn("Client verification check:", vErr);
+            }
+
+            clearCart();
+            navigate(`/orders/${createdOrder._id}`);
+
         } catch (err: any) {
             console.error("Checkout error:", err);
             toast.error(err.response?.data?.message || "Failed to place order.");
@@ -234,6 +308,8 @@ const CartPage = () => {
                         subtotal={subtotal} 
                         gstRate={settings?.gstRate}
                         shippingCost={settings?.shippingCost}
+                        paymentMethod={paymentMethod}
+                        setPaymentMethod={setPaymentMethod}
                         onCheckout={handleCheckout} 
                         disabled={checkingOut || cartItems.length === 0} 
                     />

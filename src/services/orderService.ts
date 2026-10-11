@@ -29,3 +29,7 @@ export const updateOrderStatus = (id: string, status: string) => {
 export const deleteOrder = (id: string) => {
   return api.delete(`/orders/${id}`);
 };
+
+export const verifyPayment = (orderId: string) => {
+  return api.post('/orders/verify-payment', { orderId });
+};

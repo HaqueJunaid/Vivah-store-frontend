@@ -48,6 +48,20 @@ const ProductContent: React.FC<ProductContentProps> = ({
     const [activeVariant, setActiveVariant] = useState(selectedVariantIndex ?? 0)
     const [selectedDimensionIndex, setSelectedDimensionIndex] = useState(0)
     const [customizations, setCustomizations] = useState<Record<string, string>>({})
+    const inlineButtonsRef = useRef<HTMLDivElement>(null)
+    const [isInlineInView, setIsInlineInView] = useState(false)
+
+    useEffect(() => {
+        if (!inlineButtonsRef.current) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsInlineInView(entry.isIntersecting);
+            },
+            { threshold: 0.1 }
+        );
+        observer.observe(inlineButtonsRef.current);
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         if (selectedVariantIndex !== undefined) {
@@ -244,6 +258,30 @@ const ProductContent: React.FC<ProductContentProps> = ({
                 </div>
             )}
 
+            {/* Design Variants */}
+            {variants && variants.length > 1 && (
+                <div className='flex flex-col gap-3 pt-3 pb-6 border-b border-stone-200/80'>
+                    <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Design Variants</span>
+                    <div className='flex flex-wrap gap-2'>
+                        {variants.map((variant, index) => (
+                            <button 
+                                type="button" 
+                                key={index} 
+                                onClick={() => { setActiveVariant(index); handleVariantChange(index); }} 
+                                className={`w-15 md:w-20 h-22 md:h-28 relative flex flex-col items-center gap-1.5 bg-white p-1 border transition-all duration-300 cursor-pointer rounded-xl ${
+                                    activeVariant === index 
+                                        ? 'border-[#E41F66] ring-1 ring-[#E41F66]/30' 
+                                        : 'border-stone-200 hover:border-stone-400'
+                                }`}
+                            >
+                                <img src={variant.images[0]} alt={variant.name} className='rounded-lg bg-stone-50/70 p-0.5 w-full h-full object-cover' />
+                                <span className='text-[8px] md:text-[10px] tracking-wide text-stone-600 px-1 py-0.5 font-medium'>{variant.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Quantity selection */}
             {hasFixedQuantities ? (
                 <div className='flex flex-col gap-3 pb-6 border-b border-stone-200/80'>
@@ -356,30 +394,6 @@ const ProductContent: React.FC<ProductContentProps> = ({
                 </div>
             )}
 
-            {/* Design Variants */}
-            {variants && variants.length > 1 && (
-                <div className='flex flex-col gap-3 pt-3 pb-6 border-b border-stone-200/80'>
-                    <span className='text-[10px] uppercase tracking-[0.2em] text-stone-500 font-semibold'>Design Variants</span>
-                    <div className='flex flex-wrap gap-2'>
-                        {variants.map((variant, index) => (
-                            <button 
-                                type="button" 
-                                key={index} 
-                                onClick={() => { setActiveVariant(index); handleVariantChange(index); }} 
-                                className={`w-12 md:w-20 h-18 md:h-28 relative flex flex-col items-center gap-1.5 bg-white p-1 border transition-all duration-300 cursor-pointer rounded-xl ${
-                                    activeVariant === index 
-                                        ? 'border-[#E41F66] ring-1 ring-[#E41F66]/30' 
-                                        : 'border-stone-200 hover:border-stone-400'
-                                }`}
-                            >
-                                <img src={variant.images[0]} alt={variant.name} className='rounded-lg bg-stone-50/70 p-0.5 w-full h-full object-cover' />
-                                <span className='text-[8px] md:text-[10px] tracking-wide text-stone-600 px-1 py-0.5 font-medium'>{variant.name}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
-
             {/* Dynamically Selected Text Customization Fields */}
             {isCustomizable && textKeys.length > 0 && (
                 <div className='flex flex-col pt-3 pb-6 border-b border-stone-200/80 gap-4'>
@@ -408,8 +422,8 @@ const ProductContent: React.FC<ProductContentProps> = ({
                 </div>
             )}
 
-            {/* Actions: Add to Cart and Wishlist */}
-            <div className='flex gap-4 pt-6 pb-6 items-stretch w-full'>
+            {/* Actions: Add to Cart and Wishlist (In-Page) */}
+            <div ref={inlineButtonsRef} className='flex gap-4 pt-6 pb-6 items-stretch w-full'>
                 <div className='grow'>
                     <AddToCartButton 
                         product={{ 
@@ -435,6 +449,44 @@ const ProductContent: React.FC<ProductContentProps> = ({
                     imageUrl={effectiveImageUrl} 
                     variant="detail"
                 />
+            </div>
+
+            {/* Mobile Sticky Action Bar:
+                Sticks to bottom of mobile screen until the user reaches the inline buttons */}
+            <div 
+                className={`sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-stone-200/90 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 ease-in-out ${
+                    isInlineInView 
+                        ? 'translate-y-full opacity-0 pointer-events-none' 
+                        : 'translate-y-0 opacity-100 pointer-events-auto'
+                }`}
+            >
+                <div className='flex items-stretch gap-3 w-full max-w-md mx-auto'>
+                    <div className='grow'>
+                        <AddToCartButton 
+                            product={{ 
+                                id, 
+                                title, 
+                                price: String(normalizedActionPrice), 
+                                imageUrl: effectiveImageUrl,
+                                quantity,
+                                selectedVariant: effectiveVariant,
+                                uploadedImage: uploadedImage || undefined,
+                                customizations: effectiveCustomizations,
+                                hasFixedQuantities,
+                                selectedDimension: selectedDimension,
+                                inStock: variants && variants.length > 0 ? (variants[activeVariant]?.inStock ?? true) : inStock
+                            }} 
+                            variant="luxury"
+                        />
+                    </div>
+                    <AddToWishListButton 
+                        id={id} 
+                        title={title} 
+                        price={normalizedActionPrice} 
+                        imageUrl={effectiveImageUrl} 
+                        variant="detail"
+                    />
+                </div>
             </div>
         </div>
     )

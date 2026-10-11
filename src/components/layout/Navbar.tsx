@@ -79,7 +79,7 @@ const Navbar: React.FC = () => {
                           className="absolute left-full top-0 -ml-0.5 pl-1 w-60 z-50"
                           onMouseEnter={() => setActiveCategoryUrl(cat.url)}
                         >
-                          <div className="bg-white rounded-xl shadow-xl shadow-stone-900/10 border border-stone-200/80 py-1.5 max-h-[380px] overflow-y-auto">
+                          <div className="bg-white rounded-xl shadow-xl shadow-stone-900/10 border border-stone-200/80 py-1.5 max-h-95 overflow-y-auto">
                             {cat.baseItems?.map((subItem) => (
                               <div key={subItem.url} className="px-1.5">
                                 <Link

@@ -1,8 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import Badge from '../common/badge';
-import { MdArrowBack, MdLocationOn, MdPayment, MdFileDownload } from 'react-icons/md';
+import { MdArrowBack, MdLocationOn, MdPayment, MdFileDownload, MdRefresh } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { getOrderById } from '../../services/orderService';
+import { verifyPayment } from '../../services/paymentService';
+import toast from 'react-hot-toast';
 import { generateInvoicePDF } from '../../utils/pdfGenerator';
 import UploadedImageCustomization from '../common/UploadedImageCustomization';
 
@@ -12,11 +14,36 @@ const OrderDetail = () => {
 
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = "VivahStore | Order Details";
   }, []);
+
+  const handleVerifyPayment = async (showFeedback = true) => {
+    if (!id) return;
+    setVerifyingPayment(true);
+    try {
+      const res = await verifyPayment(id);
+      if (res.data?.success && res.data.order) {
+        setOrder(res.data.order);
+        if (res.data.paymentStatus === 'Completed') {
+          if (showFeedback) {
+            toast.success("Payment verified! Order is confirmed.");
+          }
+        } else if (showFeedback) {
+          toast(res.data.message || `Payment status is ${res.data.paymentStatus}`, { icon: 'ℹ️' });
+        }
+      }
+    } catch (err: any) {
+      if (showFeedback) {
+        toast.error(err.response?.data?.message || "Failed to verify payment status.");
+      }
+    } finally {
+      setVerifyingPayment(false);
+    }
+  };
 
   useEffect(() => {
     if (id) {
@@ -26,6 +53,12 @@ const OrderDetail = () => {
         .then((res) => {
           if (res.data.success) {
             setOrder(res.data.order);
+            // If Cashfree payment is still Pending, attempt an auto-verification in the background
+            if (res.data.order?.paymentMethod === 'cashfree' && res.data.order?.paymentStatus === 'Pending') {
+              setTimeout(() => {
+                handleVerifyPayment(false);
+              }, 800);
+            }
           } else {
             setError(res.data.message || "Failed to load order.");
           }
@@ -255,26 +288,83 @@ const OrderDetail = () => {
 
             {/* Payment Information */}
             <div className='bg-white shadow-xs p-6 border border-stone-200 rounded-lg'>
-              <h2 className='flex items-center gap-2 mb-4 font-semibold text-stone-900 text-lg'>
-                <MdPayment className='size-5 text-[#E41F66]' />
-                Payment Information
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className='flex items-center gap-2 font-semibold text-stone-900 text-lg'>
+                  <MdPayment className='size-5 text-[#E41F66]' />
+                  Payment Information
+                </h2>
+                {order.paymentMethod === 'cashfree' && order.paymentStatus === 'Pending' && (
+                  <button
+                    onClick={() => handleVerifyPayment(true)}
+                    disabled={verifyingPayment}
+                    className="flex items-center gap-1 text-xs font-semibold text-[#E41F66] hover:text-[#c60b4d] cursor-pointer disabled:opacity-50"
+                    title="Check status with Cashfree"
+                  >
+                    <MdRefresh className={`size-4 ${verifyingPayment ? 'animate-spin' : ''}`} />
+                    <span>{verifyingPayment ? 'Verifying...' : 'Verify'}</span>
+                  </button>
+                )}
+              </div>
               <div className='space-y-3 text-sm'>
                 <div className='flex justify-between text-stone-700'>
                   <span>Method</span>
-                  <span className="font-medium text-stone-900 capitalize">
-                    {order.paymentMethod === 'cod' ? 'Cash On Delivery' : 'Mock Payment'}
+                  <span className="font-medium text-stone-900">
+                    {order.paymentMethod === 'cod'
+                      ? 'Cash On Delivery (COD)'
+                      : order.paymentMethod === 'cashfree'
+                      ? 'Cashfree Payments (UPI / Cards)'
+                      : 'Online Payment'}
                   </span>
                 </div>
-                <div className='flex justify-between text-stone-700'>
-                  <span>Status</span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${order.paymentStatus === 'Completed'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-yellow-100 text-yellow-700'
-                    }`}>
+                <div className='flex justify-between items-center text-stone-700'>
+                  <span>Payment Status</span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                    order.paymentStatus === 'Completed'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : order.paymentStatus === 'Failed'
+                      ? 'bg-rose-100 text-rose-800'
+                      : 'bg-amber-100 text-amber-800'
+                  }`}>
                     {order.paymentStatus}
                   </span>
                 </div>
+
+                {order.paymentDetails?.cfPaymentId && (
+                  <div className='flex justify-between text-stone-700 pt-2 border-t border-stone-100 text-xs'>
+                    <span>Transaction ID</span>
+                    <span className="font-mono text-stone-900 font-medium">
+                      {order.paymentDetails.cfPaymentId}
+                    </span>
+                  </div>
+                )}
+
+                {order.paymentDetails?.bankReference && (
+                  <div className='flex justify-between text-stone-700 text-xs'>
+                    <span>Bank Reference</span>
+                    <span className="font-mono text-stone-900">
+                      {order.paymentDetails.bankReference}
+                    </span>
+                  </div>
+                )}
+
+                {/* If order is still Pending on Cashfree, provide instant auto-reconcile tool */}
+                {order.paymentMethod === 'cashfree' && order.paymentStatus === 'Pending' && (
+                  <div className="mt-4 pt-3 border-t border-stone-100">
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 space-y-2">
+                      <p className="leading-relaxed">
+                        Paid via UPI or NetBanking but status is still Pending due to an internet drop or closed tab?
+                      </p>
+                      <button
+                        onClick={() => handleVerifyPayment(true)}
+                        disabled={verifyingPayment}
+                        className="w-full flex items-center justify-center gap-1.5 py-2 px-3 bg-[#E41F66] text-white rounded font-medium text-xs hover:bg-[#c60b4d] transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        <MdRefresh className={`size-3.5 ${verifyingPayment ? 'animate-spin' : ''}`} />
+                        <span>{verifyingPayment ? 'Checking with Cashfree...' : 'Sync & Verify Payment Status'}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
