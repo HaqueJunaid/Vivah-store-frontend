@@ -37,7 +37,6 @@ const CartPage = () => {
     const [showAddForm, setShowAddForm] = useState(false);
     const [loadingAddresses, setLoadingAddresses] = useState(false);
     const [checkingOut, setCheckingOut] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState<'cashfree' | 'cod'>('cashfree');
     const [settings, setSettings] = useState<{ gstRate: number, shippingCost: number } | null>(null);
 
     useEffect(() => {
@@ -95,8 +94,7 @@ const CartPage = () => {
     const subtotal = useCartStore((state) => state.getCartTotal());
     const selectedAddress = addresses.find((a) => a._id === selectedAddressId) || addresses[0];
 
-    const handleCheckout = async (chosenMethod?: 'cashfree' | 'cod') => {
-        const method = chosenMethod || paymentMethod;
+    const handleCheckout = async () => {
         if (!user) {
             toast.error("Please sign in to complete your checkout.");
             navigate("/login");
@@ -117,22 +115,6 @@ const CartPage = () => {
         try {
             // Background sync without blocking user interaction
             syncWithBackend().catch(() => {});
-
-            if (method === 'cod') {
-                const res = await createOrder({
-                    addressId: selectedAddressId,
-                    paymentMethod: 'cod'
-                });
-
-                if (res.data.success) {
-                    toast.success("Order placed successfully via COD!");
-                    clearCart();
-                    navigate(`/orders/${res.data.order._id}`);
-                } else {
-                    toast.error(res.data.message || "Failed to place COD order.");
-                }
-                return;
-            }
 
             // Cashfree Online Payment Flow
             const toastId = toast.loading("Opening Cashfree checkout...");
@@ -308,8 +290,6 @@ const CartPage = () => {
                         subtotal={subtotal} 
                         gstRate={settings?.gstRate}
                         shippingCost={settings?.shippingCost}
-                        paymentMethod={paymentMethod}
-                        setPaymentMethod={setPaymentMethod}
                         onCheckout={handleCheckout} 
                         disabled={checkingOut || cartItems.length === 0} 
                     />

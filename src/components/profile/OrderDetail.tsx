@@ -117,7 +117,7 @@ const OrderDetail = () => {
       <div className='mx-auto px-6 max-w-7xl'>
         {/* Header */}
         <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8'>
-          <div className='flex items-center gap-4'>
+          <div className='flex flex-col md:flex-row md:items-center gap-4'>
             <button
               onClick={() => navigate('/profile')}
               className='flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer'

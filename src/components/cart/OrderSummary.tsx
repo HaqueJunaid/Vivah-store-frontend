@@ -1,4 +1,4 @@
-import { Info, ShieldCheck, CreditCard, Banknote } from "lucide-react";
+import { Info, ShieldCheck, CreditCard } from "lucide-react";
 import type { OrderSummaryProps } from "../../types/allTypes";
 
 const OrderSummary = ({
@@ -7,8 +7,6 @@ const OrderSummary = ({
     shippingCost,
     onCheckout,
     disabled,
-    paymentMethod = 'cashfree',
-    setPaymentMethod,
 }: OrderSummaryProps) => {
     const gstAmount = subtotal * ((gstRate || 0) / 100);
     const delivery = shippingCost || 0;
@@ -16,7 +14,7 @@ const OrderSummary = ({
 
     const handlePayClick = () => {
         if (onCheckout) {
-            onCheckout(paymentMethod);
+            onCheckout();
         }
     };
 
@@ -57,81 +55,33 @@ const OrderSummary = ({
                     </div>
                 </div>
 
-                {/* Payment Method Selector */}
-                {setPaymentMethod && (
-                    <div className="mb-6 pt-4 border-t border-stone-100">
-                        <label className="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2.5">
-                            Select Payment Method
-                        </label>
-                        <div className="space-y-2.5">
-                            <label
-                                className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                                    paymentMethod === 'cashfree'
-                                        ? 'border-[#E41F66] bg-pink-50/40 text-stone-900 ring-1 ring-[#E41F66]'
-                                        : 'border-stone-200 hover:border-stone-300 text-stone-700'
-                                }`}
-                            >
-                                <input
-                                    type="radio"
-                                    name="payment_choice"
-                                    value="cashfree"
-                                    checked={paymentMethod === 'cashfree'}
-                                    onChange={() => setPaymentMethod('cashfree')}
-                                    className="mt-0.5 accent-[#E41F66]"
-                                />
-                                <div className="flex-1 text-sm">
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-semibold flex items-center gap-1.5 text-stone-900">
-                                            <CreditCard className="size-4 text-[#E41F66]" />
-                                            Cashfree Payments
-                                        </span>
-                                        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
-                                            Instant
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-stone-500 mt-1">
-                                        UPI (GPay/PhonePe), Cards, NetBanking, Wallets
-                                    </p>
-                                </div>
-                            </label>
-
-                            <label
-                                className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                                    paymentMethod === 'cod'
-                                        ? 'border-[#E41F66] bg-pink-50/40 text-stone-900 ring-1 ring-[#E41F66]'
-                                        : 'border-stone-200 hover:border-stone-300 text-stone-700'
-                                }`}
-                            >
-                                <input
-                                    type="radio"
-                                    name="payment_choice"
-                                    value="cod"
-                                    checked={paymentMethod === 'cod'}
-                                    onChange={() => setPaymentMethod('cod')}
-                                    className="mt-0.5 accent-[#E41F66]"
-                                />
-                                <div className="flex-1 text-sm">
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-semibold flex items-center gap-1.5 text-stone-900">
-                                            <Banknote className="size-4 text-stone-600" />
-                                            Cash on Delivery (COD)
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-stone-500 mt-1">
-                                        Pay with cash upon delivery of package
-                                    </p>
-                                </div>
-                            </label>
+                {/* Payment Method */}
+                <div className="mb-6 pt-4 border-t border-stone-100">
+                    <label className="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2.5">
+                        Payment Method
+                    </label>
+                    <div className="p-3.5 rounded-lg border border-[#E41F66]/30 bg-pink-50/30 text-stone-900">
+                        <div className="flex items-center justify-between text-sm">
+                            <span className="font-semibold flex items-center gap-2 text-stone-900">
+                                <CreditCard className="size-4 text-[#E41F66]" />
+                                Cashfree Payments
+                            </span>
+                            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
+                                100% Secure
+                            </span>
                         </div>
+                        <p className="text-xs text-stone-500 mt-1.5">
+                            UPI (GPay, PhonePe, Paytm), Cards, NetBanking & Wallets
+                        </p>
                     </div>
-                )}
+                </div>
 
                 <button
                     onClick={handlePayClick}
                     disabled={disabled}
                     className="bg-[#E41F66] hover:bg-[#c60b4d] disabled:bg-stone-300 mb-5 py-3.5 rounded-lg w-full font-semibold text-white transition-all cursor-pointer disabled:cursor-not-allowed shadow-sm hover:shadow"
                 >
-                    {paymentMethod === 'cashfree' ? `Pay ₹${total.toFixed(2)} with Cashfree` : 'Place COD Order'}
+                    Pay ₹{total.toFixed(2)} with Cashfree
                 </button>
 
                 <div className="pt-4 border-t border-stone-100">

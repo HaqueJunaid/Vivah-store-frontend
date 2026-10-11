@@ -14,10 +14,10 @@ export interface OrderSummaryProps {
     subtotal: number;
     gstRate?: number;
     shippingCost?: number;
-    onCheckout?: (paymentMethod?: 'cashfree' | 'cod') => void;
+    onCheckout?: () => void;
     disabled?: boolean;
-    paymentMethod?: 'cashfree' | 'cod';
-    setPaymentMethod?: (method: 'cashfree' | 'cod') => void;
+    paymentMethod?: 'cashfree';
+    setPaymentMethod?: (method: 'cashfree') => void;
 }
 
 export interface CartItemProps {
