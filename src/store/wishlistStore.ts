@@ -8,7 +8,7 @@ export const useWishlistStore = create<WishlistStoreInterface>()(
         (set, get) => ({
             wishlistItems: [],
             addWishlistItem: (wishlistItem) => {
-                const normalized: any = {
+                const normalized: WishlistItemInterface = {
                     ...wishlistItem,
                     productId: String(wishlistItem.productId),
                     productPrice: typeof wishlistItem.productPrice === 'string' ? parseFloat(String(wishlistItem.productPrice).replace(/[^0-9.-]/g, '')) || 0 : wishlistItem.productPrice,

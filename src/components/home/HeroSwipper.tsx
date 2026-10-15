@@ -3,7 +3,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade, Navigation, Pagination } from 'swiper/modules';
 import type { Swiper as SwiperClass } from 'swiper';
 import 'swiper/css';
-// @ts-ignore
 import 'swiper/css/effect-fade';
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
@@ -12,36 +11,58 @@ import type { HeroSlide } from '../../types/allTypes';
 const heroSlides: HeroSlide[] = [
   {
     id: 1,
-    tag: "LUXURY WEDDING COLLECTION 2026",
-    title: "Timeless Elegance For Your Special Day",
-    subtitle: "Handcrafted wedding stationery, acrylic signboards, bespoke wax seals, and opulent keepsake favors tailored for unforgettable celebrations.",
-    primaryCtaText: "Explore Collections",
+    tag: "BESPOKE WEDDING COLLECTION",
+    title: "Unique Designs Tailored For Your Special Moments",
+    subtitle: "Handcrafted wedding stationery, keepsake luggage tags, bespoke ritual kits, and elegant celebration favors.",
+    primaryCtaText: "Explore Collection",
     primaryCtaLink: "/products",
     secondaryCtaText: "Custom Invites",
     secondaryCtaLink: "/products/invites-planner",
-    imageUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&auto=format&fit=crop&q=80",
+    imageUrl: "/Banner/cards.png",
   },
   {
     id: 2,
-    tag: "BESPOKE DESIGN & CRAFTSMANSHIP",
-    title: "Artisanal Invites & Signature Signage",
-    subtitle: "Create lasting first impressions with premium foil accents, royal wax seals, and custom acrylic welcome boards.",
-    primaryCtaText: "Shop Boards & Signage",
-    primaryCtaLink: "/products/boards-signage",
-    secondaryCtaText: "Browse All Products",
-    secondaryCtaLink: "/products",
-    imageUrl: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=1920&auto=format&fit=crop&q=80",
+    tag: "TRENDING IN WEDDINGS",
+    title: "Custom Wedding Newspapers For Your Story",
+    subtitle: "Share your love journey, fun quizzes, and heartfelt memories with fully personalized, premium print wedding newspapers.",
+    primaryCtaText: "Shop Newspapers",
+    primaryCtaLink: "/products/fun-entertainment",
+    secondaryCtaText: "Fun & Entertainment",
+    secondaryCtaLink: "/products/fun-entertainment",
+    imageUrl: "/Banner/customnewspaper.png",
   },
   {
     id: 3,
-    tag: "THEMATIC CELEBRATION ELEMENTS",
-    title: "Unforgettable Favors & Ritual Kits",
-    subtitle: "Delight your guests with personalized room stationery, custom hamper tags, and luxury return gift accessories.",
-    primaryCtaText: "Discover Favors & Gifts",
+    tag: "VIVAH EXCLUSIVE STATIONERY",
+    title: "Artisanal Wedding Stationery & Decor",
+    subtitle: "Make your celebration one-of-a-kind with ambient table decor, luxury menu cards, door danglers, and ritual kits.",
+    primaryCtaText: "Shop Stationery",
+    primaryCtaLink: "/products/room-stationery",
+    secondaryCtaText: "Utility Stationery",
+    secondaryCtaLink: "/products/utility-stationery",
+    imageUrl: "/Banner/weddingstationery.png",
+  },
+  {
+    id: 4,
+    tag: "CUSTOM CELEBRATION KEEPSAKES",
+    title: "Custom Childhood Badges & Favors",
+    subtitle: "Turn little memories into lasting keepsakes with custom photo badges, team pins, and personalized celebration gifts.",
+    primaryCtaText: "Shop Badges & Favors",
     primaryCtaLink: "/products/favour-gifts",
-    secondaryCtaText: "Room Stationery",
-    secondaryCtaLink: "/products/room-stationery",
-    imageUrl: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=1920&auto=format&fit=crop&q=80",
+    secondaryCtaText: "Browse All Gifts",
+    secondaryCtaLink: "/products/favour-gifts",
+    imageUrl: "/Banner/badge.png",
+  },
+  {
+    id: 5,
+    tag: "ALL THINGS WEDDING",
+    title: "Personalized Signages & Essentials",
+    subtitle: "Complete your wedding setup with custom acrylic welcome boards, playful signs, drink pouches, and stationery.",
+    primaryCtaText: "Shop Boards & Signage",
+    primaryCtaLink: "/products/boards-signage",
+    secondaryCtaText: "View All Products",
+    secondaryCtaLink: "/products",
+    imageUrl: "/Banner/weddingthings.png",
   },
 ];
 
@@ -50,7 +71,7 @@ export default function HeroSwipper() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="relative w-full h-[75vh] md:h-[85vh] min-h-[500px] max-h-[815px] overflow-hidden bg-stone-950 text-white select-none">
+    <section className="relative w-full h-[75vh] md:h-[85vh] min-h-125 max-h-screen overflow-hidden bg-stone-950 text-white select-none">
       <Swiper
         effect="fade"
         fadeEffect={{ crossFade: true }}

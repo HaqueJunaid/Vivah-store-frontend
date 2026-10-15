@@ -17,6 +17,8 @@ import ProductContent from './ProductContent.tsx'
 import SimilarProducts from './SimilarProducts.tsx'
 import { Skeleton } from '../common/Skeletons'
 import { getProductById } from '../../services/productService'
+import type { Product } from '../../types/allTypes';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const ORDER_STEPS = [
     {
@@ -53,7 +55,7 @@ const ORDER_STEPS = [
 
 const DetailProduct: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [dbProduct, setDbProduct] = useState<any>(null);
+    const [dbProduct, setDbProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -86,9 +88,9 @@ const DetailProduct: React.FC = () => {
                 setError(null);
                 const { data } = await getProductById(id);
                 setDbProduct(data.product);
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error("Fetch product error:", err);
-                setError(err.response?.data?.message || err.message || "Failed to load product details.");
+                setError(getErrorMessage(err, "Failed to load product details."));
             } finally {
                 setLoading(false);
             }
@@ -96,9 +98,8 @@ const DetailProduct: React.FC = () => {
         fetchProduct();
     }, [id]);
 
-    const cleanImages = (imgs: any[]) => {
-        if (!Array.isArray(imgs)) return ['https://picsum.photos/600/500'];
-        const unique = Array.from(new Set(imgs.filter(Boolean)));
+    const cleanImages = (imgs: string[] | undefined) => {
+        const unique = Array.from(new Set((imgs || []).filter(Boolean)));
         return unique.length > 0 ? unique : ['https://picsum.photos/600/500'];
     };
 
@@ -123,14 +124,14 @@ const DetailProduct: React.FC = () => {
 
             if (dbProduct.hasVariants) {
                 if (Array.isArray(dbProduct.variants) && dbProduct.variants.length > 0) {
-                    const variantList = dbProduct.variants.map((v: any, idx: number) => ({
+                    const variantList = dbProduct.variants.map((v, idx) => ({
                         name: (v.title || v.name || `Variant ${idx + 1}`).trim(),
                         images: cleanImages(v.images && v.images.length > 0 ? v.images : mainImages),
                         inStock: (dbProduct.quantity ?? 0) > 0,
                     }));
 
                     const hasDefaultAlready = variantList.some(
-                        (v: any) => v.name.toLowerCase() === 'default'
+                        (v) => v.name.toLowerCase() === 'default'
                     );
 
                     if (!hasDefaultAlready && mainImages.length > 0) {

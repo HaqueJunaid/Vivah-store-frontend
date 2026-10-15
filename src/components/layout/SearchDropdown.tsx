@@ -1,27 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getProducts } from '../../services/productService';
 import { Skeleton } from '../common/Skeletons';
 import type { SearchProductItem as ProductItem, SearchDropdownProps } from '../../types/allTypes';
 
 
 export const SearchDropdown: React.FC<SearchDropdownProps> = ({ query, debouncedQuery, onClose }) => {
-    const navigate = useNavigate();
-    const [results, setResults] = useState<ProductItem[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [hasSearched, setHasSearched] = useState(false);
+    const [searchState, setSearchState] = useState<{ query: string; results: ProductItem[] }>({ query: '', results: [] });
+    const loading = Boolean(debouncedQuery.trim()) && searchState.query !== debouncedQuery;
+    const results = searchState.query === debouncedQuery ? searchState.results : [];
+    const hasSearched = Boolean(debouncedQuery.trim());
 
     useEffect(() => {
         if (!debouncedQuery.trim()) {
-            setResults([]);
-            setLoading(false);
-            setHasSearched(false);
             return;
         }
 
         let isMounted = true;
-        setLoading(true);
-        setHasSearched(true);
 
         getProducts()
             .then((res) => {
@@ -31,14 +26,13 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({ query, debounced
                         p.title.toLowerCase().includes(searchLower) ||
                         (p.category && p.category.toLowerCase().includes(searchLower))
                     );
-                    setResults(filtered.slice(0, 6)); // Top 6 matches
+                    setSearchState({ query: debouncedQuery, results: filtered.slice(0, 6) });
                 }
             })
             .catch((err) => {
                 console.error("Live search error:", err);
             })
             .finally(() => {
-                if (isMounted) setLoading(false);
             });
 
         return () => {
@@ -49,7 +43,10 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({ query, debounced
     if (!query.trim()) return null;
 
     return (
-        <div className="absolute top-full left-0 right-0 z-50 bg-white shadow-xl shadow-stone-900/10 rounded-2xl border border-stone-200/90 mt-2 max-h-[60vh] md:max-h-96 overflow-hidden">
+        <div 
+            className="absolute top-full left-0 right-0 z-50 bg-white shadow-xl shadow-stone-900/10 rounded-2xl border border-stone-200/90 mt-2 max-h-[70vh] md:max-h-[420px] overflow-y-auto no-scrollbar [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
             {loading ? (
                 <div className="p-4 space-y-3">
                     <div className="flex items-center gap-3 animate-pulse">

@@ -1,20 +1,20 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Edit3, PackageSearch, Plus, Search, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import toast from 'react-hot-toast';
-import { ProductCardSkeleton } from "../../components/common/Skeletons";
 import { useProductStore } from "../../store/productStore";
-import type { ProductListItemProps } from "../../types/allTypes";
+import type { Product, ProductListItemProps } from "../../types/allTypes";
+import { getErrorMessage } from "../../utils/errorMessage";
 
-const getProductId = (product: any) => product?._id || product?.id || "";
-const getProductImage = (product: any) => product?.imageUrls?.[0] || product?.imageUrl || "https://picsum.photos/600/500?random=1";
+const getProductId = (product: Product) => product._id || product.id || "";
+const getProductImage = (product: Product) => product.imageUrls?.[0] || product.imageUrl || "https://picsum.photos/600/500?random=1";
 
 const ProductListItem: React.FC<ProductListItemProps> = React.memo(({ product, onEdit, onDelete }) => {
   const id = getProductId(product);
   const image = getProductImage(product);
   const displayDescription = product.productInfo?.description || product.description || "";
 
-  const isProductInStock = product.inStock !== false && (product.inStock !== undefined || product.quantity > 0);
+  const isProductInStock = product.inStock !== false && (product.inStock !== undefined || (product.quantity ?? 0) > 0);
 
   return (
     <li className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4">
@@ -106,7 +106,7 @@ const Products = () => {
     "invites & planner"
   ];
 
-  const handleEditClick = useCallback((product: any) => {
+  const handleEditClick = useCallback((product: Product) => {
     const id = getProductId(product);
     if (id) {
       navigate(`/admin/products/edit/${id}`);
@@ -120,9 +120,9 @@ const Products = () => {
         toast.success("Product deleted successfully!");
         // Refresh products on current page
         fetchProducts(page, limit, false, debouncedSearch, selectedCategory, stockStatus, sortBy);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err);
-        toast.error(err.message || "Failed to delete product");
+        toast.error(getErrorMessage(err, "Failed to delete product"));
       }
     }
   }, [deleteProduct, page, debouncedSearch, selectedCategory, stockStatus, sortBy, fetchProducts]);
@@ -222,7 +222,7 @@ const Products = () => {
       ) : (
         <>
           <ul className="space-y-4">
-            {products.map((product: any) => (
+            {products.map((product) => (
               <ProductListItem
                 key={getProductId(product)}
                 product={product}

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { getProducts, getProductsByCategory, createProduct, deleteProduct as apiDeleteProduct, updateProduct as apiUpdateProduct } from '../services/productService';
-import type { Product, ProductStore } from '../types/allTypes';
+import type { ProductStore } from '../types/allTypes';
+import type { AxiosProgressEvent } from 'axios';
+import { getErrorMessage } from '../utils/errorMessage';
 
 export const useProductStore = create<ProductStore>()((set) => ({
   products: [],
@@ -45,7 +47,7 @@ export const useProductStore = create<ProductStore>()((set) => ({
       set({ error: message, loading: false });
     }
   },
-  addProduct: async (productData: FormData, onUploadProgress?: (progressEvent: any) => void) => {
+  addProduct: async (productData: FormData, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void) => {
     set({ loading: true, error: undefined });
     try {
       const { data } = await createProduct(productData, onUploadProgress);
@@ -53,8 +55,8 @@ export const useProductStore = create<ProductStore>()((set) => ({
         products: [data.product, ...state.products],
         loading: false,
       }));
-    } catch (error: any) {
-      const message = error.response?.data?.message || error.message || 'Failed to add product.';
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to add product.');
       set({ error: message, loading: false });
       throw new Error(message);
     }
@@ -67,13 +69,13 @@ export const useProductStore = create<ProductStore>()((set) => ({
         products: state.products.filter((p) => p._id !== id),
         loading: false,
       }));
-    } catch (error: any) {
-      const message = error.response?.data?.message || error.message || 'Failed to delete product.';
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to delete product.');
       set({ error: message, loading: false });
       throw new Error(message);
     }
   },
-  updateProduct: async (id: string, productData: FormData, onUploadProgress?: (progressEvent: any) => void) => {
+  updateProduct: async (id: string, productData: FormData, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void) => {
     set({ loading: true, error: undefined });
     try {
       const { data } = await apiUpdateProduct(id, productData, onUploadProgress);
@@ -81,8 +83,8 @@ export const useProductStore = create<ProductStore>()((set) => ({
         products: state.products.map((p) => (p._id === id ? data.product : p)),
         loading: false,
       }));
-    } catch (error: any) {
-      const message = error.response?.data?.message || error.message || 'Failed to update product.';
+    } catch (error: unknown) {
+      const message = getErrorMessage(error, 'Failed to update product.');
       set({ error: message, loading: false });
       throw new Error(message);
     }

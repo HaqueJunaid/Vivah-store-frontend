@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import React, { useEffect } from 'react'
-import { Sparkles, Heart, HeartHandshake, ArrowRight, Quote, Award, Palette, MapPin } from 'lucide-react'
+import { Sparkles, Heart, HeartHandshake, ArrowRight, Quote } from 'lucide-react'
 
 const AboutUs: React.FC = () => {
     useEffect(() => {

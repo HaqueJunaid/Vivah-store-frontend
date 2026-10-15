@@ -2,8 +2,10 @@ import Badge from "../common/badge"
 import { useNavigate } from "react-router-dom"
 import { MdFileDownload } from "react-icons/md"
 import { generateInvoicePDF } from "../../utils/pdfGenerator"
+import type { OrderRecord } from "../../types/allTypes";
+import type { BadgeVariant } from "../common/badge";
 
-const OrderTable = ({ orders }: { orders: any[] }) => {
+const OrderTable = ({ orders }: { orders: OrderRecord[] }) => {
     const navigate = useNavigate();
 
     return (
@@ -33,13 +35,13 @@ const OrderTable = ({ orders }: { orders: any[] }) => {
                                     {order.items?.length > 1 ? ` (+${order.items.length - 1} more)` : ''}
                                 </span>
                             </td>
-                            <td className="px-3.5 py-2 text-start cursor-default">{order.items?.reduce((total: number, item: any) => total + item.quantity, 0) || 0}</td>
+                            <td className="px-3.5 py-2 text-start cursor-default">{order.items?.reduce((total, item) => total + item.quantity, 0) || 0}</td>
                             <td className="px-3.5 py-2 text-start cursor-default font-semibold">₹{order.totalAmount?.toLocaleString()}</td>
                             <td className="px-3.5 py-2 text-start cursor-default uppercase text-xs">{order.paymentMethod === 'cod' ? 'Cash On Delivery' : 'Mock Payment'}</td>
                             <td className="px-3.5 py-2 text-start cursor-default">
                                 <Badge
                                     text={order.status}
-                                    variant={order.status?.toLowerCase() as any}
+                                    variant={order.status.toLowerCase() as BadgeVariant}
                                 />
                             </td>
                             <td className="px-3.5 py-2 text-center">

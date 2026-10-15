@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, Plus, Trash2, Edit3, Ruler, Check, Layers, AlertCircle } from "lucide-react";
 import type { ProductDimension } from "../../types/allTypes";
 import toast from "react-hot-toast";
+import { formatDimensionString } from "../../constants/productDimensions";
 
 interface ProductDimensionsModalProps {
   isOpen: boolean;
@@ -24,31 +25,21 @@ const PRESET_TEMPLATES = [
   { label: "Square Card (6 × 6 in)", width: "6", height: "6", thickness: "0.2", unit: "in" },
 ];
 
-export const formatDimensionString = (dim: ProductDimension): string => {
-  const parts: string[] = [];
-  if (dim.width) parts.push(`W: ${dim.width}`);
-  if (dim.height) parts.push(`H: ${dim.height}`);
-  if (dim.thickness) parts.push(`T: ${dim.thickness}`);
-  const unit = dim.unit || "in";
-  
-  if (dim.width && dim.height) {
-    let base = `${dim.width} × ${dim.height} ${unit}`;
-    if (dim.thickness) {
-      base += ` (Thick: ${dim.thickness} ${unit})`;
-    }
-    return base;
-  }
-  
-  return parts.length > 0 ? `${parts.join(" • ")} ${unit}` : "Custom Size";
-};
+const ProductDimensionsModal: React.FC<ProductDimensionsModalProps> = (props) => props.isOpen ? (
+  <ProductDimensionsDialog key={JSON.stringify(props.initialDimensions || [])} {...props} />
+) : null;
 
-const ProductDimensionsModal: React.FC<ProductDimensionsModalProps> = ({
+const ProductDimensionsDialog: React.FC<ProductDimensionsModalProps> = ({
   isOpen,
   onClose,
   initialDimensions = [],
   onSave,
 }) => {
-  const [dimensions, setDimensions] = useState<ProductDimension[]>([]);
+  const [dimensions, setDimensions] = useState<ProductDimension[]>(() => (initialDimensions || []).map((dimension, index) => ({
+    ...dimension,
+    id: dimension.id || dimension._id || `dim-${Date.now()}-${index}`,
+    unit: dimension.unit || "in",
+  })));
   const [editingId, setEditingId] = useState<string | null>(null);
 
   // Form input fields for adding / editing a single dimension item
@@ -58,19 +49,6 @@ const ProductDimensionsModal: React.FC<ProductDimensionsModalProps> = ({
   const [thickness, setThickness] = useState("");
   const [unit, setUnit] = useState("in");
   const [formError, setFormError] = useState<string | null>(null);
-
-  // Sync initial dimensions when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      const normalized = (initialDimensions || []).map((d, index) => ({
-        ...d,
-        id: d.id || d._id || `dim-${Date.now()}-${index}`,
-        unit: d.unit || "in",
-      }));
-      setDimensions(normalized);
-      resetForm();
-    }
-  }, [isOpen, initialDimensions]);
 
   // ESC key to close
   useEffect(() => {

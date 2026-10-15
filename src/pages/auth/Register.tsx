@@ -4,13 +4,15 @@ import { LuKeyRound } from "react-icons/lu";
 import { FiEye } from "react-icons/fi";
 import { FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form"
 import toast from 'react-hot-toast';
 import { registerUser, googleAuth as googleAuthApi } from '../../services/authService';
 import { setAuthToken } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import type { RegisterInputs as Inputs } from '../../types/allTypes';
+import type { GoogleCredentialResponse } from '../../google-identity';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 
 const Register = () => {
@@ -29,7 +31,7 @@ const Register = () => {
         setShowPassword(!showPassword);
     };
 
-    const handleGoogleResponse = async (response: any) => {
+    const handleGoogleResponse = async (response: GoogleCredentialResponse) => {
         if (!response?.credential) {
             toast.error('Google login failed.');
             return;
@@ -43,16 +45,16 @@ const Register = () => {
             setAuthToken(token);
             toast.success(message || 'Signed up with Google successfully');
             navigate('/');
-        } catch (error: any) {
-            const message = error?.response?.data?.message || 'Google signup failed';
+        } catch (error: unknown) {
+            const message = getErrorMessage(error, 'Google signup failed');
             toast.error(message);
         } finally {
             setLoading(false);
         }
     };
 
-    const initializeGoogleAuth = () => {
-        const google = (window as any).google;
+    const initializeGoogleAuth = useEffectEvent(() => {
+        const google = window.google;
         const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
         if (google?.accounts?.id && clientId) {
@@ -82,7 +84,7 @@ const Register = () => {
         }
 
         return false;
-    };
+    });
 
     useEffect(() => {
         document.title = 'VivahStore | Signup';
@@ -110,8 +112,8 @@ const Register = () => {
             localStorage.setItem('registerEmail', email);
             toast.success(message || 'Registration successful. Verify OTP.');
             navigate('/verify-otp', { state: { email } });
-        } catch (error: any) {
-            const message = error?.response?.data?.message || 'Registration failed';
+        } catch (error: unknown) {
+            const message = getErrorMessage(error, 'Registration failed');
             toast.error(message);
         } finally {
             setLoading(false);

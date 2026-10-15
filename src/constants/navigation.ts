@@ -1,4 +1,4 @@
-import type { BaseItem, DropdownItem } from "../types/allTypes";
+import type { DropdownItem } from "../types/allTypes";
 
 export const navigationDropdown: DropdownItem[] = [
   { title: "Assets", url: "assets" },

@@ -48,7 +48,7 @@ const SalesChart = ({ data }: SalesChartProps) => {
               />
               <Tooltip 
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                formatter={(value: any) => [`₹${Number(value).toFixed(2)}`, 'Sales']}
+                formatter={(value) => [`₹${Number(value).toFixed(2)}`, 'Sales']}
                 labelStyle={{ color: '#374151', fontWeight: 500, marginBottom: '4px' }}
               />
               <Area 

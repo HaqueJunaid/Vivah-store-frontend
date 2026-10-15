@@ -1,14 +1,14 @@
 import React from "react";
 import { Minus, Plus, X, Paintbrush, Box } from "lucide-react";
 import { useCartStore } from "../../store/cartStore";
-import type { CartComponentItemProps as CartItemProps } from "../../types/allTypes";
+import type { CartComponentItem, CartComponentItemProps as CartItemProps } from "../../types/allTypes";
 import UploadedImageCustomization from "../common/UploadedImageCustomization";
 
 const Cartitem = React.memo(({ cartItems, updateQuantity, setQuantity }: CartItemProps) => {
     const removeFromCart = useCartStore((state) => state.removeCartItem);
     const updateCartItemQuantity = useCartStore((state) => state.updateCartItemQuantity);
 
-    const handleDirectQuantity = (item: any, valStr: string) => {
+    const handleDirectQuantity = (item: CartComponentItem, valStr: string) => {
         const val = parseInt(valStr, 10);
         if (!isNaN(val)) {
             const clamped = Math.max(1, val);
@@ -20,7 +20,7 @@ const Cartitem = React.memo(({ cartItems, updateQuantity, setQuantity }: CartIte
         }
     };
 
-    const handleBlurQuantity = (item: any, valStr: string) => {
+    const handleBlurQuantity = (item: CartComponentItem, valStr: string) => {
         const val = parseInt(valStr, 10);
         if (isNaN(val) || val < 1) {
             if (setQuantity) {

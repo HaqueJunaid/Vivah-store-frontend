@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form"
 import toast from 'react-hot-toast';
 import { resetPasswordApi } from '../../services/authService';
-import type { ResetPasswordPayload } from '../../types/allTypes';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const ResetPassword = () => {
     const { token } = useParams<{ token: string }>();
@@ -41,8 +41,8 @@ const ResetPassword = () => {
             const response = await resetPasswordApi(token, { password: data.password });
             toast.success(response.data.message || 'Password reset successfully');
             navigate('/login');
-        } catch (error: any) {
-            const message = error?.response?.data?.message || 'Failed to reset password';
+        } catch (error: unknown) {
+            const message = getErrorMessage(error, 'Failed to reset password');
             toast.error(message);
         } finally {
             setLoading(false);

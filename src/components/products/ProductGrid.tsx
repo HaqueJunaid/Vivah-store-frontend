@@ -1,5 +1,5 @@
 import React from 'react'
-import type { ProductGridProps, LayoutMode } from '../../types/allTypes'
+import type { ProductGridProps } from '../../types/allTypes'
 
 const ProductGrid: React.FC<ProductGridProps> = ({ children, layout = 'grid-4' }) => {
   const layoutClassName =

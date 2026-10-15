@@ -8,6 +8,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 export const setAuthToken = (token?: string) => {
   if (token) {
@@ -31,9 +32,9 @@ api.interceptors.request.use(
 
 // Response interceptor to handle silent token refresh and auto-logout via HTTP-Only cookie
 let isRefreshing = false;
-let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: any) => void }> = [];
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown | null, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -75,7 +76,7 @@ api.interceptors.response.use(
       try {
         // HTTP-Only refreshToken cookie sent automatically via withCredentials
         const res = await axios.post(
-          `${import.meta.env.VITE_API_URL}/auth/refresh-token`,
+          `${apiBaseUrl.replace(/\/$/, '')}/auth/refresh-token`,
           {},
           { withCredentials: true }
         );

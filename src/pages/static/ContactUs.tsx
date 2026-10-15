@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Mail, Phone, Clock, MapPin, Send } from 'lucide-react'
 import api from '../../services/api'
+import { getErrorMessage } from '../../utils/errorMessage'
 
 const ContactUs: React.FC = () => {
   useEffect(() => {
@@ -37,9 +38,9 @@ const ContactUs: React.FC = () => {
       } else {
         toast.error(response.data.message || "Failed to send message.")
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting contact form:", error)
-      const errorMsg = error.response?.data?.message || "An error occurred while sending your message. Please try again."
+      const errorMsg = getErrorMessage(error, "An error occurred while sending your message. Please try again.")
       toast.error(errorMsg)
     } finally {
       setLoading(false)

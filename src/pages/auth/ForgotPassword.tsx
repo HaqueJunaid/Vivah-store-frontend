@@ -5,6 +5,7 @@ import { useForm, type SubmitHandler } from "react-hook-form"
 import toast from 'react-hot-toast';
 import { forgotPasswordApi } from '../../services/authService';
 import type { ForgotPasswordPayload } from '../../types/allTypes';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const ForgotPassword = () => {
     const [loading, setLoading] = useState(false);
@@ -25,8 +26,8 @@ const ForgotPassword = () => {
             const response = await forgotPasswordApi(data);
             toast.success(response.data.message || 'Password reset link sent to your email');
             setEmailSent(true);
-        } catch (error: any) {
-            const message = error?.response?.data?.message || 'Failed to send reset link';
+        } catch (error: unknown) {
+            const message = getErrorMessage(error, 'Failed to send reset link');
             toast.error(message);
         } finally {
             setLoading(false);

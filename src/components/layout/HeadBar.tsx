@@ -18,8 +18,8 @@ const HeadBar: React.FC<HeadBarProps> = ({ onMenuClick, onSearchClick }) => {
   const navigate = useNavigate();
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  const cartLength = useCartStore((state: any) => state.getCartItemsLength());
-  const wishlistLength = useWishlistStore((state: any) => state.getWishlistItemsLength());
+  const cartLength = useCartStore((state) => state.getCartItemsLength());
+  const wishlistLength = useWishlistStore((state) => state.getWishlistItemsLength());
 
   // Close search dropdown when clicking outside
   useEffect(() => {

@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useCartStore } from "../../store/cartStore";
 import toast from 'react-hot-toast';
 import { ShoppingBag, Trash2 } from "lucide-react";
 import type { AddToCartProduct as Product } from "../../types/allTypes";
 
 const AddToCartButton = React.memo(({ product, variant = 'default' }: { product: Product; variant?: 'default' | 'luxury' }) => {
-    const quantityInCart = useCartStore((state: any) => {
-        const item = state.cartItems.find((item: any) => {
+    const quantityInCart = useCartStore((state) => {
+        const item = state.cartItems.find((item) => {
             if (item.productId !== product.id) return false;
             const variantA = JSON.stringify(item.selectedVariant || null);
             const variantB = JSON.stringify(product.selectedVariant || null);
@@ -20,9 +20,9 @@ const AddToCartButton = React.memo(({ product, variant = 'default' }: { product:
 
     const isInCart = quantityInCart > 0;
 
-    const updateCartItemQuantity = useCartStore((state: any) => state.updateCartItemQuantity);
-    const removeCartItem = useCartStore((state: any) => state.removeCartItem);
-    const addToCart = useCartStore((state: any) => state.addCartItem);
+    const updateCartItemQuantity = useCartStore((state) => state.updateCartItemQuantity);
+    const removeCartItem = useCartStore((state) => state.removeCartItem);
+    const addToCart = useCartStore((state) => state.addCartItem);
     
     // Out of stock if explicitly false
     const isOutofStock = product.inStock === false;

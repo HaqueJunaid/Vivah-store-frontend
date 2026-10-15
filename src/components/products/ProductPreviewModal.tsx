@@ -5,6 +5,8 @@ import { useProductStore } from '../../store/productStore'
 import ProductGallary from './ProductGallary.tsx'
 import ProductContent from './ProductContent.tsx'
 import { Skeleton } from '../common/Skeletons'
+import type { Product } from '../../types/allTypes';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 interface ProductPreviewModalProps {
   productId: string | null
@@ -13,7 +15,7 @@ interface ProductPreviewModalProps {
 }
 
 const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, isOpen, onClose }) => {
-  const [dbProduct, setDbProduct] = useState<any>(null)
+  const [dbProduct, setDbProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedVariant, setSelectedVariant] = useState(0)
@@ -41,9 +43,9 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
         setDbProduct(data.product)
         setSelectedVariant(0)
         setSelectedImage(0)
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Fetch preview product error:", err)
-        setError(err.response?.data?.message || err.message || "Failed to load product preview.")
+        setError(getErrorMessage(err, "Failed to load product preview."))
       } finally {
         setLoading(false)
       }
@@ -78,9 +80,8 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
 
   if (!isOpen || !productId) return null
 
-  const cleanImages = (imgs: any[]) => {
-    if (!Array.isArray(imgs)) return ['https://picsum.photos/600/500'];
-    const unique = Array.from(new Set(imgs.filter(Boolean)));
+  const cleanImages = (imgs: string[] | undefined) => {
+    const unique = Array.from(new Set((imgs || []).filter(Boolean)));
     return unique.length > 0 ? unique : ['https://picsum.photos/600/500'];
   };
 
@@ -107,14 +108,14 @@ const ProductPreviewModal: React.FC<ProductPreviewModalProps> = ({ productId, is
 
       if (dbProduct.hasVariants) {
         if (Array.isArray(dbProduct.variants) && dbProduct.variants.length > 0) {
-          const variantList = dbProduct.variants.map((v: any, idx: number) => ({
+          const variantList = dbProduct.variants.map((v, idx) => ({
             name: (v.title || v.name || `Variant ${idx + 1}`).trim(),
             images: cleanImages(v.images && v.images.length > 0 ? v.images : mainImages),
             inStock: isStock,
           }));
 
           const hasDefaultAlready = variantList.some(
-            (v: any) => v.name.toLowerCase() === 'default'
+            (v) => v.name.toLowerCase() === 'default'
           );
 
           if (!hasDefaultAlready && mainImages.length > 0) {

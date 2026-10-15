@@ -3,13 +3,16 @@ import { LuKeyRound } from "react-icons/lu";
 import { FiEye } from "react-icons/fi";
 import { FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form"
 import toast from 'react-hot-toast';
 import { loginUser, googleAuth as googleAuthApi } from '../../services/authService';
 import { setAuthToken } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import type { LoginInputs as Inputs } from '../../types/allTypes';
+import type { GoogleCredentialResponse } from '../../google-identity';
+import { getErrorMessage } from '../../utils/errorMessage';
+import axios from 'axios';
 
 
 const Login = () => {
@@ -32,7 +35,7 @@ const Login = () => {
         setShowPassword(!showPassword);
     };
 
-    const handleGoogleResponse = async (response: any) => {
+    const handleGoogleResponse = async (response: GoogleCredentialResponse) => {
         if (!response?.credential) {
             toast.error('Google login failed.');
             return;
@@ -46,16 +49,16 @@ const Login = () => {
             setAuthToken(token);
             toast.success(message || 'Logged in with Google successfully');
             navigate('/');
-        } catch (error: any) {
-            const message = error?.response?.data?.message || 'Google login failed';
+        } catch (error: unknown) {
+            const message = getErrorMessage(error, 'Google login failed');
             toast.error(message);
         } finally {
             setLoading(false);
         }
     };
 
-    const initializeGoogleAuth = () => {
-        const google = (window as any).google;
+    const initializeGoogleAuth = useEffectEvent(() => {
+        const google = window.google;
         const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
         if (google?.accounts?.id && clientId) {
@@ -85,7 +88,7 @@ const Login = () => {
         }
 
         return false;
-    };
+    });
 
     useEffect(() => {
         document.title = 'VivahStore | Login';
@@ -110,15 +113,15 @@ const Login = () => {
             setAuthToken(token);
             toast.success(message || 'Logged in successfully');
             navigate('/');
-        } catch (error: any) {
-            if (error?.response?.data?.isUnverified) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError<{ isUnverified?: boolean; email?: string; message?: string }>(error) && error.response?.data?.isUnverified) {
                 const unverifiedEmail = error.response.data.email || data.email;
                 localStorage.setItem('registerEmail', unverifiedEmail);
-                toast.error(error?.response?.data?.message || 'Please verify your email first');
+                toast.error(error.response.data.message || 'Please verify your email first');
                 navigate('/verify-otp', { state: { email: unverifiedEmail } });
                 return;
             }
-            const message = error?.response?.data?.message || 'Login failed';
+            const message = getErrorMessage(error, 'Login failed');
             toast.error(message);
         } finally {
             setLoading(false);

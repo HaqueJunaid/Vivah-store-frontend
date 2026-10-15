@@ -1,7 +1,8 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import type { OrderRecord } from '../types/allTypes';
 
-export const generateInvoicePDF = async (order: any) => {
+export const generateInvoicePDF = async (order: OrderRecord) => {
   const doc = new jsPDF();
 
   // Helper to load image
@@ -81,12 +82,12 @@ export const generateInvoicePDF = async (order: any) => {
   currentY = 88;
 
   const tableColumn = ["Item Description", "Qty", "Unit Price", "Total"];
-  const tableRows: any[] = [];
+  const tableRows: (string | number)[][] = [];
   const preloadedImages: { [key: number]: HTMLImageElement | null } = {};
 
   if (order.items) {
     await Promise.all(
-      order.items.map(async (item: any, index: number) => {
+      order.items.map(async (item, index) => {
         if (item.uploadedImage) {
           const img = await loadImage(item.uploadedImage);
           preloadedImages[index] = img;
@@ -95,7 +96,7 @@ export const generateInvoicePDF = async (order: any) => {
     );
   }
 
-  order.items?.forEach((item: any, index: number) => {
+  order.items?.forEach((item, index) => {
     let description = `${item.name}`;
     
     if (item.selectedVariant) {
@@ -163,7 +164,7 @@ export const generateInvoicePDF = async (order: any) => {
   });
 
   // --- Summary Section ---
-  const finalY = (doc as any).lastAutoTable.finalY + 12;
+  const finalY = (doc as typeof doc & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 12;
   
   doc.setFontSize(10);
   doc.setTextColor(80, 80, 80);

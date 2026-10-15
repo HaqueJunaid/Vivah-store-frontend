@@ -3,6 +3,7 @@ import { X, Plus, Link2, FolderTree, AlertCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCategoryStore, slugify } from '../../store/categoryStore';
 import type { BaseItem } from '../../types/allTypes';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 interface AddSubCategoryModalProps {
   isOpen: boolean;
@@ -83,8 +84,8 @@ const AddSubCategoryModal: React.FC<AddSubCategoryModalProps> = ({
       } else {
         setError(result.message || 'Failed to add sub-category');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to add sub-category');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Failed to add sub-category'));
     } finally {
       setIsSubmitting(false);
     }

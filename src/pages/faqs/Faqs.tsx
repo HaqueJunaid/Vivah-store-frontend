@@ -1,27 +1,23 @@
-import React, { useState, useMemo, useEffect } from 'react'
-import Heading from '../../components/common/Heading'
+import React, { useState, useEffect } from 'react'
+import { faqs, type FaqCategory } from '../../constants/faqs'
 import {
     Search,
     ChevronDown,
     RefreshCcw,
     CreditCard,
-    Truck,
-    Package,
-    Gift,
-    ShieldAlert,
     HelpCircle,
     Phone,
     Mail,
-    Sparkles,
-    FileText
 } from 'lucide-react'
 
-interface FaqItem {
-    question: string
-    answer: string
-    category: 'shipping' | 'returns' | 'payments'
-    icon?: React.ReactNode
-}
+type FaqFilter = 'all' | FaqCategory
+
+const categoryTabs: { id: FaqFilter; label: string }[] = [
+    { id: 'all', label: 'All FAQs' },
+    { id: 'shipping', label: 'Shipping & Orders' },
+    { id: 'returns', label: 'Returns & Exchange' },
+    { id: 'payments', label: 'Payments & Billing' },
+]
 
 const Faqs: React.FC = () => {
     useEffect(() => {
@@ -29,156 +25,15 @@ const Faqs: React.FC = () => {
     }, [])
 
     const [searchQuery, setSearchQuery] = useState('')
-    const [activeCategory, setActiveCategory] = useState<'all' | 'shipping' | 'returns' | 'payments'>('all')
+    const [activeCategory, setActiveCategory] = useState<FaqFilter>('all')
     const [openIndex, setOpenIndex] = useState<number | null>(null)
 
-    // Reset open index when filtering changes
-    useEffect(() => {
-        setOpenIndex(null)
-    }, [searchQuery, activeCategory])
-
-    const faqs: FaqItem[] = useMemo(() => [
-        // Shipping & Orders
-        {
-            category: 'shipping',
-            question: "Is my Order Confirmed?",
-            answer: "Once you have placed your order, you should receive an email confirmation with your Order Id.",
-            icon: <Package className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'shipping',
-            question: "When will you Ship My Order?",
-            answer: "We normally ship all orders within 15 business days, but there might be a slight delay in shipment depending upon your order customization or in the case of some unavoidable circumstances. Final delivery time will vary based on your location.",
-            icon: <Truck className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'shipping',
-            question: "When will my order get Delivered?",
-            answer: "It usually takes 15-20 business days for your order to get delivered. But the delivery time may vary depending on your order customization and location.",
-            icon: <Truck className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'shipping',
-            question: "How much do you Charge for Delivery?",
-            answer: "Delivery charges depend on the weight of your parcel and will be calculated at the checkout page.",
-            icon: <CreditCard className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'shipping',
-            question: "How can I Track my Order?",
-            answer: "An Email containing your Tracking Id and details of the service provider is sent to you after the order is shipped. If you can't find the tracking information in your email, or if you have any other questions related to tracking, reach out to us on vivahstore.india@gmail.com or contact us on +91 8507756877. They will be glad to assist you and provide the necessary information.",
-            icon: <Search className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'shipping',
-            question: "What if I have not received some part of my order?",
-            answer: "If some part of your order is missing, it's possible that it could have been sent in more than one parcel, due to the large size of your order. In this case, you will receive one dispatch email per parcel. If you have only received one dispatch email and haven't received all of your items, please contact us within 7 days.",
-            icon: <HelpCircle className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'shipping',
-            question: "Can I Update My Order?",
-            answer: "Kindly note that we work hard to get your order dispatched as quickly as possible, we may not be able to update your order in time. If your order has not been shipped, please reach out to us at vivahstore.india@gmail.com or contact us on +91 8507756877 with your details. Kindly note that we cannot guarantee that the change will be made as the order may have been already processed.",
-            icon: <Package className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'shipping',
-            question: "Can I have my order Gift-Wrapped?",
-            answer: "Gift wrap option is available for all products. An additional amount of ₹75 will be charged.",
-            icon: <Gift className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'shipping',
-            question: "I have received a Damaged Product, what should I do?",
-            answer: "In case you receive a damaged product, please capture an unboxing video for evidence and reach out to us on vivahstore.india@gmail.com and we will resolve the issue ASAP.",
-            icon: <ShieldAlert className="size-5 text-[#E41F66]" />
-        },
-
-        // Returns & Exchange
-        {
-            category: 'returns',
-            question: "What is your Return Policy?",
-            answer: "You can return certain products upto 5 days from the date of delivery. You can send a request to vivahstore.india@gmail.com or call our number +91 8507756877. The returned product should be in its original packaging and in the same unused condition as received.",
-            icon: <RefreshCcw className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'returns',
-            question: "What items can I Return?",
-            answer: "You can only return items that are damaged/defective. You will need to inform us of any damages/defects within 24 hours of delivery of the product, in order to receive the replacement.",
-            icon: <ShieldAlert className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'returns',
-            question: "Do you arrange for Reverse Pickups?",
-            answer: "Reverse pickup is not available on any items, you will have to ship the item back to our address.",
-            icon: <Truck className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'returns',
-            question: "Where do I Ship the Returns?",
-            answer: "Please mail the item(s) to the address below. Do remember to mention your Order ID and Contact Number. Adarsh Sharma. Auto Stand, in front of ICICI Bank, near Kagal Nagar, Sonari East, Kagal Nagar, Sonari, Jamshedpur, Jharkhand - 831011, Contact Number: +91 8507756877.",
-            icon: <Package className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'returns',
-            question: "What if the parcel gets returned back by the shipping company?",
-            answer: "In any circumstance if your parcel gets returned back to us by the company, lets say because the customer's phone was not reachable, you'll have to pay the shipping amount again for us to reship it to you.",
-            icon: <ShieldAlert className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'returns',
-            question: "When will I receive my Replacement?",
-            answer: "Replacement will be shipped after the original item has been received, subject to the following conditions: 1.The item(s) should be unused, unsoiled and unwashed. 2.The package should have the original packaging. They should be returned within 7 days from the dispatch date. Any returned item received by us that does not meet the above mentioned conditions will not be accepted. No amount will be reimbursed in this case.",
-            icon: <RefreshCcw className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'returns',
-            question: "Can I choose a Different Item in Exchange?",
-            answer: "You can only exchange your item if it is damaged/defective within 5 days and receive a replacement of that exact product or another product of the same value. If the value of the replacement product exceeds that of the previously purchased product, the difference will have to be paid in advance.",
-            icon: <RefreshCcw className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'returns',
-            question: "What is your Refund Policy?",
-            answer: "We do not refund money even if the item(s) is damaged/defective. We only exchange the product.",
-            icon: <ShieldAlert className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'returns',
-            question: "Do you have Discounts / Sales?",
-            answer: "Yes we do. Subscribe to our newsletter for all the perks!",
-            icon: <Sparkles className="size-5 text-[#E41F66]" />
-        },
-
-        // Payments & Billing
-        {
-            category: 'payments',
-            question: "What Payment Methods do you accept?",
-            answer: "We accept UPI payments (Google Pay, PhonePe, Paytm), net banking, as well as all major credit and debit cards at checkout.",
-            icon: <CreditCard className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'payments',
-            question: "Is my payment information secure?",
-            answer: "Yes, all transactions are processed through highly secure, industry-standard encrypted payment gateways. We do not store any card details on our servers.",
-            icon: <CreditCard className="size-5 text-[#E41F66]" />
-        },
-        {
-            category: 'payments',
-            question: "Can I request a GST Invoice?",
-            answer: "An invoice is automatically emailed to you upon order confirmation. If you need a GST invoice or custom company billing info, please reach out to us at vivahstore.india@gmail.com with your GST details.",
-            icon: <FileText className="size-5 text-[#E41F66]" />
-        }
-    ], [])
-
-    const filteredFaqs = useMemo(() => {
-        return faqs.filter(faq => {
-            const matchesCategory = activeCategory === 'all' || faq.category === activeCategory
-            const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
-            return matchesCategory && matchesSearch
-        })
-    }, [faqs, activeCategory, searchQuery])
+    const filteredFaqs = faqs.filter(faq => {
+        const matchesCategory = activeCategory === 'all' || faq.category === activeCategory
+        const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+        return matchesCategory && matchesSearch
+    })
 
     return (
         <div className="bg-stone-50/50 min-h-screen py-12 pb-20 w-full font-sans tracking-wide">
@@ -203,12 +58,18 @@ const Faqs: React.FC = () => {
                             type="text"
                             placeholder="Search questions, policies, shipping times..."
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value)
+                                setOpenIndex(null)
+                            }}
                             className="bg-transparent border-none outline-none w-full text-stone-800 placeholder:text-stone-400 text-sm md:text-base"
                         />
                         {searchQuery && (
                             <button
-                                onClick={() => setSearchQuery('')}
+                                onClick={() => {
+                                    setSearchQuery('')
+                                    setOpenIndex(null)
+                                }}
                                 className="text-stone-400 hover:text-stone-600 font-medium text-xs px-2 cursor-pointer"
                             >
                                 Clear
@@ -251,15 +112,13 @@ const Faqs: React.FC = () => {
 
             {/* Filter Tabs */}
             <div className="max-w-3xl mx-auto px-6 mt-12 flex justify-center flex-wrap gap-2 md:gap-3">
-                {[
-                    { id: 'all', label: 'All FAQs' },
-                    { id: 'shipping', label: 'Shipping & Orders' },
-                    { id: 'returns', label: 'Returns & Exchange' },
-                    { id: 'payments', label: 'Payments & Billing' }
-                ].map((tab) => (
+                {categoryTabs.map((tab) => (
                     <button
                         key={tab.id}
-                        onClick={() => setActiveCategory(tab.id as any)}
+                        onClick={() => {
+                            setActiveCategory(tab.id)
+                            setOpenIndex(null)
+                        }}
                         className={`px-5 py-2.5 rounded-full text-xs md:text-sm font-semibold border transition-all duration-300 cursor-pointer ${activeCategory === tab.id
                             ? 'bg-[#E41F66] border-[#E41F66] text-white shadow-md shadow-[#E41F66]/20 hover:bg-[#c60b4d]'
                             : 'bg-white border-stone-200/80 text-stone-600 hover:bg-stone-50 hover:text-stone-800'
@@ -283,6 +142,7 @@ const Faqs: React.FC = () => {
                             onClick={() => {
                                 setSearchQuery('')
                                 setActiveCategory('all')
+                                setOpenIndex(null)
                             }}
                             className="mt-4 text-sm font-bold text-[#E41F66] hover:underline cursor-pointer"
                         >

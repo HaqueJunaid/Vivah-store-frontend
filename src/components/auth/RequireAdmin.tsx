@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import type { RequireAdminProps as Props } from '../../types/allTypes';

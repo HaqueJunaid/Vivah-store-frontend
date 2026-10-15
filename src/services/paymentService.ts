@@ -1,9 +1,10 @@
 import api from './api';
+import type { OrderRecord } from '../types/allTypes';
 
 export interface CashfreeOrderResponse {
   success: boolean;
   message?: string;
-  order: any;
+  order: OrderRecord;
   paymentSessionId?: string;
   cashfreeOrderId?: string;
   mode?: string;
@@ -14,7 +15,7 @@ export interface VerifyPaymentResponse {
   message?: string;
   paymentStatus: 'Pending' | 'Completed' | 'Failed' | 'Cancelled';
   orderStatus: string;
-  order: any;
+  order: OrderRecord;
 }
 
 export const createCashfreePaymentOrder = (addressId: string) => {

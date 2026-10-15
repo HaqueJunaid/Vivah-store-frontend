@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ScrollToTop from "./utils/ScrollToTop.tsx";
 import ProgressBar from "./components/common/ProgressBar.tsx";
 import UserLayout from './components/layout/userLayout.tsx';
-import HomePage from './pages/home/HomePage.tsx';
 import RequireAuth from './components/auth/RequireAuth';
 import RequireAdmin from './components/auth/RequireAdmin';
 import { useAuthStore } from './store/authStore';
@@ -11,24 +10,23 @@ import { setAuthToken } from './services/api';
 import { useCartStore } from './store/cartStore';
 import { useCategoryStore } from './store/categoryStore';
 
-// Eager/Direct Imports for All User & Public Pages for Instant Responsiveness & Zero Transition Lag
-import CartPage from './pages/cart/CartPage.tsx';
-import WishListPage from './pages/wishlist/WishListPage.tsx';
-import Faqs from './pages/faqs/Faqs.tsx';
-import AboutUs from './pages/static/AboutUs.tsx';
-import ContactUs from './pages/static/ContactUs.tsx';
-import ProductLayout from './components/layout/ProductLayout.tsx';
-import DetailProduct from './components/products/DetailProduct.tsx';
-import OrderDetail from './components/profile/OrderDetail.tsx';
-import Profile from './pages/profile/Profile.tsx';
-import Register from './pages/auth/Register.tsx';
-import Login from './pages/auth/Login.tsx';
-import VerifyOTP from './pages/auth/VerifyOTP.tsx';
-import ForgotPassword from './pages/auth/ForgotPassword.tsx';
-import ResetPassword from './pages/auth/ResetPassword.tsx';
-import NotFound from './pages/static/NotFound.tsx';
+const HomePage = lazy(() => import('./pages/home/HomePage.tsx'));
+const CartPage = lazy(() => import('./pages/cart/CartPage.tsx'));
+const WishListPage = lazy(() => import('./pages/wishlist/WishListPage.tsx'));
+const Faqs = lazy(() => import('./pages/faqs/Faqs.tsx'));
+const AboutUs = lazy(() => import('./pages/static/AboutUs.tsx'));
+const ContactUs = lazy(() => import('./pages/static/ContactUs.tsx'));
+const ProductLayout = lazy(() => import('./components/layout/ProductLayout.tsx'));
+const DetailProduct = lazy(() => import('./components/products/DetailProduct.tsx'));
+const OrderDetail = lazy(() => import('./components/profile/OrderDetail.tsx'));
+const Profile = lazy(() => import('./pages/profile/Profile.tsx'));
+const Register = lazy(() => import('./pages/auth/Register.tsx'));
+const Login = lazy(() => import('./pages/auth/Login.tsx'));
+const VerifyOTP = lazy(() => import('./pages/auth/VerifyOTP.tsx'));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword.tsx'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword.tsx'));
+const NotFound = lazy(() => import('./pages/static/NotFound.tsx'));
 
-// Only Admin Pages are Lazy Loaded
 const AdminLayout = lazy(() => import('./components/layout/AdminLayout.tsx'));
 const Dashboard = lazy(() => import('./pages/Admin/Dashboard.tsx'));
 const Products = lazy(() => import('./pages/Admin/Products.tsx'));
@@ -60,6 +58,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <Suspense fallback={<ProgressBar />}>
       <Routes>
         {/* User & Auth Routes - Rendered Instantly with Zero Lazy Chunk Delay */}
         <Route path="register" element={<Register />} />
@@ -104,6 +103,7 @@ const App = () => {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

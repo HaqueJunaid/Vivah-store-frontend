@@ -11,7 +11,8 @@ import { getAddresses, deleteAddress } from '../../services/addressService';
 import { getCurrentUser } from '../../services/authService';
 import { getMyOrders } from '../../services/orderService';
 import toast from 'react-hot-toast';
-import type { AddressItem } from '../../types/allTypes';
+import type { AddressItem, OrderRecord } from '../../types/allTypes';
+import { getErrorMessage } from '../../utils/errorMessage';
 import { useAuthStore } from '../../store/authStore';
 
 const Profile = () => {
@@ -25,7 +26,7 @@ const Profile = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingAddress, setEditingAddress] = useState<AddressItem | null>(null);
     const [addresses, setAddresses] = useState<AddressItem[]>([]);
-    const [orders, setOrders] = useState<any[]>([]); // Dynamic order state
+    const [orders, setOrders] = useState<OrderRecord[]>([]);
     const [loadingAddresses, setLoadingAddresses] = useState(false);
     const [loadingOrders, setLoadingOrders] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -50,9 +51,9 @@ const Profile = () => {
             if (res.data.success) {
                 setAddresses(res.data.addresses);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Failed to fetch addresses:", err);
-            setErrorMsg("Could not load addresses from server.");
+            setErrorMsg(getErrorMessage(err, "Could not load addresses from server."));
         } finally {
             setLoadingAddresses(false);
         }

@@ -1,34 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
-import { Navigation } from 'swiper/modules';
 import ProductCard from './ProductCard';
 import { getSimilarProducts } from '../../services/productService';
 import { ProductCardSkeleton } from '../common/Skeletons';
+import type { Product } from '../../types/allTypes';
 
 interface SimilarProductsProps {
     productId?: string;
 }
 
 export default function SimilarProducts({ productId }: SimilarProductsProps) {
-    const [products, setProducts] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [result, setResult] = useState<{ productId: string; products: Product[] } | null>(null);
+    const loading = Boolean(productId) && result?.productId !== productId;
+    const products = result && result.productId === productId ? result.products : [];
 
     useEffect(() => {
         if (!productId) return;
-        setLoading(true);
+        let active = true;
         getSimilarProducts(productId)
             .then((res) => {
-                if (res.data.success && Array.isArray(res.data.products)) {
-                    setProducts(res.data.products);
-                }
+                if (active) setResult({ productId, products: res.data.success && Array.isArray(res.data.products) ? res.data.products : [] });
             })
             .catch((err) => {
                 console.error("Failed to load similar products:", err);
+                if (active) setResult({ productId, products: [] });
             })
-            .finally(() => {
-                setLoading(false);
-            });
+        return () => { active = false; };
     }, [productId]);
 
     if (loading) {

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { navigationDropdown as defaultNavigationDropdown } from '../constants/navigation';
 import { fetchCategoriesApi, addSubCategoryApi } from '../services/categoryService';
 import type { DropdownItem, BaseItem } from '../types/allTypes';
+import { getErrorMessage } from '../utils/errorMessage';
 
 export const slugify = (text: string): string => {
   return text
@@ -47,10 +48,10 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
       } else {
         set({ isLoading: false });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to fetch categories from backend database:', err);
       set({
-        error: err.response?.data?.message || err.message || 'Failed to fetch categories',
+        error: getErrorMessage(err, 'Failed to fetch categories'),
         isLoading: false,
       });
     }
@@ -138,8 +139,8 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
         success: false,
         message: response.message || 'Failed to add sub-category.',
       };
-    } catch (err: any) {
-      const errMsg = err.response?.data?.message || err.message || 'Failed to save sub-category to database.';
+    } catch (err: unknown) {
+      const errMsg = getErrorMessage(err, 'Failed to save sub-category to database.');
       return {
         success: false,
         message: errMsg,

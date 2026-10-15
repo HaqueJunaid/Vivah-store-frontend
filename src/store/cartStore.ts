@@ -139,7 +139,7 @@ export const useCartStore = create<cartStoreInterface>()(
         }),
         {
             name: 'cart-storage',
-            onRehydrateStorage: (state) => {
+            onRehydrateStorage: () => {
                 return (state, error) => {
                     if (!error) {
                         state?.setHydrated(true);

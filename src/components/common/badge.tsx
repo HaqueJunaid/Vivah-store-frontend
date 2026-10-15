@@ -1,4 +1,4 @@
-type BadgeVariant = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type BadgeVariant = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 
 const Badge = ({ text, variant }: { text: string, variant: BadgeVariant }) => {
     let containerClass = "";

@@ -12,10 +12,18 @@ import type {LayoutChangerMode as LayoutMode} from '../../types/allTypes'
 
 const ProductLayout: React.FC = () => {
   const { id } = useParams();
-  const [searchParams] = useSearchParams();
-  const [sort, setSort] = useState(searchParams.get('sort') || 'default');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoryId = id && id !== 'all' ? id : '';
+  const sort = searchParams.get('sort') || 'default';
+  const setSort = (value: string) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (value === 'default') nextParams.delete('sort');
+    else nextParams.set('sort', value);
+    setSearchParams(nextParams, { replace: true });
+  };
   const [layout, setLayout] = useState<LayoutMode>('grid-3');
-  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ categoryId, page: 1 });
+  const page = pagination.categoryId === categoryId ? pagination.page : 1;
 
   const categories = useCategoryStore((state) => state.categories);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
@@ -29,13 +37,6 @@ const ProductLayout: React.FC = () => {
     const fromQuery = searchParams.get('search');
     return fromQuery ? fromQuery.trim() : '';
   }, [searchParams]);
-
-  const categoryId = useMemo(() => {
-    if (id && id !== 'all') {
-      return id;
-    }
-    return '';
-  }, [id]);
 
   const categoryTitle = useMemo(() => {
     if (!categoryId) return '';
@@ -58,11 +59,6 @@ const ProductLayout: React.FC = () => {
   }, [searchKeyword, categoryTitle]);
 
   useEffect(() => {
-    setSort(searchParams.get('sort') || 'default');
-  }, [searchParams]);
-
-  useEffect(() => {
-    setPage(1);
     if (categoryId) {
       fetchProductsByCategory(categoryId);
     } else {
@@ -72,7 +68,7 @@ const ProductLayout: React.FC = () => {
 
   const loadMore = () => {
     const nextPage = page + 1;
-    setPage(nextPage);
+    setPagination({ categoryId, page: nextPage });
     fetchProducts(nextPage, 12, true);
   };
 

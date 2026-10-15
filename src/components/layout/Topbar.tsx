@@ -1,20 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 const TOPBAR_STORAGE_KEY = 'vivahstore_topbar_closed_at'
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
 
 const Topbar: React.FC = () => {
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
+  const [visible, setVisible] = useState(() => {
     const stored = localStorage.getItem(TOPBAR_STORAGE_KEY)
     const closedAt = stored ? parseInt(stored, 10) : null
     const now = Date.now()
-
-    if (!closedAt || now - closedAt >= ONE_DAY_MS) {
-      setVisible(true)
-    }
-  }, [])
+    return !closedAt || now - closedAt >= ONE_DAY_MS
+  })
 
   const handleClose = () => {
     localStorage.setItem(TOPBAR_STORAGE_KEY, Date.now().toString())

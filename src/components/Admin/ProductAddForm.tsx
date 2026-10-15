@@ -29,7 +29,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
   } = useForm<Product>();
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [objectUrls, setObjectUrls] = useState<string[]>([]);
+  const [, setObjectUrls] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -38,7 +38,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
 
   // Variant image states
   const [variantImagePreviews, setVariantImagePreviews] = useState<string[]>([]);
-  const [variantObjectUrls, setVariantObjectUrls] = useState<string[]>([]);
+  const [, setVariantObjectUrls] = useState<string[]>([]);
   const [selectedVariantFiles, setSelectedVariantFiles] = useState<File[]>([]);
 
   const validateCustomizationSlots = React.useCallback((slots: string[]) => {
@@ -235,7 +235,7 @@ const ProductAddForm: React.FC<ProductAddFormProps> = ({
       clearVariantImagePreviews();
       reset();
       onClose();
-    } catch (err: any) {
+    } catch {
       // Errors will be caught and alerted in parent Products component
     } finally {
       setIsUploading(false);

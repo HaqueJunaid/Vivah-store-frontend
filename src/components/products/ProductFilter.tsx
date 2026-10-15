@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import PriceRangeSlider from './PriceRangeSlider.tsx'
 import { CiFilter } from "react-icons/ci";
 import { X } from "lucide-react";
@@ -8,39 +8,31 @@ const ProductFilterSideBar: React.FC = () => {
     const [open, setOpen] = useState(false)
 
     const [searchParams, setSearchParams] = useSearchParams()
-    const [inStock, setInStock] = useState(searchParams.get('inStock') === 'true')
-    const [price, setPrice] = useState(23200)
-
-    // Sync state when URL params change (e.g. on clear)
-    useEffect(() => {
-        setInStock(searchParams.get('inStock') === 'true');
-        const priceParam = searchParams.get('price_lte');
-        setPrice(priceParam ? parseInt(priceParam, 10) : 23200);
-    }, [searchParams]);
+    const inStock = searchParams.get('inStock') === 'true';
+    const price = Number.parseInt(searchParams.get('price_lte') || '23200', 10);
 
     const handlePriceChange = (nextValue: number) => {
-        setPrice(nextValue)
-        searchParams.set('price_lte', nextValue.toString());
-        setSearchParams(searchParams, { replace: true })
+        const nextParams = new URLSearchParams(searchParams);
+        nextParams.set('price_lte', nextValue.toString());
+        setSearchParams(nextParams, { replace: true })
     }
 
     const handleStockChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const isChecked = e.target.checked;
-        setInStock(isChecked);
+        const nextParams = new URLSearchParams(searchParams);
         if (isChecked) {
-            searchParams.set('inStock', 'true');
+            nextParams.set('inStock', 'true');
         } else {
-            searchParams.delete('inStock');
+            nextParams.delete('inStock');
         }
-        setSearchParams(searchParams, { replace: true });
+        setSearchParams(nextParams, { replace: true });
     }
 
     const handleClearFilters = () => {
-        searchParams.delete('inStock');
-        searchParams.delete('price_lte');
-        setSearchParams(searchParams, { replace: true });
-        setInStock(false);
-        setPrice(23200);
+        const nextParams = new URLSearchParams(searchParams);
+        nextParams.delete('inStock');
+        nextParams.delete('price_lte');
+        setSearchParams(nextParams, { replace: true });
     };
 
     const isFilterActive = searchParams.has('inStock') || searchParams.has('price_lte');

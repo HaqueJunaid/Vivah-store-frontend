@@ -4,6 +4,7 @@ import { createAddress, updateAddress } from "../../services/addressService";
 import { useAuthStore } from "../../store/authStore";
 import { useState, useMemo } from "react";
 import { MdMyLocation } from "react-icons/md";
+import { getErrorMessage } from "../../utils/errorMessage";
 
 
 const AddAddressForm = ({ cancel, onSubmitSuccess, initialData }: AddAddressFormProps) => {
@@ -122,9 +123,9 @@ const AddAddressForm = ({ cancel, onSubmitSuccess, initialData }: AddAddressForm
                     cancel(false);
                 }
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Error saving address:", err);
-            setApiError(err.response?.data?.message || "Failed to save address. Please try again.");
+            setApiError(getErrorMessage(err, "Failed to save address. Please try again."));
         } finally {
             setLoading(false);
         }

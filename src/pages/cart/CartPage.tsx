@@ -6,22 +6,21 @@ import { AddressSkeleton } from '../../components/common/Skeletons';
 import { useCartStore } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
 import { getAddresses } from '../../services/addressService';
-import { createOrder } from '../../services/orderService';
 import { createCashfreePaymentOrder, verifyPayment } from '../../services/paymentService';
 import { load } from '@cashfreepayments/cashfree-js';
 import toast from 'react-hot-toast';
 import type { AddressItem } from '../../types/allTypes';
+import type { cartItemInterface } from '../../types/allTypes';
+import { getErrorMessage } from '../../utils/errorMessage';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 
-// Cache and preload Cashfree SDK instance in memory for instant modal rendering
-let cachedCashfreePromise: Promise<any> | null = null;
+// Keep SDK instances separate so a sandbox preload cannot shadow production mode.
+const cachedCashfreePromises: Partial<Record<'sandbox' | 'production', ReturnType<typeof load>>> = {};
 const getPreloadedCashfree = (mode: 'sandbox' | 'production' = 'sandbox') => {
-    if (!cachedCashfreePromise) {
-        cachedCashfreePromise = load({ mode });
-    }
-    return cachedCashfreePromise;
+    cachedCashfreePromises[mode] ??= load({ mode });
+    return cachedCashfreePromises[mode]!;
 };
 
 const CartPage = () => {
@@ -74,12 +73,12 @@ const CartPage = () => {
         });
     }, [user]);
 
-    const updateQuantity = (item: any, change: number) => {
+    const updateQuantity = (item: cartItemInterface, change: number) => {
         const newQuantity = Math.max(1, item.productQuantity + change);
         updateCartItemQuantity(item.productId, newQuantity, item.customizations, item.selectedVariant);
     };
 
-    const setQuantity = (item: any, quantity: number) => {
+    const setQuantity = (item: cartItemInterface, quantity: number) => {
         const newQuantity = Math.max(1, quantity);
         updateCartItemQuantity(item.productId, newQuantity, item.customizations, item.selectedVariant);
     };
@@ -130,16 +129,6 @@ const CartPage = () => {
             const paymentSessionId = res.data.paymentSessionId;
             const cfEnv = res.data.mode === 'production' ? 'production' : 'sandbox';
 
-            // Check if mock session (development fallback)
-            if (paymentSessionId && paymentSessionId.startsWith('mock_session_')) {
-                toast.dismiss(toastId);
-                toast.success("Test session initialized. Verifying payment...");
-                await verifyPayment(createdOrder._id);
-                clearCart();
-                navigate(`/orders/${createdOrder._id}`);
-                return;
-            }
-
             if (!paymentSessionId) {
                 toast.dismiss(toastId);
                 toast.error("Unable to start payment session. Please try again.");
@@ -159,21 +148,23 @@ const CartPage = () => {
             await cashfree.checkout(checkoutOptions);
 
             // When modal completes/returns, verify payment with backend
+            let paymentCompleted = false;
             try {
                 const verifyRes = await verifyPayment(createdOrder._id);
                 if (verifyRes.data.success && verifyRes.data.paymentStatus === 'Completed') {
+                    paymentCompleted = true;
                     toast.success("Payment completed successfully!");
                 }
             } catch (vErr) {
                 console.warn("Client verification check:", vErr);
             }
 
-            clearCart();
+            if (paymentCompleted) clearCart();
             navigate(`/orders/${createdOrder._id}`);
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Checkout error:", err);
-            toast.error(err.response?.data?.message || "Failed to place order.");
+            toast.error(getErrorMessage(err, "Failed to place order."));
         } finally {
             setCheckingOut(false);
         }

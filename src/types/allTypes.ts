@@ -1,4 +1,52 @@
 import React from 'react';
+import type { AxiosProgressEvent } from 'axios';
+
+export type OrderStatus = 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+export type PaymentStatus = 'Pending' | 'Completed' | 'Failed' | 'Cancelled';
+
+export interface SelectedProductVariant {
+  _id?: string;
+  id?: string;
+  name?: string;
+  title?: string;
+  image?: string;
+  images?: string[];
+  inStock?: boolean;
+}
+
+export interface OrderLineItem {
+  product?: string | { imageUrls?: string[]; title?: string };
+  name: string;
+  price: number;
+  quantity: number;
+  productImage?: string;
+  selectedVariant?: SelectedProductVariant | string | null;
+  customizations?: Record<string, string>;
+  uploadedImage?: string;
+}
+
+export interface OrderRecord {
+  _id: string;
+  user?: string;
+  items: OrderLineItem[];
+  shippingAddress?: AddressItem;
+  subtotal?: number;
+  shippingCost?: number;
+  gstAmount?: number;
+  totalAmount: number;
+  paymentMethod: 'cashfree' | 'cod' | 'card' | 'upi' | 'mock';
+  paymentStatus: PaymentStatus;
+  paymentDetails?: {
+    cfPaymentId?: string | null;
+    bankReference?: string | null;
+    paymentAmount?: number;
+    paymentCurrency?: string;
+    paymentMethod?: string;
+    paymentTime?: string;
+  } | null;
+  status: OrderStatus;
+  createdAt?: string;
+}
 
 export interface CartItem {
     id: number;
@@ -45,7 +93,7 @@ export interface ProductContentProps {
         images: string[];
         inStock: boolean;
     }[];
-    customizable?: any;
+    customizable?: boolean;
     isCustomizable?: boolean;
     customizations?: string[];
     hasFixedQuantities?: boolean;
@@ -119,6 +167,7 @@ export interface ProductVariant {
   _id?: string;
   title: string;
   name?: string;
+  image?: string;
   images: string[];
   inStock?: boolean;
 }
@@ -126,6 +175,7 @@ export interface ProductVariant {
 // Product Store Types
 export interface Product {
   _id: string;
+  id?: string;
   title: string;
   price: number;
   quantity?: number;
@@ -133,6 +183,7 @@ export interface Product {
   category: string;
   subCategory?: string;
   imageUrls?: string[];
+  imageUrl?: string;
   thumbnail?: string;
   description?: string;
   productInfo?: ProductInfo;
@@ -156,9 +207,9 @@ export interface ProductStore {
   error?: string;
   fetchProducts: (page?: number, limit?: number, append?: boolean, search?: string, category?: string, stockStatus?: string, sortBy?: string) => Promise<void>;
   fetchProductsByCategory: (category: string) => Promise<void>;
-  addProduct: (productData: FormData, onUploadProgress?: (progressEvent: any) => void) => Promise<void>;
+  addProduct: (productData: FormData, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
-  updateProduct: (id: string, productData: FormData, onUploadProgress?: (progressEvent: any) => void) => Promise<void>;
+  updateProduct: (id: string, productData: FormData, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void) => Promise<void>;
 }
 
 // Cart Store Types
@@ -168,7 +219,7 @@ export interface cartItemInterface {
     productPrice: number | string;
     productImage?: string;
     productQuantity: number;
-    selectedVariant?: any;
+    selectedVariant?: SelectedProductVariant | string | null;
     uploadedImage?: string;
     customizations?: Record<string, string>;
 }
@@ -178,8 +229,8 @@ export interface cartStoreInterface {
     isHydrated: boolean;
     setHydrated: (val: boolean) => void;
     addCartItem: (cartItem: cartItemInterface) => void;
-    removeCartItem: (productId: string, customizations?: Record<string, string>, selectedVariant?: any) => void;
-    updateCartItemQuantity: (productId: string, quantity: number, customizations?: Record<string, string>, selectedVariant?: any) => void;
+    removeCartItem: (productId: string, customizations?: Record<string, string>, selectedVariant?: SelectedProductVariant | string | null) => void;
+    updateCartItemQuantity: (productId: string, quantity: number, customizations?: Record<string, string>, selectedVariant?: SelectedProductVariant | string | null) => void;
     clearCart: () => void;
     getCartTotal: () => number;
     getCartItemsLength: () => number;
@@ -218,7 +269,7 @@ export interface CartItemApi {
     productPrice: number;
     productImage?: string;
     productQuantity: number;
-    selectedVariant?: any;
+    selectedVariant?: SelectedProductVariant | string | null;
     uploadedImage?: string;
     customizations?: Record<string, string>;
 }
@@ -297,8 +348,8 @@ export type AdminUser = {
 
 // Admin Product List Item Props
 export interface ProductListItemProps {
-  product: any;
-  onEdit: (product: any) => void;
+  product: Product & { id?: string; imageUrl?: string };
+  onEdit: (product: Product & { id?: string; imageUrl?: string }) => void;
   onDelete: (id: string, title: string) => void;
 }
 
@@ -439,12 +490,15 @@ export interface CartComponentItem {
     productPrice: number | string;
     productImage?: string;
     productQuantity: number;
+    selectedVariant?: SelectedProductVariant | string | null;
+    uploadedImage?: string;
+    customizations?: Record<string, string>;
 }
 
 export interface CartComponentItemProps {
-    cartItems: any[];
-    updateQuantity: (item: any, change: number) => void;
-    setQuantity?: (item: any, quantity: number) => void;
+    cartItems: CartComponentItem[];
+    updateQuantity: (item: CartComponentItem, change: number) => void;
+    setQuantity?: (item: CartComponentItem, quantity: number) => void;
 }
 
 // Add To Cart Button Product Type
@@ -454,7 +508,7 @@ export interface AddToCartProduct {
     price: string | number | undefined;
     imageUrl: string | undefined;
     quantity?: number;
-    selectedVariant?: any;
+    selectedVariant?: SelectedProductVariant | string | null;
     uploadedImage?: string;
     customizations?: Record<string, string>;
     inStock?: boolean;

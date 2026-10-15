@@ -13,13 +13,13 @@ const WishListPage = () => {
   const removeWishlistItem = useWishlistStore((state) => state.removeWishlistItem)
   const clearWishlist = useWishlistStore((state) => state.clearWishlist)
 
-  const parsePrice = (v: any) => {
+  const parsePrice = (v: string | number) => {
     if (typeof v === 'number') return v
     const n = Number(String(v).replace(/[^0-9.-]/g, ''))
     return Number.isFinite(n) ? n : 0
   }
 
-  const formatPrice = (v: any) => {
+  const formatPrice = (v: string | number) => {
     const n = parsePrice(v)
     return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }

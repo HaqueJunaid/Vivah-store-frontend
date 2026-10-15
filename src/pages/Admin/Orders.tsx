@@ -4,12 +4,14 @@ import { Eye, SearchIcon, ShoppingCartIcon, ChevronLeft, ChevronRight, Trash2, D
 import { getAllOrdersAdmin, updateOrderStatus, deleteOrder as deleteOrderApi } from "../../services/orderService";
 import { generateInvoicePDF } from "../../utils/pdfGenerator";
 import UploadedImageCustomization from "../../components/common/UploadedImageCustomization";
+import type { OrderRecord, OrderStatus } from "../../types/allTypes";
+import { getErrorMessage } from "../../utils/errorMessage";
 
 const Orders = () => {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDetailOn, setIsDetailOn] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderRecord | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -58,7 +60,7 @@ const Orders = () => {
     setSelectedOrder(orders.find((e) => e._id === orderId) || null);
   };
 
-  const updateStatus = async (orderId: string, newStatus: string) => {
+  const updateStatus = async (orderId: string, newStatus: OrderStatus) => {
     try {
       const res = await updateOrderStatus(orderId, newStatus);
       if (res.data.success) {
@@ -66,13 +68,13 @@ const Orders = () => {
           prev.map((o) => (o._id === orderId ? { ...o, status: newStatus } : o))
         );
         if (selectedOrder && selectedOrder._id === orderId) {
-          setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));
+          setSelectedOrder((prev) => prev ? { ...prev, status: newStatus } : prev);
         }
         toast.success("Order status updated successfully!");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error updating order status:", err);
-      toast.error(err.response?.data?.message || "Failed to update order status.");
+      toast.error(getErrorMessage(err, "Failed to update order status."));
     }
   };
 
@@ -91,14 +93,14 @@ const Orders = () => {
           setTotalRevenue((rev) => Math.max(0, rev - (deletedOrder.totalAmount || 0)));
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error deleting order:", err);
-      toast.error(err.response?.data?.message || "Failed to delete order.");
+      toast.error(getErrorMessage(err, "Failed to delete order."));
     }
   };
 
 
-  const calcQty = (items: any[]) => items?.reduce((s, it) => s + it.quantity, 0) || 0;
+  const calcQty = (items: OrderRecord['items']) => items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPages = Math.ceil(total / limit) || 1;
 
   const getStatusSelectClass = (status: string) => {
@@ -193,7 +195,7 @@ const Orders = () => {
                     </td>
                     <td className="px-5 py-5 align-top">
                       <ul className="space-y-1.5">
-                        {order.items?.map((it: any, i: number) => (
+                        {order.items?.map((it, i) => (
                           <li key={i} className="text-sm text-stone-700 leading-tight">
                             <span className="font-semibold text-stone-900">{it.name}</span>
                             <span className="ml-1.5 text-stone-400 font-medium">×{it.quantity}</span>
@@ -206,7 +208,7 @@ const Orders = () => {
                     <td className="px-5 py-5 align-top">
                       <select
                         value={order.status}
-                        onChange={(e) => updateStatus(order._id, e.target.value)}
+                        onChange={(e) => updateStatus(order._id, e.target.value as OrderStatus)}
                         className={`rounded-full border px-3 py-1.5 text-xs font-semibold focus:outline-none transition cursor-pointer ${getStatusSelectClass(order.status)}`}
                       >
                         <option value="Pending">Pending</option>
@@ -269,7 +271,7 @@ const Orders = () => {
                   Customer: {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}
                 </div>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {order.items?.map((it: any, i: number) => (
+                  {order.items?.map((it, i) => (
                     <span key={i} className="inline-block bg-stone-50 border border-stone-100 rounded-lg px-2.5 py-1 text-xs text-stone-700">
                       {it.name} <span className="text-stone-400 font-semibold">×{it.quantity}</span>
                     </span>
@@ -282,7 +284,7 @@ const Orders = () => {
                 <div className="flex items-center justify-between mt-2">
                   <select
                     value={order.status}
-                    onChange={(e) => updateStatus(order._id, e.target.value)}
+                    onChange={(e) => updateStatus(order._id, e.target.value as OrderStatus)}
                     className={`rounded-full border px-3 py-1 text-xs font-semibold focus:outline-none transition cursor-pointer ${getStatusSelectClass(order.status)}`}
                   >
                     <option value="Pending">Pending</option>
@@ -407,11 +409,11 @@ const Orders = () => {
                 </div>
 
                 <div className="space-y-4">
-                  {selectedOrder.items?.map((item: any, index: number) => {
+                      {selectedOrder.items?.map((item, index) => {
                     const itemMainImage = 
                       item.productImage || 
                       (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) ||
-                      (item.product?.imageUrls && item.product.imageUrls[0]) || 
+                        (typeof item.product === 'object' && item.product?.imageUrls?.[0]) ||
                       'https://picsum.photos/600/500';
 
                     return (
@@ -447,7 +449,7 @@ const Orders = () => {
                           })()}
                           {((item.customizations && Object.entries(item.customizations).length > 0) || item.uploadedImage) && (
                             <div className="mt-2 flex flex-wrap gap-1.5 items-center">
-                              {item.customizations && Object.entries(item.customizations).map(([k, v]: any) => (
+                              {item.customizations && Object.entries(item.customizations).map(([k, v]) => (
                                 <span key={k} className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] text-[10px] sm:text-xs px-2 py-0.5 rounded-md font-medium capitalize">
                                   <span className="opacity-70 capitalize mr-1">{k.replace(/([A-Z])/g, ' $1')}:</span>
                                   <span className="font-semibold">{v}</span>

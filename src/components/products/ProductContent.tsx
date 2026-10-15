@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, type ChangeEvent } from 'react'
-import type { ProductContentProps, ProductDimension } from "../../types/allTypes";
+import type { ProductContentProps } from "../../types/allTypes";
 import AddToCartButton from '../cart/AddToCartButton';
 import AddToWishListButton from '../wishlist/AddToWishListButton';
 import { uploadCustomizationImage } from '../../services/productService';
 import { useCartStore } from '../../store/cartStore';
 import toast from 'react-hot-toast';
 import { Loader2, Ruler, Check } from 'lucide-react';
-import { formatDimensionString } from '../Admin/ProductDimensionsModal';
+import { formatDimensionString } from '../../constants/productDimensions';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const FIELD_CONFIG: Record<string, { label: string; placeholder: string; type: string }> = {
     coupleName: { label: "Couple Name", placeholder: "Enter couple name", type: "text" },
@@ -20,8 +21,6 @@ const ProductContent: React.FC<ProductContentProps> = ({
     id, 
     title, 
     price, 
-    description,
-    productInfo,
     inStock, 
     canUploadImage, 
     variants, 
@@ -29,7 +28,6 @@ const ProductContent: React.FC<ProductContentProps> = ({
     customizations: activeCustomizationKeys,
     hasFixedQuantities,
     batchQuantities,
-    hasDimensions,
     dimensions = [],
     selectedImage,
     selectedVariantIndex,
@@ -69,8 +67,8 @@ const ProductContent: React.FC<ProductContentProps> = ({
         }
     }, [selectedVariantIndex]);
 
-    const cartItems = useCartStore((state: any) => state.cartItems);
-    const updateCartItemQuantity = useCartStore((state: any) => state.updateCartItemQuantity);
+    const cartItems = useCartStore((state) => state.cartItems);
+    const updateCartItemQuantity = useCartStore((state) => state.updateCartItemQuantity);
 
     const currentVariantObj = variants?.[activeVariant] || null;
     const isRealVariant = !!hasVariants || (variants && variants.length > 1 && variants.some(v => v.name.toLowerCase() !== 'default'));
@@ -94,7 +92,7 @@ const ProductContent: React.FC<ProductContentProps> = ({
     }, [customizations, selectedDimension]);
 
     // Check if this item (with exact variant & customizations) is in cart
-    const itemInCart = cartItems.find((item: any) => {
+    const itemInCart = cartItems.find((item) => {
         if (item.productId !== id) return false;
         const variantA = JSON.stringify(item.selectedVariant || null);
         const variantB = JSON.stringify(effectiveVariant || null);
@@ -170,9 +168,9 @@ const ProductContent: React.FC<ProductContentProps> = ({
             } else {
                 toast.error(res.data.message || 'Failed to upload image');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Custom image upload error:', error);
-            const msg = error?.response?.data?.message || 'Failed to upload custom image. Please try again.';
+            const msg = getErrorMessage(error, 'Failed to upload custom image. Please try again.');
             toast.error(msg);
         } finally {
             setIsUploading(false);

@@ -1,18 +1,21 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import Badge from '../common/badge';
 import { MdArrowBack, MdLocationOn, MdPayment, MdFileDownload, MdRefresh } from 'react-icons/md';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getOrderById } from '../../services/orderService';
 import { verifyPayment } from '../../services/paymentService';
 import toast from 'react-hot-toast';
 import { generateInvoicePDF } from '../../utils/pdfGenerator';
 import UploadedImageCustomization from '../common/UploadedImageCustomization';
+import type { OrderRecord } from '../../types/allTypes';
+import { getErrorMessage } from '../../utils/errorMessage';
+import type { BadgeVariant } from '../common/badge';
 
 const OrderDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<OrderRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [verifyingPayment, setVerifyingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +24,7 @@ const OrderDetail = () => {
     document.title = "VivahStore | Order Details";
   }, []);
 
-  const handleVerifyPayment = async (showFeedback = true) => {
+  const handleVerifyPayment = useCallback(async (showFeedback = true) => {
     if (!id) return;
     setVerifyingPayment(true);
     try {
@@ -36,14 +39,14 @@ const OrderDetail = () => {
           toast(res.data.message || `Payment status is ${res.data.paymentStatus}`, { icon: 'ℹ️' });
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (showFeedback) {
-        toast.error(err.response?.data?.message || "Failed to verify payment status.");
+        toast.error(getErrorMessage(err, "Failed to verify payment status."));
       }
     } finally {
       setVerifyingPayment(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     if (id) {
@@ -71,7 +74,7 @@ const OrderDetail = () => {
           setLoading(false);
         });
     }
-  }, [id]);
+  }, [id, handleVerifyPayment]);
 
   if (loading) {
     return (
@@ -141,7 +144,7 @@ const OrderDetail = () => {
             </button>
             <Badge
               text={order.status}
-              variant={order.status?.toLowerCase() as any}
+              variant={order.status.toLowerCase() as BadgeVariant}
             />
           </div>
         </div>
@@ -177,11 +180,11 @@ const OrderDetail = () => {
             <div className='bg-white shadow-xs p-6 border border-stone-200 rounded-lg'>
               <h2 className='mb-4 font-semibold text-stone-900 text-lg'>Order Items</h2>
               <div className='space-y-6'>
-                {order.items?.map((item: any, index: number) => {
+                {order.items?.map((item, index) => {
                   const itemMainImage = 
                     item.productImage || 
                     (typeof item.selectedVariant === 'object' && item.selectedVariant?.images?.[0]) ||
-                    (item.product?.imageUrls && item.product.imageUrls[0]) || 
+                    (typeof item.product === 'object' && item.product?.imageUrls?.[0]) ||
                     'https://picsum.photos/600/500';
 
                   return (
@@ -207,7 +210,7 @@ const OrderDetail = () => {
                               </span>
                             );
                           })()}
-                          {item.customizations && Object.entries(item.customizations).map(([k, v]: any) => (
+                          {item.customizations && Object.entries(item.customizations).map(([k, v]) => (
                             <span key={k} className="inline-flex items-center bg-[#E41F66]/5 border border-[#E41F66]/10 text-[#E41F66] px-2.5 py-0.5 rounded-md font-semibold capitalize">
                               <span className="opacity-70 mr-1">{k.replace(/([A-Z])/g, ' $1')}:</span>
                               <span>{v}</span>

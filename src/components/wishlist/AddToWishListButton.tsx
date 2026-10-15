@@ -4,9 +4,9 @@ import { FaHeart, FaRegHeart } from "react-icons/fa"
 
 const AddToWishListButton = ({ id, title, price, imageUrl, variant = 'default' }: { id: string, title: string, price: string | number, imageUrl: string | undefined, variant?: 'default' | 'floating' | 'detail' }) => {
 
-    const addToWishlist = useWishlistStore((state: any) => state.addWishlistItem)
-    const removeFromWishlist = useWishlistStore((state: any) => state.removeWishlistItem)
-    const isAddedToWishList = useWishlistStore((state: any) => state.isInWishlist(id))
+    const addToWishlist = useWishlistStore((state) => state.addWishlistItem)
+    const removeFromWishlist = useWishlistStore((state) => state.removeWishlistItem)
+    const isAddedToWishList = useWishlistStore((state) => state.isInWishlist(id))
 
     const normalizePrice = (val: string | number) => {
         if (typeof val === 'number') return val
@@ -24,7 +24,7 @@ const AddToWishListButton = ({ id, title, price, imageUrl, variant = 'default' }
                 productId: String(id),
                 productName: title,
                 productPrice: normalizePrice(price),
-                productImage: imageUrl,
+                productImage: imageUrl || '',
             })
             toast.success(`Product added to wishlist`)
         }

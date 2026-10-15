@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+@keyframes route-progress {
+  0% { width: 15%; opacity: 1; }
+  70% { width: 90%; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
+
+.route-progress {
+  animation: route-progress 1s ease-out forwards;
+}
+
 html, body {
   overflow-x: hidden;
   max-width: 100%;

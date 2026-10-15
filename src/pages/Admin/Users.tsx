@@ -5,54 +5,6 @@ import type { AdminUser as User } from "../../types/allTypes";
 import toast from 'react-hot-toast';
 import { getAdminUsers, updateAdminUserStatus } from "../../services/authService";
 
-const mockUsers: User[] = [
-  {
-    id: "USR-1001",
-    name: "Junaid Haque",
-    email: "junaid@example.com",
-    date: "2026-01-15",
-    ordersCount: 15,
-    totalSpent: 1249.50,
-    status: "Active",
-  },
-  {
-    id: "USR-1002",
-    name: "Sarah Connor",
-    email: "sarah@example.com",
-    date: "2026-03-22",
-    ordersCount: 8,
-    totalSpent: 450.00,
-    status: "Active",
-  },
-  {
-    id: "USR-1003",
-    name: "John Doe",
-    email: "john.doe@example.com",
-    date: "2026-05-10",
-    ordersCount: 1,
-    totalSpent: 99.00,
-    status: "Inactive",
-  },
-  {
-    id: "USR-1004",
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    date: "2025-11-05",
-    ordersCount: 42,
-    totalSpent: 8750.20,
-    status: "Active",
-  },
-  {
-    id: "USR-1005",
-    name: "Alice Cooper",
-    email: "alice@example.com",
-    date: "2026-05-28",
-    ordersCount: 0,
-    totalSpent: 0.00,
-    status: "Suspended",
-  }
-];
-
 const Users = () => {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);

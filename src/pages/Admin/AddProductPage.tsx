@@ -5,7 +5,6 @@ import {
   ChevronLeft, 
   Upload, 
   X, 
-  Sparkles, 
   AlertCircle, 
   Layers, 
   Sliders, 
@@ -16,35 +15,21 @@ import {
   Plus,
   Trash2,
   Image as ImageIcon,
-  DollarSign,
-  Tag,
-  Check,
-  Eye,
   Settings2,
-  Info,
   Palette,
   Ruler,
   Boxes,
-  HelpCircle,
-  ShoppingBag
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCategoryStore } from "../../store/categoryStore";
-import AddSubCategoryButton from "../../components/Admin/AddSubCategoryButton";
+import { customizationOptions } from "../../constants/productCustomization";
 import AddSubCategoryModal from "../../components/Admin/AddSubCategoryModal";
 import { useProductStore } from "../../store/productStore";
-import ProductDimensionsModal, { formatDimensionString } from "../../components/Admin/ProductDimensionsModal";
-import ProductBatchQuantitiesModal, { DEFAULT_BATCH_QUANTITIES } from "../../components/Admin/ProductBatchQuantitiesModal";
+import ProductDimensionsModal from "../../components/Admin/ProductDimensionsModal";
+import ProductBatchQuantitiesModal from "../../components/Admin/ProductBatchQuantitiesModal";
+import { DEFAULT_BATCH_QUANTITIES } from "../../constants/productBatchQuantities";
+import { formatDimensionString } from "../../constants/productDimensions";
 import type { ProductFormInputs, ProductDimension } from "../../types/allTypes";
-
-const CUSTOMIZATION_OPTIONS = [
-  { label: "Custom Image Uploader", value: "customImage" },
-  { label: "Couple Name", value: "coupleName" },
-  { label: "Custom Description", value: "customDescription" },
-  { label: "Custom Tags", value: "customTags" },
-  { label: "Whatsapp Number", value: "whatsappNumber" },
-  { label: "Additional Message", value: "additionalMessage" },
-];
 
 interface FormVariantItem {
   id: string;
@@ -119,16 +104,10 @@ const AddProductPage: React.FC = () => {
   const [isAddSubCategoryModalOpen, setIsAddSubCategoryModalOpen] = useState(false);
 
   const watchedTitle = watch("title") || "";
-  const watchedPrice = watch("price") || 0;
-  const watchedInStock = watch("inStock");
   const selectedCategory = watch("category");
-  const selectedSubCategory = watch("subCategory");
   const hasVariants = watch("hasVariants");
   const isCustomizable = watch("isCustomizable");
   const hasFixedQuantities = watch("hasFixedQuantities");
-  const watchedDescription = watch("description") || "";
-  const watchedAbout = watch("about") || "";
-  const watchedNote = watch("note") || "";
 
   const selectedCategoryItem = useMemo(
     () => categories.find((item) => item.title === selectedCategory),
@@ -391,9 +370,9 @@ const AddProductPage: React.FC = () => {
 
       toast.success("Product created and published successfully!");
       navigate("/admin/products");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Create product failed:", err);
-      toast.error(err.message || "Failed to create product");
+      toast.error(err instanceof Error ? err.message : "Failed to create product");
     } finally {
       setIsSubmitting(false);
     }
@@ -1048,7 +1027,7 @@ const AddProductPage: React.FC = () => {
                         className="flex-1 rounded-xl border border-stone-200 bg-stone-50/40 px-3.5 py-2.5 text-xs font-semibold text-stone-900 outline-none focus:border-[#E41F66]"
                       >
                         <option value="">-- Choose Input Option --</option>
-                        {CUSTOMIZATION_OPTIONS.map((opt) => (
+                        {customizationOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>
                             {opt.label}
                           </option>

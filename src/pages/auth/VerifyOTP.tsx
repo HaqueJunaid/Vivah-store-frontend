@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { verifyOTP, resendOTP } from '../../services/authService';
 import { setAuthToken } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const VerifyOTP = () => {
     const navigate = useNavigate();
@@ -73,8 +74,8 @@ const VerifyOTP = () => {
             localStorage.removeItem('registerEmail');
             toast.success(message || 'OTP verified successfully');
             navigate('/');
-        } catch (err: any) {
-            const message = err?.response?.data?.message || 'Failed to verify OTP. Please try again.';
+        } catch (err: unknown) {
+            const message = getErrorMessage(err, 'Failed to verify OTP. Please try again.');
             setError(message);
             toast.error(message);
         } finally {
@@ -94,8 +95,8 @@ const VerifyOTP = () => {
             setOtp(["", "", "", "", "", ""]);
             setError("");
             toast.success(response.data.message || 'OTP resent to your email');
-        } catch (err: any) {
-            const message = err?.response?.data?.message || 'Failed to resend OTP. Please try again.';
+        } catch (err: unknown) {
+            const message = getErrorMessage(err, 'Failed to resend OTP. Please try again.');
             setError(message);
             toast.error(message);
         } finally {
