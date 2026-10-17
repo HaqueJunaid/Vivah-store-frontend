@@ -16,6 +16,10 @@ const WishListPage = lazy(() => import('./pages/wishlist/WishListPage.tsx'));
 const Faqs = lazy(() => import('./pages/faqs/Faqs.tsx'));
 const AboutUs = lazy(() => import('./pages/static/AboutUs.tsx'));
 const ContactUs = lazy(() => import('./pages/static/ContactUs.tsx'));
+const PrivacyPolicy = lazy(() => import('./pages/static/PrivacyPolicy.tsx'));
+const TermsAndConditions = lazy(() => import('./pages/static/TermsAndConditions.tsx'));
+const ReturnRefundPolicy = lazy(() => import('./pages/static/ReturnRefundPolicy.tsx'));
+const ShippingPolicy = lazy(() => import('./pages/static/ShippingPolicy.tsx'));
 const ProductLayout = lazy(() => import('./components/layout/ProductLayout.tsx'));
 const DetailProduct = lazy(() => import('./components/products/DetailProduct.tsx'));
 const OrderDetail = lazy(() => import('./components/profile/OrderDetail.tsx'));
@@ -75,6 +79,13 @@ const App = () => {
           <Route path="profile" element={<RequireAuth><Profile /></RequireAuth>} />
           <Route path='about-us' element={<AboutUs />} />
           <Route path='contact-us' element={<ContactUs />} />
+          <Route path='privacy-policy' element={<PrivacyPolicy />} />
+          <Route path='terms-and-conditions' element={<TermsAndConditions />} />
+          <Route path='terms-condition' element={<TermsAndConditions />} />
+          <Route path='terms' element={<TermsAndConditions />} />
+          <Route path='return-and-refund-policy' element={<ReturnRefundPolicy />} />
+          <Route path='return-refund-policy' element={<ReturnRefundPolicy />} />
+          <Route path='shipping-policy' element={<ShippingPolicy />} />
           <Route path="products" element={<ProductLayout />} />
           <Route path="products/:id" element={<ProductLayout />} />
           <Route path="products/:id/details" element={<DetailProduct />} />

@@ -13,7 +13,7 @@ const Footer = () => {
                         Crafting bespoke wedding stationery, personalized badges, luxury invitations, and curated gifts. Translating your love stories into timeless celebration keepsakes.
                     </p>
                 </div>
-                <div className="flex flex-col lg:flex-row flex-1 md:justify-end items-start gap-20">
+                <div className="flex flex-col sm:flex-row flex-wrap lg:flex-nowrap flex-1 md:justify-end items-start gap-12 lg:gap-16 xl:gap-20">
                     <div>
                         <h2 className="mb-5 font-semibold text-gray-800">Company</h2>
                         <ul className="space-y-2 text-sm">
@@ -24,9 +24,18 @@ const Footer = () => {
                         </ul>
                     </div>
                     <div>
+                        <h2 className="mb-5 font-semibold text-gray-800 uppercase tracking-wide">More Info</h2>
+                        <ul className="space-y-2 text-sm">
+                            <li><Link to="/privacy-policy" className='hover:underline'>Privacy Policy</Link></li>
+                            <li><Link to="/terms-and-conditions" className='hover:underline'>Terms &amp; Condition</Link></li>
+                            <li><Link to="/return-and-refund-policy" className='hover:underline'>Return &amp; Refund Policy</Link></li>
+                            <li><Link to="/shipping-policy" className='hover:underline'>Shipping Policy</Link></li>
+                        </ul>
+                    </div>
+                    <div>
                         <h2 className="mb-5 font-semibold text-gray-800">Subscribe to our newsletter</h2>
                         <div className="space-y-2 text-sm">
-                            <p className='w-2/3'>The latest Products, Upcoming Products, and resources, sent to your inbox weekly.</p>
+                            <p className='max-w-xs'>The latest Products, Upcoming Products, and resources, sent to your inbox weekly.</p>
                             <div className="flex flex-col lg:flex-row lg:items-center gap-2 pt-4">
                                 <input className="px-2 border border-gray-500/30 rounded outline-none ring-stone-600 focus:ring-2 w-full max-w-64 h-9 placeholder-gray-500" type="email" placeholder="Enter your email" />
                                 <button className="bg-[#E41F66] w-fit hover:bg-[#c60b4d] px-5 rounded-sm h-9 text-normal text-stone-50 transition-all duration-300 cursor-pointer easeInOut">Subscribe</button>

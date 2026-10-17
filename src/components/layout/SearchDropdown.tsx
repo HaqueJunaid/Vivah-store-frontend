@@ -44,7 +44,7 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({ query, debounced
 
     return (
         <div 
-            className="absolute top-full left-0 right-0 z-50 bg-white shadow-xl shadow-stone-900/10 rounded-2xl border border-stone-200/90 mt-2 max-h-[70vh] md:max-h-[420px] overflow-y-auto no-scrollbar [&::-webkit-scrollbar]:hidden"
+            className="absolute top-full left-0 right-0 z-50 bg-white shadow-xl shadow-stone-900/10 rounded-2xl border border-stone-200/90 mt-2 max-h-[70vh] md:max-h-105 overflow-y-auto no-scrollbar [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
             {loading ? (

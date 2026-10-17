@@ -18,7 +18,7 @@ declare global {
           renderButton: (element: HTMLElement, options: {
             theme: 'outline';
             size: 'large';
-            width: string;
+            width?: string | number;
           }) => void;
         };
       };

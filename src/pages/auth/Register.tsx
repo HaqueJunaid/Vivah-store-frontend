@@ -73,10 +73,13 @@ const Register = () => {
             });
 
             if (googleButtonRef.current) {
+                const buttonWidth = googleButtonRef.current.clientWidth
+                    ? Math.min(Math.max(googleButtonRef.current.clientWidth, 200), 400)
+                    : 380;
                 google.accounts.id.renderButton(googleButtonRef.current, {
                     theme: 'outline',
                     size: 'large',
-                    width: '100%',
+                    width: String(buttonWidth),
                 });
             }
 
