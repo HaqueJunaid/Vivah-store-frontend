@@ -8,8 +8,6 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
-  LayoutGrid,
-  List,
   Eye,
   ExternalLink,
   Copy,
@@ -34,158 +32,7 @@ const getProductPhotosCount = (product: Product) =>
 const getProductStockStatus = (product: Product) =>
   product.inStock !== false && (product.inStock !== undefined || (product.quantity ?? 0) > 0);
 
-// --- Lightweight, High-Performance Grid Card ---
-const ProductGridCard: React.FC<{
-  product: Product;
-  onEdit: (product: Product) => void;
-  onDelete: (id: string, title: string) => void;
-  onPreview: (id: string) => void;
-  onCopyId: (id: string, e: React.MouseEvent) => void;
-  copiedId: string | null;
-}> = React.memo(({ product, onEdit, onDelete, onPreview, onCopyId, copiedId }) => {
-  const id = getProductId(product);
-  const image = getProductImage(product);
-  const displayDescription = product.productInfo?.description || product.description || "";
-  const isProductInStock = getProductStockStatus(product);
-  const photosCount = getProductPhotosCount(product);
-  const isCopied = copiedId === id;
-
-  return (
-    <div className="flex flex-col bg-white rounded-2xl border border-stone-200 hover:border-stone-400/80 shadow-xs overflow-hidden transition-colors duration-150">
-      {/* Product Image Section */}
-      <div className="relative aspect-4/3 w-full bg-stone-100 overflow-hidden">
-        <img
-          src={image}
-          alt={product.title}
-          className="w-full h-full object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-
-        {/* Top Badges */}
-        <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1.5">
-          {product.category ? (
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-white text-stone-800 shadow-xs border border-stone-200">
-              {product.category}
-            </span>
-          ) : (
-            <span />
-          )}
-
-          <span
-            className={`text-[10px] font-semibold px-2 py-0.5 rounded-md shadow-xs flex items-center gap-1.5 ${
-              isProductInStock
-                ? "bg-emerald-600 text-white"
-                : "bg-rose-600 text-white"
-            }`}
-          >
-            <span className="size-1.5 rounded-full bg-white shrink-0" />
-            {isProductInStock ? "In Stock" : "Out of Stock"}
-          </span>
-        </div>
-
-        {/* Bottom Badges */}
-        <div className="absolute bottom-2 left-2 flex items-center gap-1">
-          {photosCount > 1 && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-stone-900/90 text-white">
-              {photosCount} photos
-            </span>
-          )}
-          {product.hasVariants && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-stone-900/90 text-white">
-              Variants
-            </span>
-          )}
-          {product.isCustomizable && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[#E41F66] text-white">
-              Custom
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Card Body */}
-      <div className="p-3.5 flex flex-col flex-1 justify-between gap-3">
-        <div>
-          <h3 className="font-bold text-stone-900 text-sm truncate mb-1">
-            {product.title}
-          </h3>
-
-          <p className="text-stone-500 text-xs line-clamp-2 leading-relaxed">
-            {displayDescription || "No product description available."}
-          </p>
-        </div>
-
-        <div>
-          {/* ID & Stock Info */}
-          <div className="flex items-center justify-between text-[11px] text-stone-400 mb-2.5">
-            <button
-              onClick={(e) => onCopyId(id, e)}
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-600 font-mono text-[10px] cursor-pointer"
-              title="Copy Product ID"
-            >
-              {isCopied ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
-              <span>ID: {id ? `${id.slice(0, 6)}...${id.slice(-4)}` : "—"}</span>
-              {isCopied && <span className="text-emerald-600 font-sans font-bold">Copied</span>}
-            </button>
-            {product.quantity !== undefined && (
-              <span className="text-stone-500 font-medium">Qty: {product.quantity}</span>
-            )}
-          </div>
-
-          {/* Price & Actions Row */}
-          <div className="pt-2.5 border-t border-stone-100 flex items-center justify-between gap-1.5">
-            <div>
-              <span className="text-base font-bold text-stone-900">
-                ₹{product.price?.toLocaleString("en-IN") || "0"}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => onPreview(id)}
-                title="Quick Preview"
-                className="flex items-center justify-center size-7 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 cursor-pointer"
-              >
-                <Eye size={13} />
-              </button>
-
-              <a
-                href={`/products/${id}/details`}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="View in Store"
-                className="flex items-center justify-center size-7 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 cursor-pointer"
-              >
-                <ExternalLink size={13} />
-              </a>
-
-              <button
-                onClick={() => onEdit(product)}
-                title="Edit Product"
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold cursor-pointer"
-              >
-                <Edit3 size={12} />
-                Edit
-              </button>
-
-              <button
-                onClick={() => onDelete(id, product.title)}
-                title="Delete Product"
-                className="flex items-center justify-center size-7 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-              >
-                <Trash2 size={13} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-});
-ProductGridCard.displayName = "ProductGridCard";
-
-// --- Lightweight List Item Component ---
+// --- Lightweight, Fully-Responsive List Item Component ---
 const ProductListItem: React.FC<ProductListItemProps> = React.memo(
   ({ product, onEdit, onDelete, onPreview, onCopyId, copiedId }) => {
     const id = getProductId(product);
@@ -196,97 +43,102 @@ const ProductListItem: React.FC<ProductListItemProps> = React.memo(
     const isCopied = copiedId === id;
 
     return (
-      <li className="rounded-xl border border-stone-200 bg-white p-3.5 shadow-2xs hover:border-stone-400/80 flex flex-col md:flex-row items-start md:items-center gap-3.5 transition-colors duration-150">
-        {/* Thumbnail */}
-        <div className="relative size-20 shrink-0 rounded-xl overflow-hidden bg-stone-100 border border-stone-200">
-          <img
-            className="w-full h-full object-cover"
-            src={image}
-            alt={product.title}
-            loading="lazy"
-            decoding="async"
-          />
-          {photosCount > 1 && (
-            <span className="absolute bottom-1 right-1 text-[9px] font-bold bg-stone-900/90 text-white px-1 py-0.5 rounded">
-              {photosCount} 📷
-            </span>
-          )}
-        </div>
-
-        {/* Middle Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <h3 className="text-sm font-bold text-stone-900 truncate">
-              {product.title}
-            </h3>
-
-            {product.category && (
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200">
-                {product.category}
-              </span>
-            )}
-
-            <span
-              className={`text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1.5 ${
-                isProductInStock
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                  : "bg-rose-50 text-rose-700 border border-rose-200"
-              }`}
-            >
-              <span className={`size-1.5 rounded-full shrink-0 ${isProductInStock ? "bg-emerald-500" : "bg-rose-500"}`} />
-              {isProductInStock ? "In Stock" : "Out of Stock"}
-            </span>
-
-            {product.isCustomizable && (
-              <span className="text-[10px] font-medium bg-rose-50 text-[#E41F66] px-1.5 py-0.5 rounded border border-rose-100">
-                Customizable
-              </span>
-            )}
-            {product.hasVariants && (
-              <span className="text-[10px] font-medium bg-stone-100 text-stone-600 px-1.5 py-0.5 rounded">
-                Variants
+      <li className="rounded-2xl border border-stone-200 bg-white p-3.5 sm:p-4 shadow-2xs hover:border-stone-400/80 transition-colors duration-150 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+        {/* Left: Thumbnail & Details */}
+        <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+          {/* Thumbnail */}
+          <div className="relative size-16 sm:size-20 shrink-0 rounded-xl overflow-hidden bg-stone-100 border border-stone-200">
+            <img
+              className="w-full h-full object-cover"
+              src={image}
+              alt={product.title}
+              loading="lazy"
+              decoding="async"
+            />
+            {photosCount > 1 && (
+              <span className="absolute bottom-1 right-1 text-[9px] font-bold bg-stone-900/90 text-white px-1 py-0.5 rounded backdrop-blur-xs">
+                {photosCount} 📷
               </span>
             )}
           </div>
 
-          <p className="text-stone-500 text-xs line-clamp-2 leading-relaxed mb-2">
-            {displayDescription || "No detailed product description available."}
-          </p>
+          {/* Details */}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
+              <h3 className="text-sm sm:text-base font-bold text-stone-900 truncate" title={product.title}>
+                {product.title}
+              </h3>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs text-stone-400">
-            <button
-              onClick={(e) => onCopyId && onCopyId(id, e)}
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-600 font-mono text-[10px] cursor-pointer"
-              title="Copy Product ID"
-            >
-              {isCopied ? <Check size={10} className="text-emerald-600" /> : <Copy size={10} />}
-              <span>ID: {id ? `${id.slice(0, 8)}...${id.slice(-4)}` : "—"}</span>
-              {isCopied && <span className="text-emerald-600 font-sans font-bold">Copied</span>}
-            </button>
+              {product.category && (
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-stone-100 text-stone-600 border border-stone-200 shrink-0">
+                  {product.category}
+                </span>
+              )}
 
-            {product.quantity !== undefined && (
-              <span className="text-stone-500 text-[11px]">
-                Stock: <strong className="text-stone-700">{product.quantity}</strong>
+              <span
+                className={`text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1.5 shrink-0 ${
+                  isProductInStock
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    : "bg-rose-50 text-rose-700 border border-rose-200"
+                }`}
+              >
+                <span className={`size-1.5 rounded-full shrink-0 ${isProductInStock ? "bg-emerald-500" : "bg-rose-500"}`} />
+                {isProductInStock ? "In Stock" : "Out of Stock"}
               </span>
-            )}
+
+              {product.isCustomizable && (
+                <span className="text-[10px] font-medium bg-rose-50 text-[#E41F66] px-1.5 py-0.5 rounded border border-rose-100 shrink-0">
+                  Customizable
+                </span>
+              )}
+              {product.hasVariants && (
+                <span className="text-[10px] font-medium bg-stone-100 text-stone-600 px-1.5 py-0.5 rounded shrink-0">
+                  Variants
+                </span>
+              )}
+            </div>
+
+            <p className="text-stone-500 text-xs line-clamp-1 sm:line-clamp-2 leading-relaxed mb-2">
+              {displayDescription || "No detailed product description available."}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2.5 text-xs text-stone-400">
+              <button
+                onClick={(e) => onCopyId && onCopyId(id, e)}
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-600 font-mono text-[10px] cursor-pointer"
+                title="Copy Product ID"
+              >
+                {isCopied ? <Check size={10} className="text-emerald-600 shrink-0" /> : <Copy size={10} className="shrink-0" />}
+                <span>ID: {id ? `${id.slice(0, 6)}...${id.slice(-4)}` : "—"}</span>
+                {isCopied && <span className="text-emerald-600 font-sans font-bold shrink-0">Copied</span>}
+              </button>
+
+              {product.quantity !== undefined && (
+                <span className="text-stone-500 text-[11px]">
+                  Stock: <strong className="text-stone-700 font-medium">{product.quantity}</strong>
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Right Price & Actions */}
-        <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-2.5 pt-2 md:pt-0 border-t md:border-t-0 border-stone-100">
+        {/* Right: Price & Actions */}
+        <div className="flex items-center justify-between md:flex-col md:items-end md:justify-center gap-2 pt-2.5 md:pt-0 border-t md:border-t-0 border-stone-100 shrink-0">
           <div className="text-left md:text-right">
-            <span className="text-[10px] uppercase tracking-wider text-stone-400 font-bold block">Price</span>
-            <span className="text-lg font-bold text-stone-900">
+            <span className="text-[10px] uppercase tracking-wider text-stone-400 font-bold block md:inline lg:block">
+              Price
+            </span>
+            <span className="text-base sm:text-lg font-extrabold text-stone-900 tracking-tight">
               ₹{product.price?.toLocaleString("en-IN") || "0"}
             </span>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             {onPreview && (
               <button
                 onClick={() => onPreview(id)}
                 title="Quick Preview"
-                className="flex items-center justify-center size-7 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 cursor-pointer"
+                className="flex items-center justify-center size-7.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 cursor-pointer transition-colors"
               >
                 <Eye size={13} />
               </button>
@@ -297,14 +149,15 @@ const ProductListItem: React.FC<ProductListItemProps> = React.memo(
               target="_blank"
               rel="noopener noreferrer"
               title="View in Store"
-              className="flex items-center justify-center size-7 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 cursor-pointer"
+              className="flex items-center justify-center size-7.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 cursor-pointer transition-colors"
             >
               <ExternalLink size={13} />
             </a>
 
             <button
               onClick={() => onEdit(product)}
-              className="flex items-center gap-1 bg-stone-900 hover:bg-stone-800 text-white px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer"
+              title="Edit Product"
+              className="flex items-center gap-1 bg-stone-900 hover:bg-[#E41F66] text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
             >
               <Edit3 size={12} />
               Edit
@@ -313,7 +166,7 @@ const ProductListItem: React.FC<ProductListItemProps> = React.memo(
             <button
               onClick={() => onDelete(id, product.title)}
               title="Delete Product"
-              className="flex items-center justify-center size-7 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+              className="flex items-center justify-center size-7.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer transition-colors"
             >
               <Trash2 size={13} />
             </button>
@@ -336,11 +189,6 @@ const Products = () => {
   const [stockStatus, setStockStatus] = useState("All");
   const [sortBy, setSortBy] = useState("Default");
 
-  // View mode: Grid vs List (persisted in localStorage)
-  const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
-    return (localStorage.getItem("admin_products_view_mode") as "grid" | "list") || "grid";
-  });
-
   // Quick preview modal state
   const [previewProductId, setPreviewProductId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -352,11 +200,6 @@ const Products = () => {
   useEffect(() => {
     document.title = "Admin | All Products";
   }, []);
-
-  const handleViewModeChange = (mode: "grid" | "list") => {
-    setViewMode(mode);
-    localStorage.setItem("admin_products_view_mode", mode);
-  };
 
   // Debounce search query
   useEffect(() => {
@@ -586,32 +429,6 @@ const Products = () => {
               <option value="Price: High to Low">Price: High to Low</option>
               <option value="Name: A-Z">Name: A to Z</option>
             </select>
-
-            {/* View Switcher */}
-            <div className="flex items-center rounded-lg bg-stone-100 p-0.5 border border-stone-200">
-              <button
-                onClick={() => handleViewModeChange("grid")}
-                title="Grid View"
-                className={`flex items-center justify-center size-7 rounded cursor-pointer ${
-                  viewMode === "grid"
-                    ? "bg-white text-stone-900 shadow-2xs font-bold"
-                    : "text-stone-500 hover:text-stone-800"
-                }`}
-              >
-                <LayoutGrid size={15} />
-              </button>
-              <button
-                onClick={() => handleViewModeChange("list")}
-                title="List View"
-                className={`flex items-center justify-center size-7 rounded cursor-pointer ${
-                  viewMode === "list"
-                    ? "bg-white text-stone-900 shadow-2xs font-bold"
-                    : "text-stone-500 hover:text-stone-800"
-                }`}
-              >
-                <List size={15} />
-              </button>
-            </div>
           </div>
         </div>
 
@@ -662,38 +479,26 @@ const Products = () => {
         )}
       </div>
 
-      {/* Product Content List / Grid */}
+      {/* Product Content List */}
       {loading ? (
-        viewMode === "grid" ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl border border-stone-200 p-3 flex flex-col space-y-2.5"
-              >
-                <div className="w-full aspect-4/3 bg-stone-100 rounded-xl" />
-                <div className="w-1/3 h-3 bg-stone-100 rounded" />
-                <div className="w-3/4 h-4 bg-stone-100 rounded" />
-                <div className="w-full h-3 bg-stone-100 rounded" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="p-3.5 border border-stone-200 bg-white rounded-xl flex gap-3.5 items-center"
-              >
-                <div className="size-20 bg-stone-100 rounded-xl shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="w-1/4 h-4 bg-stone-100 rounded" />
-                  <div className="w-1/2 h-3 bg-stone-100 rounded" />
+        <div className="space-y-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-3.5 sm:p-4 border border-stone-200 bg-white rounded-2xl flex flex-col md:flex-row gap-3.5 items-start md:items-center animate-pulse"
+            >
+              <div className="flex items-start gap-3 flex-1 w-full">
+                <div className="size-16 sm:size-20 bg-stone-100 rounded-xl shrink-0" />
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="w-1/3 h-4 bg-stone-100 rounded" />
+                  <div className="w-2/3 h-3 bg-stone-100 rounded" />
+                  <div className="w-1/4 h-3 bg-stone-100 rounded" />
                 </div>
               </div>
-            ))}
-          </div>
-        )
+              <div className="w-full md:w-32 h-8 bg-stone-100 rounded-lg shrink-0 mt-2 md:mt-0" />
+            </div>
+          ))}
+        </div>
       ) : products.length === 0 ? (
         <div className="text-center py-16 bg-white border border-stone-200 rounded-2xl p-6 max-w-md mx-auto">
           <PackageSearch size={28} className="mx-auto text-stone-400 mb-2" />
@@ -719,35 +524,19 @@ const Products = () => {
         </div>
       ) : (
         <>
-          {viewMode === "grid" ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {products.map((product) => (
-                <ProductGridCard
-                  key={getProductId(product)}
-                  product={product}
-                  onEdit={handleEditClick}
-                  onDelete={handleDeleteClick}
-                  onPreview={(id) => setPreviewProductId(id)}
-                  onCopyId={handleCopyId}
-                  copiedId={copiedId}
-                />
-              ))}
-            </div>
-          ) : (
-            <ul className="space-y-3">
-              {products.map((product) => (
-                <ProductListItem
-                  key={getProductId(product)}
-                  product={product}
-                  onEdit={handleEditClick}
-                  onDelete={handleDeleteClick}
-                  onPreview={(id) => setPreviewProductId(id)}
-                  onCopyId={handleCopyId}
-                  copiedId={copiedId}
-                />
-              ))}
-            </ul>
-          )}
+          <ul className="space-y-3">
+            {products.map((product) => (
+              <ProductListItem
+                key={getProductId(product)}
+                product={product}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+                onPreview={(id) => setPreviewProductId(id)}
+                onCopyId={handleCopyId}
+                copiedId={copiedId}
+              />
+            ))}
+          </ul>
 
           {/* Pagination Controls */}
           {totalPages > 1 && (

@@ -6,7 +6,7 @@ export const navigationDropdown: DropdownItem[] = [
     title: "Boards & Signage",
     url: "boards-signage",
     baseItems: [
-      { title: "Guest pick up card", url: "guest-pickup-card" },
+      { title: "Guest pick up card", url: "guest-pick-up-card" },
       { title: "Playful Sign", url: "playful-sign" },
       { title: "Wedding Contact Board", url: "wedding-contact-board" },
       { title: "Wedding Welcome Board", url: "wedding-welcome-board" },
