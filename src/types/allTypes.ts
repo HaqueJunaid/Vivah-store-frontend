@@ -351,6 +351,9 @@ export interface ProductListItemProps {
   product: Product & { id?: string; imageUrl?: string };
   onEdit: (product: Product & { id?: string; imageUrl?: string }) => void;
   onDelete: (id: string, title: string) => void;
+  onPreview?: (productId: string) => void;
+  onCopyId?: (id: string, e: React.MouseEvent) => void;
+  copiedId?: string | null;
 }
 
 // Admin Page Order Types
