@@ -37,7 +37,7 @@ const OrderTable = ({ orders }: { orders: OrderRecord[] }) => {
                             </td>
                             <td className="px-3.5 py-2 text-start cursor-default">{order.items?.reduce((total, item) => total + item.quantity, 0) || 0}</td>
                             <td className="px-3.5 py-2 text-start cursor-default font-semibold">₹{order.totalAmount?.toLocaleString()}</td>
-                            <td className="px-3.5 py-2 text-start cursor-default uppercase text-xs">{order.paymentMethod === 'cod' ? 'Cash On Delivery' : 'Mock Payment'}</td>
+                            <td className="px-3.5 py-2 text-start cursor-default uppercase text-xs">{order.paymentMethod === 'cod' ? 'Cash On Delivery' : order.paymentMethod === 'cashfree' ? 'Cashfree Payments' : 'Online Payment'}</td>
                             <td className="px-3.5 py-2 text-start cursor-default">
                                 <Badge
                                     text={order.status}

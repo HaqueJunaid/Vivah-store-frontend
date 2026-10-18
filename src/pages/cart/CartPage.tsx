@@ -6,7 +6,7 @@ import { AddressSkeleton } from '../../components/common/Skeletons';
 import { useCartStore } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
 import { getAddresses } from '../../services/addressService';
-import { createCashfreePaymentOrder, verifyPayment } from '../../services/paymentService';
+import { createCashfreePaymentOrder, verifyPayment, cancelPaymentOrder } from '../../services/paymentService';
 import { load } from '@cashfreepayments/cashfree-js';
 import toast from 'react-hot-toast';
 import type { AddressItem } from '../../types/allTypes';
@@ -111,6 +111,7 @@ const CartPage = () => {
         }
 
         setCheckingOut(true);
+        let createdOrderId: string | null = null;
         try {
             // Background sync without blocking user interaction
             syncWithBackend().catch(() => {});
@@ -126,12 +127,16 @@ const CartPage = () => {
             }
 
             const createdOrder = res.data.order;
+            createdOrderId = createdOrder._id;
             const paymentSessionId = res.data.paymentSessionId;
             const cfEnv = res.data.mode === 'production' ? 'production' : 'sandbox';
 
             if (!paymentSessionId) {
                 toast.dismiss(toastId);
                 toast.error("Unable to start payment session. Please try again.");
+                if (createdOrderId) {
+                    await cancelPaymentOrder(createdOrderId).catch(() => {});
+                }
                 return;
             }
 
@@ -145,7 +150,17 @@ const CartPage = () => {
                 redirectTarget: "_modal" as const,
             };
 
-            await cashfree.checkout(checkoutOptions);
+            const checkoutResult: any = await cashfree.checkout(checkoutOptions);
+
+            // Check if user dismissed or cancelled the modal directly
+            if (checkoutResult?.error) {
+                console.log("Cashfree checkout cancelled/error:", checkoutResult.error);
+                if (createdOrderId) {
+                    await cancelPaymentOrder(createdOrderId).catch(() => {});
+                }
+                toast.error("Payment cancelled");
+                return;
+            }
 
             // When modal completes/returns, verify payment with backend
             let paymentCompleted = false;
@@ -153,18 +168,36 @@ const CartPage = () => {
                 const verifyRes = await verifyPayment(createdOrder._id);
                 if (verifyRes.data.success && verifyRes.data.paymentStatus === 'Completed') {
                     paymentCompleted = true;
-                    toast.success("Payment completed successfully!");
                 }
             } catch (vErr) {
                 console.warn("Client verification check:", vErr);
             }
 
-            if (paymentCompleted) clearCart();
-            navigate(`/orders/${createdOrder._id}`);
+            if (paymentCompleted) {
+                clearCart();
+                toast.success("Payment completed successfully!");
+                navigate(`/orders/${createdOrder._id}`);
+            } else {
+                // Payment was cancelled or not completed by user
+                if (createdOrderId) {
+                    await cancelPaymentOrder(createdOrderId).catch(() => {});
+                }
+                toast.error("Payment cancelled");
+                // Cart stays intact, user remains on Cart page
+            }
 
         } catch (err: unknown) {
             console.error("Checkout error:", err);
-            toast.error(getErrorMessage(err, "Failed to place order."));
+            if (createdOrderId) {
+                try {
+                    await cancelPaymentOrder(createdOrderId);
+                } catch (cErr) {
+                    console.warn("Failed to cancel unpaid staging order:", cErr);
+                }
+                toast.error("Payment cancelled");
+            } else {
+                toast.error(getErrorMessage(err, "Failed to place order."));
+            }
         } finally {
             setCheckingOut(false);
         }

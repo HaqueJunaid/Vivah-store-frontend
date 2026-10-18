@@ -26,6 +26,11 @@ export const verifyPayment = (orderId: string) => {
   return api.post<VerifyPaymentResponse>('/payment/verify', { orderId });
 };
 
+export const cancelPaymentOrder = (orderId: string) => {
+  return api.post<{ success: boolean; message: string }>('/payment/cancel', { orderId });
+};
+
 export const getCashfreeConfig = () => {
   return api.get<{ success: boolean; env: string; isConfigured: boolean }>('/payment/config');
 };
+
